@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+// Auto-configure the API URL for Railway deployment if not set
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  process.env.NEXT_PUBLIC_API_URL = 'https://backend-production-c6fe.up.railway.app';
+}
 // @ts-ignore
 import withPWA from 'next-pwa';
 

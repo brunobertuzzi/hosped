@@ -38,9 +38,11 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   app.useGlobalFilters(new GlobalExceptionFilter(prismaService));
 
-  // Ativar CORS com restrição de origem
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://frontend-production-2b45.up.railway.app'
+    ],
     credentials: true,
   });
 
