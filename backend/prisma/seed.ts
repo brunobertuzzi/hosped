@@ -106,7 +106,13 @@ async function main() {
   });
 
   if (existingAdmin) {
-    console.log(`Super admin já existe (${superAdminEmail}). Nenhuma ação necessária.`);
+    console.log(`Super admin já existe (${superAdminEmail}). Forçando atualização da senha para garantir acesso...`);
+    const newPasswordHash = await bcrypt.hash(superAdminPassword, 10);
+    await prisma.user.update({
+      where: { email: superAdminEmail },
+      data: { password: newPasswordHash },
+    });
+    console.log('Senha do Super Admin redefinida com sucesso.');
     return;
   }
 
