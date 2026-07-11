@@ -37,7 +37,7 @@ import { IcalModule } from './ical/ical.module';
         ? {
             host: new URL(process.env.REDIS_URL).hostname || 'localhost',
             port: Number(new URL(process.env.REDIS_URL).port) || 6379,
-            password: new URL(process.env.REDIS_URL).password || undefined,
+            password: new URL(process.env.REDIS_URL).password ? decodeURIComponent(new URL(process.env.REDIS_URL).password) : undefined,
             username: new URL(process.env.REDIS_URL).username || undefined,
           }
         : {
