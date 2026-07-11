@@ -44,4 +44,13 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
 
-CMD ["sh", "-c", "echo \"[Entrypoint] Aplicando migrações...\" && npx prisma migrate deploy && echo \"[Entrypoint] Executando seed...\" && (node dist_seed/seed.js || echo \"[Entrypoint] Seed finalizado (com avisos ou ignorado)\") && echo \"[Entrypoint] Iniciando servidor...\" && node dist/src/main.js"]
+CMD ["sh", "-c", "\
+  echo \"[Entrypoint] Resolvendo migration com falha anterior...\" && \
+  npx prisma migrate resolve --applied 20260711132500_add_system_plan 2>/dev/null && \
+  echo \"[Entrypoint] Migration marcada como applied\" || true ; \
+  echo \"[Entrypoint] Verificando migrações pendentes...\" && \
+  npx prisma migrate deploy ; \
+  echo \"[Entrypoint] Executando seed...\" && \
+  (node dist_seed/seed.js || echo \"[Entrypoint] Seed finalizado (com avisos)\") && \
+  echo \"[Entrypoint] Iniciando servidor...\" && \
+  node dist/src/main.js"]
