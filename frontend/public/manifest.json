@@ -1,0 +1,9 @@
+{
+  "name": "Hosped Sistema",
+  "short_name": "Hosped",
+  "description": "Sistema de Gestão Hoteleira Multi-Filiais",
+  "start_url": "/admin/dashboard",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

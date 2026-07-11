@@ -1,0 +1,11 @@
+import { Module } from '@nestjs/common';
+import { IcalController } from './ical.controller';
+import { IcalService } from './ical.service';
+import { PrismaService } from '../core/prisma.service';
+
+@Module({
+  controllers: [IcalController],
+  providers: [IcalService, PrismaService],
+  exports: [IcalService],
+})
+export class IcalModule {}

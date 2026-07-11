@@ -1,0 +1,4 @@
+-- AddHotelPublicFields
+ALTER TABLE "Hotel" ADD COLUMN IF NOT EXISTS "slogan" TEXT;
+ALTER TABLE "Hotel" ADD COLUMN IF NOT EXISTS "descricaoPublica" TEXT;
+ALTER TABLE "Hotel" ADD COLUMN IF NOT EXISTS "diferenciais" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];

@@ -1,0 +1,401 @@
+'use client';
+
+import React, { useState } from 'react';
+import { 
+  BedDouble, Tag, Plus, Edit2, LayoutList, 
+  Settings2, Hash, Zap, Image as ImageIcon, Trash2
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
+import { api } from '../../../lib/api';
+import { alerts } from '../../../lib/alerts';
+
+export default function QuartosPage() {
+  const { roomCategories, rooms, addRoomCategory, updateRoomCategoryPhotos, addRoom, addAuditLog, user } = useActiveBranchData();
+  const [activeTab, setActiveTab] = useState<'CATEGORIES' | 'ROOMS'>('CATEGORIES');
+  
+  // Modals
+  const [isCatModalOpen, setIsCatModalOpen] = useState(false);
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [isCatEditModalOpen, setIsCatEditModalOpen] = useState(false);
+
+  // Form Categoria Create
+  const [catName, setCatName] = useState('');
+  const [catPrice, setCatPrice] = useState('');
+  const [catCap, setCatCap] = useState('2');
+
+  // Form Categoria Edit (Fotos)
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
+  const [editingCatFotos, setEditingCatFotos] = useState<string[]>([]);
+  const [newFotoUrl, setNewFotoUrl] = useState('');
+
+  // Form Quarto
+  const [roomNum, setRoomNum] = useState('');
+  const [roomCatId, setRoomCatId] = useState('');
+
+  const handleCreateCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catName || !catPrice) return;
+
+    const newCat = {
+      id: 'cat_' + Date.now(),
+      nome: catName,
+      valorBase: parseFloat(catPrice),
+      capacidade: parseInt(catCap),
+      comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV'],
+      fotos: []
+    };
+
+    addRoomCategory(newCat);
+    addAuditLog({
+      id: 'a_' + Date.now(),
+      usuario: user?.nome || 'Admin',
+      data: new Date().toISOString(),
+      acao: 'CRIAR',
+      entidade: 'ROOM_CATEGORY',
+      detalhes: `Nova categoria criada: ${catName}`
+    });
+
+    setIsCatModalOpen(false);
+    setCatName(''); setCatPrice(''); setCatCap('2');
+  };
+
+  const openEditCat = (cat: any) => {
+    setEditingCatId(cat.id);
+    setEditingCatFotos(cat.fotos || []);
+    setNewFotoUrl('');
+    setIsCatEditModalOpen(true);
+  };
+
+  const handleAddFoto = () => {
+    if (newFotoUrl.trim() !== '') {
+      setEditingCatFotos([...editingCatFotos, newFotoUrl]);
+      setNewFotoUrl('');
+    }
+  };
+
+  const handleRemoveFoto = (idx: number) => {
+    setEditingCatFotos(editingCatFotos.filter((_, i) => i !== idx));
+  };
+
+  const handleSavePhotos = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCatId) {
+      updateRoomCategoryPhotos(editingCatId, editingCatFotos);
+      addAuditLog({
+        id: 'a_' + Date.now(),
+        usuario: user?.nome || 'Admin',
+        data: new Date().toISOString(),
+        acao: 'ATUALIZAR',
+        entidade: 'ROOM_CATEGORY',
+        detalhes: `Fotos da categoria atualizadas.`
+      });
+    }
+    setIsCatEditModalOpen(false);
+  };
+
+  const handleCreateRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roomNum || !roomCatId) return;
+
+    const newRoom = {
+      id: 'r_' + Date.now(),
+      numero: roomNum,
+      categoryId: roomCatId,
+      status: 'DISPONIVEL',
+      observacoes: ''
+    };
+
+    addRoom(newRoom);
+    addAuditLog({
+      id: 'a_' + Date.now(),
+      usuario: user?.nome || 'Admin',
+      data: new Date().toISOString(),
+      acao: 'CRIAR',
+      entidade: 'ROOM',
+      detalhes: `Novo quarto criado: ${roomNum}`
+    });
+
+    setIsRoomModalOpen(false);
+    setRoomNum(''); setRoomCatId('');
+  };
+
+  const handleDeleteRoom = async (id: string) => {
+    const isConfirmed = await alerts.confirm('Excluir Quarto', 'Tem certeza que deseja excluir este quarto? Esta ação não pode ser desfeita.');
+    if (isConfirmed) {
+      try {
+        await api.deleteRoom(id);
+        alerts.success('Quarto excluído!');
+      } catch (err: any) {
+        alerts.error('Erro ao excluir', err.message);
+      }
+    }
+  };
+
+  const handleEditRoom = async (id: string, currentStatus: string) => {
+    const status = await alerts.prompt('Editar Status', currentStatus, 'DISPONIVEL, OCUPADO, LIMPEZA, MANUTENCAO');
+    if (status) {
+      try {
+        await api.updateRoom(id, { status: status.toUpperCase() });
+        alerts.success('Status atualizado!');
+      } catch (err: any) {
+        alerts.error('Erro ao atualizar', err.message);
+      }
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20 max-w-6xl mx-auto">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
+        <div>
+          <h1 className="text-[28px] font-semibold text-white tracking-tight flex items-center gap-3">
+            Gestão de Quartos
+          </h1>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Configure a precificação base, inventário e as fotos da página de vendas.</p>
+        </div>
+        
+        <div className="flex gap-3 bg-white/[0.03] p-1.5 rounded-xl border border-white/10">
+          <button 
+            onClick={() => setActiveTab('CATEGORIES')}
+            className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'CATEGORIES' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/80'}`}
+          >
+            <Tag className="w-3.5 h-3.5" /> Categorias & Fotos
+          </button>
+          <button 
+            onClick={() => setActiveTab('ROOMS')}
+            className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'ROOMS' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/80'}`}
+          >
+            <LayoutList className="w-3.5 h-3.5" /> Mapa de Unidades
+          </button>
+        </div>
+      </div>
+
+      {/* Aba: CATEGORIAS */}
+      {activeTab === 'CATEGORIES' && (
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <button onClick={() => setIsCatModalOpen(true)} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Nova Categoria
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {roomCategories.map(cat => {
+              const countRooms = rooms.filter(r => r.categoryId === cat.id).length;
+              const fotosCount = cat.fotos?.length || 0;
+              return (
+                <div key={cat.id} className="glass-card p-6 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center border border-brand/20">
+                        <BedDouble className="w-5 h-5" />
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-1 bg-white/5 rounded text-white/50">{countRooms} Und</span>
+                        <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border ${fotosCount > 0 ? 'bg-brand/10 text-brand border-brand/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>{fotosCount} Fotos</span>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-white mb-1">{cat.nome}</h3>
+                    <div className="flex items-center gap-2 text-white/40 text-[12px] font-medium mb-6">
+                      <Zap className="w-3.5 h-3.5" /> Capacidade: {cat.capacidade} Pessoas
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {cat.comodidades.slice(0, 3).map((c: string, idx: number) => (
+                        <span key={idx} className="text-[9px] uppercase font-bold tracking-widest px-2 py-1 bg-white/[0.03] border border-white/5 rounded text-white/60">
+                          {c}
+                        </span>
+                      ))}
+                      {cat.comodidades.length > 3 && <span className="text-[9px] uppercase font-bold tracking-widest px-2 py-1 text-white/40">+{cat.comodidades.length - 3}</span>}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                    <div>
+                      <span className="block text-[9px] uppercase tracking-widest text-white/40 mb-1">Diária Base</span>
+                      <span className="text-lg font-bold text-emerald-400 font-mono">R$ {cat.valorBase.toFixed(2)}</span>
+                    </div>
+                    <button onClick={() => openEditCat(cat)} className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
+                      <ImageIcon className="w-3.5 h-3.5" /> Fotos
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Aba: QUARTOS FISICOS */}
+      {activeTab === 'ROOMS' && (
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <button onClick={() => setIsRoomModalOpen(true)} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Adicionar Quarto Físico
+            </button>
+          </div>
+
+          <div className="bg-black border border-white/[0.04] rounded-[24px] overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-[13px]">
+                <thead>
+                  <tr className="border-b border-white/[0.04] text-white/30 uppercase tracking-widest font-bold text-[10px]">
+                    <th className="py-4 px-6">Identificação</th>
+                    <th className="py-4 px-6">Categoria</th>
+                    <th className="py-4 px-6">Status Atual</th>
+                    <th className="py-4 px-6 text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                  {rooms.map(room => {
+                    const cat = roomCategories.find(c => c.id === room.categoryId);
+                    return (
+                      <tr key={room.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <Hash className="w-4 h-4 text-white/20" />
+                            <span className="font-bold text-white text-base font-mono">{room.numero}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="text-white/70 font-medium bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                            {cat?.nome || 'Desconhecida'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded-md ${
+                            room.status === 'DISPONIVEL' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                            room.status === 'OCUPADO' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                            room.status === 'LIMPEZA' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
+                            'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                          }`}>
+                            {room.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right flex items-center justify-end gap-3">
+                          <button onClick={() => handleEditRoom(room.id, room.status)} className="text-[10px] uppercase font-bold tracking-widest text-white/30 hover:text-brand transition-colors">
+                            Editar Status
+                          </button>
+                          <button onClick={() => handleDeleteRoom(room.id)} className="text-white/30 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Nova Categoria */}
+      {isCatModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-6">Nova Categoria</h2>
+            <form onSubmit={handleCreateCategory} className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
+                <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Diária Base (R$)</label>
+                  <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Capacidade (Pessoas)</label>
+                  <input required type="number" min="1" max="10" value={catCap} onChange={e => setCatCap(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                </div>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button type="button" onClick={() => setIsCatModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
+                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Criar Categoria</button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal Gestão de Fotos */}
+      {isCatEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-2xl p-8 rounded-[24px] border border-white/10 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-2">Gerenciar Fotos</h2>
+            <p className="text-[13px] text-white/40 mb-6">Insira os links das imagens que aparecerão no portal de vendas.</p>
+            
+            <form onSubmit={handleSavePhotos} className="space-y-6">
+              <div className="flex gap-3">
+                <input 
+                  type="text" 
+                  value={newFotoUrl} 
+                  onChange={e => setNewFotoUrl(e.target.value)} 
+                  placeholder="Cole a URL da foto aqui (https://...)" 
+                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                />
+                <button type="button" onClick={handleAddFoto} className="px-6 py-3 bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">
+                  Adicionar
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
+                {editingCatFotos.map((url, idx) => (
+                  <div key={idx} className="relative group aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
+                    <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image')} />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button type="button" onClick={() => handleRemoveFoto(idx)} className="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500/40 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {editingCatFotos.length === 0 && (
+                  <div className="col-span-full py-8 text-center border-2 border-dashed border-white/10 rounded-xl text-white/30 text-[12px] font-medium uppercase tracking-widest">
+                    Nenhuma foto cadastrada
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 flex gap-3 border-t border-white/5">
+                <button type="button" onClick={() => setIsCatEditModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
+                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Salvar Alterações</button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal Novo Quarto */}
+      {isRoomModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-6">Cadastrar Quarto Físico</h2>
+            <form onSubmit={handleCreateRoom} className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número / Identificação</label>
+                <input required type="text" value={roomNum} onChange={e => setRoomNum(e.target.value)} placeholder="Ex: 101" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-mono outline-none focus:border-brand" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vincular a Categoria</label>
+                <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer">
+                  <option value="" disabled>Selecione uma Categoria...</option>
+                  {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {c.valorBase.toFixed(2)})</option>)}
+                </select>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button type="button" onClick={() => setIsRoomModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
+                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Cadastrar Quarto</button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+    </motion.div>
+  );
+}

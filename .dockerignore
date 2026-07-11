@@ -1,0 +1,28 @@
+# Ignorar node_modules de todos os pacotes (evita enviar GBs para o build context)
+**/node_modules
+
+# Build outputs
+**/dist
+**/.next
+**/out
+**/dist_seed
+
+# Variáveis de ambiente
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+
+# Arquivos de SO e editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Git
+.git
+.gitignore
