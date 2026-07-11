@@ -67,22 +67,30 @@ async function main() {
   console.log('Iniciando seed idempotente...');
 
   // 1. Seed dos planos do sistema (sempre seguro — usa upsert)
-  for (const plan of SYSTEM_PLANS) {
-    await prisma.systemPlan.upsert({
-      where: { name: plan.name },
-      update: {
-        description: plan.description,
-        price: plan.price,
-        maxBranches: plan.maxBranches,
-        maxRooms: plan.maxRooms,
-        maxUsers: plan.maxUsers,
-        features: plan.features,
-        isActive: plan.isActive,
-      },
-      create: plan,
-    });
+  try {
+    for (const plan of SYSTEM_PLANS) {
+      await prisma.systemPlan.upsert({
+        where: { name: plan.name },
+        update: {
+          description: plan.description,
+          price: plan.price,
+          maxBranches: plan.maxBranches,
+          maxRooms: plan.maxRooms,
+          maxUsers: plan.maxUsers,
+          features: plan.features,
+          isActive: plan.isActive,
+        },
+        create: plan,
+      });
+    }
+    console.log('Planos do sistema sincronizados.');
+  } catch (error: any) {
+    // Pode ocorrer na primeira execução se as migrations ainda não foram
+    // totalmente propagadas (ex: Railway reiniciou antes da migration concluir).
+    // O servidor continua funcionando normalmente sem os planos.
+    console.warn(`Aviso: planos do sistema não foram sincronizados - ${error?.message || error}`);
+    console.warn('O servidor iniciará normalmente. Os planos serão criados no próximo restart.');
   }
-  console.log('Planos do sistema sincronizados.');
 
   // 2. Criar Super Admin apenas se não existir
   const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
@@ -125,8 +133,8 @@ main()
     await pool.end();
   })
   .catch(async (e) => {
-    console.error(e);
+    console.error('Erro no seed (não fatal):', e?.message || e);
+    console.log('Seed finalizado com avisos. O servidor continuará iniciando.');
     await prisma.$disconnect();
     await pool.end();
-    process.exit(1);
   });

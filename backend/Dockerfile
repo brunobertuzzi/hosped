@@ -44,4 +44,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
 
-CMD ["sh", "-c", "npx prisma migrate deploy 2>/dev/null; node dist_seed/seed.js && node dist/src/main.js"]
+CMD ["sh", "-c", "echo \"[Entrypoint] Aplicando migrações...\" && npx prisma migrate deploy && echo \"[Entrypoint] Executando seed...\" && (node dist_seed/seed.js || echo \"[Entrypoint] Seed finalizado (com avisos ou ignorado)\") && echo \"[Entrypoint] Iniciando servidor...\" && node dist/src/main.js"]

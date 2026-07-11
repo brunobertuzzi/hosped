@@ -442,10 +442,13 @@ const connectionString = process.env.DATABASE_URL
 **Migrações:** O Dockerfile executa antes de iniciar:
 
 ```bash
-npx prisma migrate deploy 2>/dev/null   # Aplica migrações pendentes
-node dist_seed/seed.js                   # Popula dados iniciais
-node dist/src/main.js                    # Inicia o servidor
+# ✅ Correto — usa && para garantir ordem e logs visíveis
+npx prisma migrate deploy   # Aplica migrações pendentes
+node dist_seed/seed.js       # Popula dados iniciais (tolerante a falhas)
+node dist/src/main.js        # Inicia o servidor
 ```
+
+> ⚠️ **Importante:** O CMD do Dockerfile deve usar `&&` (não `;`) e **nunca** usar `2>/dev/null` para suprimir erros do Prisma. Caso contrário, migrações falham silenciosamente e o seed quebra em loop.
 
 ### 5.5 Configuração de Logs
 
@@ -853,6 +856,64 @@ const port = process.env.PORT ?? 3001;
 | `DATABASE_URL` incorreta | Verifique a URL fornecida pelo plugin |
 | Migrações não executadas | Verifique se `prisma migrate deploy` roda no CMD do Dockerfile |
 | Pool esgotado | Aumente o plano do banco ou configure pool size |
+
+### 11.8 Seed Falha com "Table does not exist" (Loop de Reinicialização)
+
+**Sintoma:** O log mostra:
+```
+5 migrations found in prisma/migrations
+Applying migration `...` ✅
+Iniciando seed idempotente...
+PrismaClientKnownRequestError: The table "public.SystemPlan" does not exist
+```
+E o Railway reinicia o container em loop (3 tentativas).
+
+**Causa raiz:** O `CMD` do Dockerfile estava usando `;` (ponto e vírgula) e `2>/dev/null`, fazendo com que:
+1. O `prisma migrate deploy` falhasse silenciosamente (erro suprimido)
+2. O `;` fizesse o seed executar mesmo após a falha
+3. O seed quebrasse ao tentar acessar tabelas que não existiam
+4. O `&&` impedisse o servidor de iniciar
+5. O Railway reiniciasse o container → ciclo infinito
+
+**Solução:**
+
+```bash
+# ✅ CMD correto no Dockerfile — use && (não ;) e nunca suprima erros
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist_seed/seed.js && node dist/src/main.js"]
+```
+
+**Medidas de proteção adicionais no seed:**
+- O seed deve ter `try/catch` em cada bloco de operação
+- Erros no seed não devem causar `process.exit(1)`
+- O servidor deve iniciar mesmo se o seed falhar parcialmente
+
+```typescript
+// ✅ Seed resiliente — captura erros e continua
+try {
+  await prisma.systemPlan.upsert({ ... });
+} catch (error) {
+  console.warn('Planos não sincronizados (não fatal):', error.message);
+  // O servidor continua funcionando sem os planos
+}
+
+// ❌ Nunca faça isso no catch do seed:
+// process.exit(1);  ← Isso mata o container no Railway!
+```
+
+### 11.9 Container Reinicia em Loop (Healthcheck Falhando)
+
+**Sintoma:** O Railway mostra "Restarting" repetidamente. O container inicia, falha o healthcheck, e é reiniciado.
+
+**Causas comuns:**
+
+| Problema | Solução |
+|----------|---------|
+| Porta errada | Verifique se `process.env.PORT` é usado no `main.ts` |
+| Seed quebrou o servidor | Verifique se o seed não usa `process.exit(1)` |
+| Migration falhou | Verifique os logs de migration no Dockerfile |
+| Healthcheck muito rápido | Ajuste `healthcheckTimeout` no `railway.json` para 100+ segundos |
+
+**Solução:** O Railway tem `restartPolicyMaxRetries: 3`. Após 3 falhas, ele para de tentar. Faça um novo deploy manual após corrigir o código.
 
 ---
 
