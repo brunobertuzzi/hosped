@@ -46,8 +46,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 CMD ["sh", "-c", "\
   echo \"[Entrypoint] Resolvendo migration com falha anterior...\" && \
-  npx prisma migrate resolve --applied 20260711132500_add_system_plan 2>/dev/null && \
-  echo \"[Entrypoint] Migration marcada como applied\" || true ; \
+  npx prisma migrate resolve --rolled-back 20260711132500_add_system_plan 2>/dev/null && \
+  echo \"[Entrypoint] Migration marcada como rolled back\" || true ; \
   echo \"[Entrypoint] Verificando migrações pendentes...\" && \
   npx prisma migrate deploy ; \
   echo \"[Entrypoint] Executando seed...\" && \
