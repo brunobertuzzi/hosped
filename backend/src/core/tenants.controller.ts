@@ -74,6 +74,50 @@ export class TenantsController {
     });
   }
 
+  @Post('seed-default')
+  async seedDefaultHotel() {
+    const defaultHotelId = '11111111-1111-1111-1111-111111111111';
+    const defaultBranchId = '22222222-2222-2222-2222-222222222222';
+    
+    let existingHotel = await this.prisma.client.hotel.findUnique({ where: { id: defaultHotelId } });
+    if (!existingHotel) {
+      try {
+        existingHotel = await this.prisma.client.hotel.create({
+          data: {
+            id: defaultHotelId,
+            nome: 'Hotel Exemplo (Padrão)',
+            razaoSocial: 'Hotel Exemplo LTDA',
+            documentoFiscal: `00.000.000/${Date.now().toString().slice(-4)}-00`,
+            email: `contato-${Date.now()}@hotelexemplo.com`,
+            telefone: '11999999999',
+            endereco: 'Rua das Flores, 123',
+            branches: {
+              create: {
+                id: defaultBranchId,
+                nome: 'Matriz',
+                endereco: 'Rua das Flores, 123',
+                cidade: 'São Paulo',
+                estado: 'SP',
+                telefone: '11999999999',
+                email: `contato-${Date.now()}@hotelexemplo.com`,
+              }
+            }
+          }
+        });
+      } catch (e: any) {
+        return { success: false, error: e.message };
+      }
+    }
+
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || 'brunobertuzzib@gmail.com';
+    await this.prisma.client.user.updateMany({
+      where: { email: superAdminEmail },
+      data: { hotelId: defaultHotelId, branchId: defaultBranchId }
+    });
+
+    return { success: true, hotel: existingHotel };
+  }
+
   @Post()
   async createTenant(@Body() body: any, @Request() req: any) {
     this.checkSuperAdmin(req);
