@@ -82,30 +82,28 @@ export class TenantsController {
     let existingHotel = await this.prisma.client.hotel.findUnique({ where: { id: defaultHotelId } });
     if (!existingHotel) {
       try {
-        existingHotel = await this.prisma.client.hotel.create({
-          data: {
-            id: defaultHotelId,
-            nome: 'Hotel Exemplo (Padrão)',
-            razaoSocial: 'Hotel Exemplo LTDA',
-            documentoFiscal: `00.000.000/${Date.now().toString().slice(-4)}-00`,
-            email: `contato-${Date.now()}@hotelexemplo.com`,
-            telefone: '11999999999',
-            endereco: 'Rua das Flores, 123',
-            branches: {
-              create: {
-                id: defaultBranchId,
-                nome: 'Matriz',
-                endereco: 'Rua das Flores, 123',
-                cidade: 'São Paulo',
-                estado: 'SP',
-                telefone: '11999999999',
-                email: `contato-${Date.now()}@hotelexemplo.com`,
-              }
-            }
-          }
-        });
+        const doc = `00.000.000/${Date.now().toString().slice(-4)}-00`;
+        const email = `contato-${Date.now()}@hotelexemplo.com`;
+        
+        await this.prisma.client.$executeRaw`
+          INSERT INTO "Hotel" (
+            "id", "nome", "razaoSocial", "documentoFiscal", "email", "telefone", "endereco", "plan", "status", "mrr", "createdAt", "updatedAt"
+          ) VALUES (
+            ${defaultHotelId}, 'Hotel Exemplo (Padrão)', 'Hotel Exemplo LTDA', ${doc}, ${email}, '11999999999', 'Rua das Flores, 123', 'STARTUP', 'ACTIVE', 150.0, NOW(), NOW()
+          )
+        `;
+
+        await this.prisma.client.$executeRaw`
+          INSERT INTO "Branch" (
+            "id", "hotel_id", "nome", "endereco", "cidade", "estado", "telefone", "email", "createdAt", "updatedAt"
+          ) VALUES (
+            ${defaultBranchId}, ${defaultHotelId}, 'Matriz', 'Rua das Flores, 123', 'São Paulo', 'SP', '11999999999', ${email}, NOW(), NOW()
+          )
+        `;
+        
+        existingHotel = await this.prisma.client.hotel.findUnique({ where: { id: defaultHotelId } });
       } catch (e: any) {
-        return { success: false, error: e.message };
+        return { success: false, error: e.message || String(e) };
       }
     }
 
