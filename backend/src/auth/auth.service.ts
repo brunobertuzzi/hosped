@@ -91,6 +91,7 @@ export class AuthService {
           email: email,
           telefone: '00000000000',
           endereco: 'Endereço não informado',
+          diferenciais: [],
         },
       });
 
