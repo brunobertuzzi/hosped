@@ -12,13 +12,16 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from './auth.guard';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -37,8 +40,9 @@ export class AuthController {
     return result;
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
-  async register(@Body() data: any) {
+  async register(@Body() data: RegisterDto) {
     return this.authService.register(data);
   }
 
