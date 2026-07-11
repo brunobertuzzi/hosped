@@ -113,23 +113,60 @@ async function main() {
       data: { password: newPasswordHash },
     });
     console.log('Senha do Super Admin redefinida com sucesso.');
-    return;
+  } else {
+    const passwordHash = await bcrypt.hash(superAdminPassword, 10);
+    await prisma.user.create({
+      data: {
+        nome: 'Super Admin',
+        email: superAdminEmail,
+        password: passwordHash,
+        role: Role.PLATFORM_OWNER,
+        permissions: ['*'],
+        status: 'ATIVO',
+      },
+    });
+    console.log(`Super admin criado: ${superAdminEmail}`);
   }
 
-  const passwordHash = await bcrypt.hash(superAdminPassword, 10);
+  // 3. Criar Hotel de Exemplo e vincular
+  const defaultHotelId = '11111111-1111-1111-1111-111111111111';
+  const defaultBranchId = '22222222-2222-2222-2222-222222222222';
+  
+  const existingHotel = await prisma.hotel.findUnique({ where: { id: defaultHotelId } });
+  if (!existingHotel) {
+    console.log('Criando Hotel de Exemplo (Tenant Padrão)...');
+    await prisma.hotel.create({
+      data: {
+        id: defaultHotelId,
+        nome: 'Hotel Exemplo',
+        razaoSocial: 'Hotel Exemplo LTDA',
+        documentoFiscal: '00.000.000/0001-00',
+        email: 'contato@hotelexemplo.com',
+        telefone: '11999999999',
+        endereco: 'Rua das Flores, 123',
+        branches: {
+          create: {
+            id: defaultBranchId,
+            nome: 'Matriz',
+            endereco: 'Rua das Flores, 123',
+            cidade: 'São Paulo',
+            estado: 'SP',
+            telefone: '11999999999',
+            email: 'contato@hotelexemplo.com',
+          }
+        }
+      }
+    });
+  }
 
-  await prisma.user.create({
-    data: {
-      nome: 'Super Admin',
-      email: superAdminEmail,
-      password: passwordHash,
-      role: Role.PLATFORM_OWNER,
-      permissions: ['*'],
-      status: 'ATIVO',
-    },
+  // Atualizar Super Admin para pertencer a este hotel para visualização inicial
+  await prisma.user.update({
+    where: { email: superAdminEmail },
+    data: { hotelId: defaultHotelId, branchId: defaultBranchId }
   });
+  console.log('Super Admin vinculado ao Hotel de Exemplo.');
 
-  console.log(`Super admin criado: ${superAdminEmail}`);
+
   console.log('Seed finalizado com sucesso!');
 }
 
