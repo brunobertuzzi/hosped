@@ -34,16 +34,16 @@ import { IcalModule } from './ical/ical.module';
     }),
     BullModule.forRoot({
       connection: process.env.REDIS_URL 
-        ? new URL(process.env.REDIS_URL).hostname ? {
-            host: new URL(process.env.REDIS_URL).hostname,
+        ? {
+            host: new URL(process.env.REDIS_URL).hostname || 'localhost',
             port: Number(new URL(process.env.REDIS_URL).port) || 6379,
-            password: new URL(process.env.REDIS_URL).password,
-            username: new URL(process.env.REDIS_URL).username,
-          } : undefined
+            password: new URL(process.env.REDIS_URL).password || undefined,
+            username: new URL(process.env.REDIS_URL).username || undefined,
+          }
         : {
             host: process.env.REDIS_HOST || process.env.REDISHOST || 'localhost',
             port: Number(process.env.REDIS_PORT || process.env.REDISPORT) || 6379,
-            password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD,
+            password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || undefined,
           },
     }),
     ThrottlerModule.forRoot([
