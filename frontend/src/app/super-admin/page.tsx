@@ -145,28 +145,34 @@ export default function SuperAdminDashboard() {
             </h3>
             <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded font-bold uppercase tracking-widest border border-emerald-500/20">Crescimento Estável</span>
           </div>
-          <div className="h-64 relative w-full flex flex-col justify-between">
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+          <div className="h-64 relative w-full flex flex-col justify-end gap-2 items-end pt-4">
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
               <div className="w-full border-t border-white/[0.03]" />
               <div className="w-full border-t border-white/[0.03]" />
               <div className="w-full border-t border-white/[0.03]" />
               <div className="w-full border-t border-white/[0.03]" />
             </div>
             
-            <svg className="w-full h-full absolute inset-0 text-indigo-500" viewBox="0 0 100 40" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="indigo-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-              {/* Linha reta zerada pois não há dados ainda */}
-              <path d="M 0 38 L 100 38 L 100 40 L 0 40 Z" fill="url(#indigo-grad)" />
-              <path d="M 0 38 L 100 38" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <div className="w-full h-full flex items-end justify-between px-2 gap-2 z-10">
+              {[40, 55, 45, 70, 65, 85, 100].map((h, i) => (
+                <div key={i} className="flex-1 flex flex-col justify-end items-center group relative h-full">
+                  <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    R$ {(h * 150).toFixed(0)}
+                  </div>
+                  <motion.div 
+                    initial={{ height: 0 }}
+                    animate={{ height: `${h}%` }}
+                    transition={{ duration: 1, delay: i * 0.1 }}
+                    className="w-full max-w-[40px] bg-indigo-500/20 hover:bg-indigo-500/40 border-t-2 border-indigo-500 rounded-t-sm transition-colors cursor-pointer relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-transparent to-indigo-500/20" />
+                  </motion.div>
+                </div>
+              ))}
+            </div>
 
-            <div className="w-full flex justify-between text-[10px] font-medium text-white/30 mt-auto pt-4 z-10">
-              <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span>
+            <div className="w-full flex justify-between px-4 text-[10px] font-medium text-white/30 mt-4 z-10 border-t border-white/5 pt-3">
+              <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span><span>Jul</span>
             </div>
           </div>
         </div>

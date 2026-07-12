@@ -78,6 +78,10 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             <Link href="/super-admin/invoices" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/invoices' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
               <DollarSign className="w-4 h-4" /> Faturas e Cobranças
             </Link>
+
+            <Link href="/super-admin/settings" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/settings' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
+              <Settings className="w-4 h-4" /> Configurações Globais
+            </Link>
             
             <div className="pt-6 mt-6 border-t border-white/5 space-y-1">
               <Link href="/super-admin/logs" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/logs' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
