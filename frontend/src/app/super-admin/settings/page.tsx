@@ -162,6 +162,64 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
+        {/* White Label e E-mail */}
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <Settings className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">White Label & Suporte</h2>
+              <p className="text-[11px] text-white/40 font-medium">Configurações visuais e de contato do SaaS</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
+            <div>
+              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Nome da Plataforma</label>
+              <input type="text" defaultValue="Hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">E-mail de Suporte Global</label>
+              <input type="email" defaultValue="ajuda@hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">URL da Central de Ajuda</label>
+              <input type="url" defaultValue="https://help.hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500 text-purple-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Segurança */}
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Segurança Global</h2>
+              <p className="text-[11px] text-white/40 font-medium">Políticas de senha e autenticação</p>
+            </div>
+          </div>
+
+          <div className="space-y-6 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-bold text-white mb-1">Forçar 2FA (MFA)</h4>
+                <p className="text-[11px] text-white/40 max-w-xs">Obriga todos os administradores de hotéis a usarem autenticação em duas etapas.</p>
+              </div>
+              <button className={`w-14 h-7 rounded-full transition-colors relative flex items-center shrink-0 bg-white/10`}>
+                <motion.div className="w-5 h-5 rounded-full bg-white absolute left-[4px]" />
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Timeout de Sessão (minutos)</label>
+              <input type="number" defaultValue={120} className="w-32 bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-blue-500 font-mono" />
+            </div>
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );
