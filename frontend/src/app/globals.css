@@ -103,3 +103,31 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateX(100%);
   }
 }
+
+/* Global Select & Dropdown Standardization */
+select {
+  /* Prevent white background flash on Windows/Chrome */
+  color-scheme: dark;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 1rem center !important;
+  background-size: 16px !important;
+  padding-right: 2.5rem !important;
+  cursor: pointer;
+}
+
+select option {
+  background-color: #0f0f13 !important; /* Deep noir background for dropdowns */
+  color: #ffffff;
+  padding: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+}
+
+select:focus > option:checked {
+  background: var(--brand-primary) !important;
+  color: white !important;
+}
