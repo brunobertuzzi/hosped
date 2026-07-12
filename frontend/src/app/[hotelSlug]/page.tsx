@@ -159,7 +159,7 @@ export default function TenantLandingPage() {
 
           <h1 className="text-5xl md:text-8xl font-bold tracking-tight text-white drop-shadow-2xl">{hotel.nome}</h1>
           <p className="text-lg md:text-xl text-white/80 font-medium max-w-2xl mx-auto drop-shadow-lg leading-relaxed font-sans">
-            {hotel.descricaoPublica || 'Viva estadias memoráveis nas localizações mais cobiçadas, com conforto inigualável e atendimento premium white-label.'}
+            {hotel.descricaoPublica || 'Viva estadias memoráveis nas localizações mais cobiçadas, com conforto inigualável e atendimento exclusivo para você e sua família.'}
           </p>
           
           <div className="pt-4">
@@ -250,7 +250,7 @@ export default function TenantLandingPage() {
                 { i: Coffee, t: 'Café da Manhã Gourmet', d: 'Gastronomia sofisticada, assinada por chefs locais com opções orgânicas e artesanais.' },
                 { i: Waves, t: 'Lazer e Piscinas Climatizadas', d: 'Piscinas com borda infinita, saunas modernas e SPAs de relaxamento corporal.' },
                 { i: Tv, t: 'Suítes High-Tech', d: 'Smart TVs interativas de 55", automação de luz e cortinas por comando de voz.' },
-                { i: Shield, t: 'Segurança Zero-Trust', d: 'Controle de acesso digital, cofres biométricos e criptografia em todas as reservas.' },
+                { i: Shield, t: 'Tranquilidade e Segurança', d: 'Controle de acesso digital aos quartos e cofres eletrônicos para sua total privacidade.' },
                 { i: Award, t: 'Atendimento Concierge', d: 'Equipe de suporte disponível 24h para agendar passeios, traslados e experiências.' }
               ].map((A, idx) => (
                 <div key={idx} className="glass-panel p-8 rounded-[24px] border border-white/5 hover:border-brand/30 transition-colors flex flex-col items-center gap-4 text-center">

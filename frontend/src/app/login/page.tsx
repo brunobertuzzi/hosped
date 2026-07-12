@@ -80,7 +80,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold tracking-tight">
             HOSPED
           </h1>
-          <p className="text-white/40 text-[13px] mt-2 font-medium">Plataforma Hoteleira Multi-Tenant</p>
+          <p className="text-white/40 text-[13px] mt-2 font-medium">Sistema Inteligente de Gestão Hoteleira</p>
         </div>
 
         {/* Login Form Card */}
@@ -141,7 +141,7 @@ export default function LoginPage() {
               {loading ? (
                 <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
               ) : (
-                <>Acessar Workspace <ChevronRight className="w-4 h-4 opacity-50" /></>
+                <>Entrar no Sistema <ChevronRight className="w-4 h-4 opacity-50" /></>
               )}
             </button>
           </form>

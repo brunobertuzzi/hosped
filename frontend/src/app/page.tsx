@@ -11,54 +11,54 @@ const featuresList = [
     icon: Building2, 
     title: 'Multi-Tenant Nativo', 
     desc: 'Gerencie dezenas de filiais no mesmo painel. Controle de acesso por unidade e visão consolidada.',
-    longDesc: 'Com nossa arquitetura de isolamento de dados de nível corporativo (Row-Level Security), você pode operar centenas de CNPJs no mesmo ambiente. Cada gerente enxerga apenas o seu hotel, enquanto o painel do dono consolida faturamento, ocupação e auditorias de todas as filiais em tempo real.'
+    longDesc: 'Se você tem mais de uma pousada ou hotel, acesse todas as unidades usando apenas uma senha. Visualize facilmente quanto cada unidade faturou e controle o que seus gerentes podem ver.'
   },
   { 
     icon: Globe, 
     title: 'Motor de Reservas', 
     desc: 'Venda diretamente no seu site sem pagar comissões para OTAs. Totalmente customizável.',
-    longDesc: 'Transforme seu site em uma máquina de vendas diretas 24 horas por dia. O nosso motor sincroniza o calendário automaticamente com o sistema de recepção. Ofereça cupons de desconto, pacotes especiais e processamento de pagamentos 100% white-label.'
+    longDesc: 'Pare de pagar comissões altas. Tenha um site de reservas próprio onde seu cliente pode ver as fotos do quarto, escolher a data e pagar com Pix ou cartão de crédito a qualquer hora do dia ou da noite.'
   },
   { 
     icon: Calendar, 
     title: 'Mapa Interativo (Gantt)', 
     desc: 'Gerencie as reservas em um mapa visual intuitivo com suporte a arrastar e soltar.',
-    longDesc: 'Uma linha do tempo horizontal que mostra todos os quartos e suas ocupações diárias. Arraste as reservas para trocar hóspedes de quarto, estenda estadias apenas puxando a borda da reserva, e identifique buracos na agenda instantaneamente.'
+    longDesc: 'Esqueça cadernos e tabelas complicadas. Veja todos os seus quartos em uma tela visual super simples. Troque um hóspede de quarto ou aumente os dias da estadia apenas clicando e arrastando o mouse.'
   },
   { 
     icon: Zap, 
-    title: 'Check-in Expresso', 
-    desc: 'Hóspedes fazem o check-in online antes mesmo de chegar ao hotel, evitando filas na recepção.',
+    title: 'Fim das Filas na Recepção', 
+    desc: 'Envie um link para o celular do hóspede. Ele preenche os dados em casa e chega ao hotel apenas para pegar a chave.',
     longDesc: 'Aumente o nível de serviço do seu hotel enviando um link de pré check-in pelo WhatsApp. O hóspede preenche a FNRH, assina digitalmente e tira foto do documento pelo celular. Quando ele chega, basta entregar a chave.'
   },
   { 
     icon: CreditCard, 
-    title: 'Pagamentos Integrados', 
-    desc: 'Cobre via Pix, cartão de crédito e parcele hospedagens de forma automática e segura.',
+    title: 'Recebimentos Descomplicados', 
+    desc: 'Receba via Pix e cartão de crédito direto no sistema. Pagamentos e parcelamentos processados de forma automática e segura.',
     longDesc: 'Integração bancária e de cartão que dá baixa automática no sistema. Sem conciliação manual. Ao pagar pelo Pix, a reserva já muda de status instantaneamente. Parcele as vendas e emita notas fiscais (NFS-e) direto pela plataforma.'
   },
   { 
     icon: Shield, 
-    title: 'Auditoria Completa', 
-    desc: 'Saiba exatamente quem fez o quê. Logs de ações por usuário e permissões granulares.',
+    title: 'Controle de Acesso da Equipe', 
+    desc: 'Saiba exatamente o que cada funcionário fez. Você escolhe as telas que a recepção, a limpeza e o financeiro podem acessar.',
     longDesc: 'Evite fraudes e desorganização. Toda pequena alteração (excluir reserva, aplicar desconto, mudar quarto) gera um log detalhado apontando o e-mail, horário e o dado exato que foi modificado. Durma tranquilo sabendo que a operação está blindada.'
   },
   {
     icon: RefreshCcw,
-    title: 'Channel Manager Integrado',
-    desc: 'Sincronização bidirecional em tempo real com Booking.com, Airbnb, Expedia e dezenas de OTAs.',
+    title: 'Conexão com Sites de Reserva',
+    desc: 'Atualize suas vagas no Booking, Airbnb e Expedia. Se um quarto é alugado em um site, bloqueia nos outros na mesma hora.',
     longDesc: 'Evite overbookings de uma vez por todas. Toda vez que uma reserva entra pelo Booking ou pelo seu site, a disponibilidade é atualizada automaticamente em todos os outros canais em questão de segundos. Gestão de tarifas unificada.'
   },
   {
     icon: Package,
-    title: 'Estoque e PDV',
-    desc: 'Controle o frigobar, restaurante e a lojinha do hotel de forma integrada com a conta do hóspede.',
+    title: 'Consumo e Fechamento de Conta',
+    desc: 'Lance o consumo do frigobar e restaurante direto na conta do quarto. Facilita o pagamento na hora em que o hóspede for embora.',
     longDesc: 'Lance consumos diretamente na fatura do quarto. O sistema atualiza o estoque instantaneamente e avisa quando produtos estão acabando. Emita cupom fiscal de vendas avulsas para não-hóspedes diretamente do nosso PDV (Ponto de Venda).'
   },
   {
     icon: MessageSquare,
-    title: 'CRM e Réguas de Relacionamento',
-    desc: 'Encante seus hóspedes com mensagens automáticas pré-estadia, de boas vindas e pós check-out.',
+    title: 'Comunicação Automática',
+    desc: 'O sistema envia sozinho mensagens de boas-vindas, lembretes de check-in e agradecimentos após a saída do hóspede.',
     longDesc: 'Aumente o retorno de hóspedes e as avaliações no TripAdvisor. Configure e-mails e mensagens de WhatsApp automáticas. Envie dicas da cidade 2 dias antes do check-in e envie um cupom de desconto exclusivo 1 dia após o check-out.'
   }
 ];
@@ -116,12 +116,12 @@ export default function SaasLandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-[1.1]">
-            Gestão Hoteleira no <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Nível Corporativo.</span>
+            Gestão Hoteleira <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Simples e Lucrativa.</span>
           </h1>
           
           <p className="text-lg md:text-xl text-white/40 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-            Abandone as planilhas. Uma única plataforma para gerenciar Multi-Filiais, Recepção, Finanças e ter o seu próprio Motor de Reservas online.
+            Abandone as planilhas e o trabalho manual. Um sistema que faz a sua recepção ser mais rápida, conecta seu hotel com a internet e ajuda você a lucrar mais, tudo em um só lugar.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -212,8 +212,8 @@ export default function SaasLandingPage() {
                 </motion.div>
                 <motion.h3 layoutId={`feature-title-${i}`} className="text-lg font-bold mb-3">{f.title}</motion.h3>
                 <motion.p layoutId={`feature-desc-${i}`} className="text-[13px] text-white/40 leading-relaxed">{f.desc}</motion.p>
-                <div className="mt-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/20 group-hover:text-indigo-400 transition-colors">
-                  <span>Clique para detalhes</span>
+                <div className="mt-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/60 group-hover:text-indigo-400 transition-colors">
+                  <span>Saiba mais</span>
                   <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
                 </div>
               </motion.div>
@@ -326,7 +326,7 @@ export default function SaasLandingPage() {
                   <CreditCard className="w-5 h-5" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Contas e Fluxo</h3>
-                <p className="text-white/40 text-sm leading-relaxed">Contas a Pagar, Receber e fechamento de caixa automático por turno.</p>
+                <p className="text-white/40 text-sm leading-relaxed">Nunca mais perca dinheiro no fechamento do turno. Controle de contas a pagar, a receber e conciliação de caixa automático para cada recepcionista.</p>
               </div>
               <div className="mt-8 flex items-end gap-2 h-24 opacity-70 group-hover:opacity-100 transition-opacity">
                 {[40, 60, 30, 80, 50, 100].map((h, i) => (
@@ -434,7 +434,7 @@ export default function SaasLandingPage() {
                   <PieChart className="w-5 h-5" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Relatórios Automáticos</h3>
-                <p className="text-white/40 text-sm leading-relaxed">Gráficos fáceis de entender mostrando a ocupação do mês, lucros e o valor médio vendido por quarto.</p>
+                <p className="text-white/40 text-sm leading-relaxed">Pare de adivinhar. Tenha gráficos automáticos no seu celular mostrando a ocupação do mês, lucro real e quais canais estão vendendo mais quartos.</p>
               </div>
               <div className="mt-8 relative flex justify-center items-center h-24 opacity-60 group-hover:opacity-100 transition-opacity group-hover:scale-110 duration-500">
                 {/* Fake Pie Chart */}
@@ -443,6 +443,17 @@ export default function SaasLandingPage() {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* CTA Middle */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center bg-indigo-500/10 border border-indigo-500/20 rounded-3xl p-12">
+          <h2 className="text-3xl font-bold mb-4">Pronto para transformar a gestão do seu hotel?</h2>
+          <p className="text-white/60 mb-8">Junte-se a centenas de hotéis que já modernizaram suas operações.</p>
+          <Link href="/onboarding" className="inline-block px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[13px] uppercase tracking-widest rounded-full transition-all shadow-[0_0_30px_-5px_#6366f1] hover:scale-105">
+            Assinar Agora
+          </Link>
         </div>
       </section>
 
@@ -458,7 +469,7 @@ export default function SaasLandingPage() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {plans.map((plan, i) => {
-              const isPro = plan.name.toLowerCase() === 'pro';
+              const isPro = i === 1 || plan.name.toLowerCase().includes('pro');
               return (
                 <motion.div 
                   key={plan.id}
@@ -502,6 +513,52 @@ export default function SaasLandingPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 px-6 bg-[#050505] border-t border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
+            <p className="text-white/40">Tudo o que você precisa saber sobre o HOSPED.</p>
+          </div>
+          
+          <div className="space-y-4">
+            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
+              <summary className="font-bold text-lg list-none flex justify-between items-center">
+                Posso migrar meus dados de outro sistema?
+                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
+              </summary>
+              <p className="mt-4 text-white/50 leading-relaxed">Sim! Nossa equipe auxilia em toda a migração dos dados do seu sistema antigo, incluindo reservas futuras, cadastro de hóspedes e configurações dos quartos.</p>
+            </details>
+            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
+              <summary className="font-bold text-lg list-none flex justify-between items-center">
+                Existe contrato de fidelidade?
+                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
+              </summary>
+              <p className="mt-4 text-white/50 leading-relaxed">Não. Você pode cancelar sua assinatura a qualquer momento. Não cobramos multas de cancelamento.</p>
+            </details>
+            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
+              <summary className="font-bold text-lg list-none flex justify-between items-center">
+                Como funciona o suporte técnico?
+                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
+              </summary>
+              <p className="mt-4 text-white/50 leading-relaxed">Oferecemos suporte via WhatsApp e e-mail em horário comercial. Em planos corporativos, você conta com um gerente de contas dedicado e suporte 24/7 para emergências.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA End */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-900/20 pointer-events-none" />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Chegou a hora de evoluir.</h2>
+          <p className="text-xl text-white/50 mb-10">Comece a usar o HOSPED hoje mesmo e simplifique a gestão do seu hotel.</p>
+          <Link href="/onboarding" className="inline-flex items-center gap-2 px-10 py-5 bg-white text-black hover:bg-white/90 font-bold text-[14px] uppercase tracking-widest rounded-full transition-all hover:scale-105">
+            Assinar Agora <ArrowRight className="w-5 h-5" />
+          </Link>
         </div>
       </section>
 

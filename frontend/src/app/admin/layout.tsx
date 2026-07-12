@@ -98,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div>
                 <h2 className="text-sm font-semibold tracking-tight text-white/90">{hotel.nome}</h2>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Tenant Ativo</span>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Sistema Ativo</span>
               </div>
             </div>
 
@@ -108,10 +108,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <LayoutDashboard className="w-4 h-4" /> Dashboard
               </Link>
               <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <CalendarDays className="w-4 h-4" /> Reservas (PMS)
+                <CalendarDays className="w-4 h-4" /> Controle de Reservas
               </Link>
               <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <Users className="w-4 h-4" /> Hospedes (CRM)
+                <Users className="w-4 h-4" /> Cadastro de Hóspedes
               </Link>
               <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <Calendar className="w-4 h-4" /> Mapa de Ocupação
@@ -133,7 +133,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
                 <Link href="/admin/auditoria" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/auditoria' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <ShieldCheck className="w-4 h-4" /> Auditoria Row-Level
+                  <ShieldCheck className="w-4 h-4" /> Histórico de Ações
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
@@ -159,7 +159,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               <div className="pt-6 mt-6 border-t border-white/5">
                 <Link href={`/${hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
-                  <CloudLightning className="w-4 h-4" /> Acessar Portal Público
+                  <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
                 </Link>
               </div>
             </nav>

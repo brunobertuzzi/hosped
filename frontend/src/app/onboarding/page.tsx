@@ -173,11 +173,11 @@ function OnboardingContent() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4 text-sm font-semibold text-white/40">
             <CheckCircle2 className={`w-5 h-5 ${step >= 1 ? 'text-indigo-400' : 'text-white/20'}`} />
-            <span className={step >= 1 ? 'text-white' : ''}>Conta do Administrador</span>
+            <span className={step >= 1 ? 'text-white' : ''}>Conta do Gerente</span>
           </div>
           <div className="flex items-center gap-4 text-sm font-semibold text-white/40">
             <CheckCircle2 className={`w-5 h-5 ${step >= 2 ? 'text-indigo-400' : 'text-white/20'}`} />
-            <span className={step >= 2 ? 'text-white' : ''}>Dados da Rede Hoteleira</span>
+            <span className={step >= 2 ? 'text-white' : ''}>Dados do seu Hotel</span>
           </div>
           <div className="flex items-center gap-4 text-sm font-semibold text-white/40">
             <CheckCircle2 className={`w-5 h-5 ${step >= 3 ? 'text-indigo-400' : 'text-white/20'}`} />
@@ -200,8 +200,8 @@ function OnboardingContent() {
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Seus dados de acesso</h3>
-                  <p className="text-sm text-white/40">Você será o Proprietário do sistema.</p>
+                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Crie sua conta de acesso</h3>
+                  <p className="text-sm text-white/40">Estes serão seus dados para entrar no sistema todos os dias.</p>
                 </div>
                 
                 <form onSubmit={handleNextStep} className="space-y-4">
@@ -237,8 +237,8 @@ function OnboardingContent() {
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Dados da Rede</h3>
-                  <p className="text-sm text-white/40">Como a sua rede hoteleira se chama?</p>
+                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Dados do seu Negócio</h3>
+                  <p className="text-sm text-white/40">Falta pouco! Qual o nome do seu hotel ou pousada?</p>
                 </div>
                 
                 <form onSubmit={handleNextStep} className="space-y-4">
@@ -272,8 +272,8 @@ function OnboardingContent() {
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Finalizar Assinatura</h3>
-                  <p className="text-sm text-white/40">Selecione o seu plano e crie o painel.</p>
+                  <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Escolha seu Plano</h3>
+                  <p className="text-sm text-white/40">Tudo pronto. Qual plano atende melhor a sua recepção?</p>
                 </div>
                 
                 <div className="space-y-4 mb-8">
