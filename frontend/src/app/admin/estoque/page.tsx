@@ -65,18 +65,28 @@ export default function EstoquePage() {
       const store = useTenantStore.getState();
       const item = store.inventory.find(i => i.id === restockItemId);
       if (!item) throw new Error('Item não encontrado.');
-      useTenantStore.setState({ inventory: store.inventory.map(i => i.id === restockItemId ? { ...i, quantidade: i.quantidade + Number(restockQty) } : i) });
+      
+      await api.updateInventoryItem(restockItemId, {
+        quantidade: item.quantidade + Number(restockQty)
+      });
+      await api.getInventory();
+      
       setIsRestockModalOpen(false); setRestockItemId(''); setRestockQty(10);
       alerts.success('Estoque reposto com sucesso!');
     } catch (err: any) { alerts.error('Atenção', err.message); }
   };
 
-  const handleAddNewItem = () => {
+  const handleAddNewItem = async () => {
     if (!newItemName || newItemPrice < 0) return;
     try {
-      const store = useTenantStore.getState();
-      const newItem = { id: 'i_' + Date.now(), nome: newItemName, categoria: newItemCategory, unidade: newItemUnit, quantidade: Number(newItemQty), estoqueMinimo: Number(newItemMin), valorVenda: Number(newItemPrice) };
-      useTenantStore.setState({ inventory: [...store.inventory, newItem] });
+      await api.createInventoryItem({
+        nome: newItemName,
+        categoria: newItemCategory,
+        unidade: newItemUnit,
+        quantidade: Number(newItemQty),
+        estoqueMinimo: Number(newItemMin),
+        valorVenda: Number(newItemPrice)
+      });
       setIsNewItemModalOpen(false); setNewItemName(''); setNewItemQty(0); setNewItemMin(5); setNewItemPrice(0.00);
       alerts.success('Item cadastrado!');
     } catch (err: any) { alerts.error('Atenção', err.message); }
@@ -104,11 +114,9 @@ export default function EstoquePage() {
     try {
       await api.updateInventoryItem(id, { 
         valorVenda: Number(priceStr), 
-        estoque: Number(stockStr) 
+        quantidade: Number(stockStr) 
       });
-      useTenantStore.setState(state => ({
-        inventory: state.inventory.map(i => i.id === id ? { ...i, valorVenda: Number(priceStr), quantidade: Number(stockStr) } : i)
-      }));
+      await api.getInventory();
       alerts.success('Produto atualizado!');
     } catch (err: any) {
       alerts.error('Erro ao atualizar', err.message);
@@ -120,9 +128,7 @@ export default function EstoquePage() {
     if (isConfirmed) {
       try {
         await api.deleteInventoryItem(id);
-        useTenantStore.setState(state => ({
-          inventory: state.inventory.filter(i => i.id !== id)
-        }));
+        await api.getInventory();
         alerts.success('Item excluído!');
       } catch (err: any) {
         alerts.error('Erro ao excluir', err.message);

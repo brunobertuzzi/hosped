@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Calendar as CalendarIcon, Search, Plus, Filter, MoreVertical, 
-  CheckCircle, XCircle, Clock, User, DoorOpen, CreditCard, ArrowRight, Save
+  CheckCircle, XCircle, Clock, User, DoorOpen, CreditCard, ArrowRight, Save, ShoppingBag
 } from 'lucide-react';
 import { useActiveBranchData } from '../../../store/useTenantStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +19,7 @@ export default function AdminReservasPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(1);
 
-  // New Reservation State
+  // Nova Reserva State
   const [newRes, setNewRes] = useState({
     guestId: '',
     categoryId: '',
@@ -28,6 +28,17 @@ export default function AdminReservasPage() {
     valorPersonalizado: '',
     origem: 'BALCAO'
   });
+
+  // PDV / Consumo State
+  const { inventory } = useActiveBranchData();
+  const [isPosModalOpen, setIsPosModalOpen] = useState(false);
+  const [posResId, setPosResId] = useState<string | null>(null);
+  const [posItemId, setPosItemId] = useState('');
+  const [posQty, setPosQty] = useState('1');
+
+  React.useEffect(() => {
+    api.getInventory().catch(err => console.error(err));
+  }, []);
 
   // Filter Data
   const filteredReservations = useMemo(() => {
@@ -112,6 +123,37 @@ export default function AdminReservasPage() {
       } catch (err: any) {
         alerts.error('Erro ao excluir', err.message);
       }
+    }
+  };
+
+  const openPosModal = (id: string) => {
+    setPosResId(id);
+    setPosItemId('');
+    setPosQty('1');
+    setIsPosModalOpen(true);
+  };
+
+  const handleAddConsumption = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!posResId || !posItemId || !posQty) return;
+
+    try {
+      await api.addConsumption(posResId, posItemId, parseInt(posQty));
+      
+      const item = inventory.find(i => i.id === posItemId);
+      addAuditLog({
+        id: 'a_' + Date.now(),
+        usuario: user?.nome || 'Admin',
+        data: new Date().toISOString(),
+        acao: 'CRIAR',
+        entidade: 'CONSUMPTION',
+        detalhes: `Lançado ${posQty}x ${item?.nome} na reserva ${posResId}`
+      });
+
+      setIsPosModalOpen(false);
+      alerts.success('Consumo lançado com sucesso!');
+    } catch (err: any) {
+      alerts.error('Erro ao lançar consumo', err.message);
     }
   };
 
@@ -205,6 +247,11 @@ export default function AdminReservasPage() {
                     </td>
                     <td className="p-4 text-right flex items-center justify-end gap-3">
                       <span className="font-mono font-bold text-white whitespace-nowrap">R$ {Number(res.valorTotal).toFixed(2)}</span>
+                      {(res.status === 'HOSPEDADO' || res.status === 'CONFIRMADA') && (
+                        <button onClick={() => openPosModal(res.id)} className="text-[10px] text-white/40 hover:text-emerald-400 uppercase font-bold tracking-widest flex items-center gap-1" title="Lançar Consumo/PDV">
+                          <ShoppingBag className="w-4 h-4" />
+                        </button>
+                      )}
                       <button onClick={() => handleEditStatus(res.id, res.status)} className="text-[10px] text-white/40 hover:text-brand uppercase font-bold tracking-widest">Status</button>
                       <button onClick={() => handleDelete(res.id)} className="text-white/40 hover:text-red-400"><XCircle className="w-4 h-4" /></button>
                     </td>
@@ -318,6 +365,52 @@ export default function AdminReservasPage() {
                   </div>
                 )}
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL PDV / CONSUMO */}
+      <AnimatePresence>
+        {isPosModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsPosModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+              
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+                <div>
+                  <h2 className="text-lg font-bold text-white tracking-tight">Lançar Consumo (PDV)</h2>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mt-1 flex items-center gap-1">Reserva: {posResId}</p>
+                </div>
+                <button onClick={() => setIsPosModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
+              </div>
+
+              <form onSubmit={handleAddConsumption} className="p-6 space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Item do Estoque</label>
+                  <select required value={posItemId} onChange={e => setPosItemId(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
+                    <option value="" className="bg-black">-- Selecione um Produto --</option>
+                    {inventory.map(item => (
+                      <option key={item.id} value={item.id} className="bg-black">
+                        {item.nome} - R$ {Number(item.valorVenda).toFixed(2)} ({item.quantidade} {item.unidade} restam)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Quantidade</label>
+                  <input required type="number" min="1" value={posQty} onChange={e => setPosQty(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
+                </div>
+
+                <div className="pt-4 flex gap-3 border-t border-white/5">
+                  <button type="button" onClick={() => setIsPosModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all shadow-[0_0_15px_-3px_var(--brand-primary)] flex items-center justify-center gap-2">
+                    <ShoppingBag className="w-4 h-4" /> Lançar na Conta
+                  </button>
+                </div>
+              </form>
+
             </motion.div>
           </div>
         )}
