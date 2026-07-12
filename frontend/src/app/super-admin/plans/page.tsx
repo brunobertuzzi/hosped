@@ -304,7 +304,8 @@ export default function PlansPage() {
                 </button>
               </div>
             </motion.div>
-          )}})
+          )
+          })}
         </div>
       )}
 
