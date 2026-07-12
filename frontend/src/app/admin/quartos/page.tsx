@@ -19,46 +19,94 @@ export default function QuartosPage() {
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [isCatEditModalOpen, setIsCatEditModalOpen] = useState(false);
 
-  // Form Categoria Create
+  // Form Categoria Create & Edit
   const [catName, setCatName] = useState('');
   const [catPrice, setCatPrice] = useState('');
   const [catCap, setCatCap] = useState('2');
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
 
   // Form Categoria Edit (Fotos)
-  const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editingCatFotos, setEditingCatFotos] = useState<string[]>([]);
   const [newFotoUrl, setNewFotoUrl] = useState('');
 
   // Form Quarto
   const [roomNum, setRoomNum] = useState('');
   const [roomCatId, setRoomCatId] = useState('');
+  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
+
+  const handleOpenCatModal = (cat?: any) => {
+    if (cat) {
+      setEditingCatId(cat.id);
+      setCatName(cat.nome);
+      setCatPrice(cat.valorBase.toString());
+      setCatCap(cat.capacidade.toString());
+    } else {
+      setEditingCatId(null);
+      setCatName('');
+      setCatPrice('');
+      setCatCap('2');
+    }
+    setIsCatModalOpen(true);
+  };
+
+  const handleOpenRoomModal = (room?: any) => {
+    if (room) {
+      setEditingRoomId(room.id);
+      setRoomNum(room.numero);
+      setRoomCatId(room.categoryId);
+    } else {
+      setEditingRoomId(null);
+      setRoomNum('');
+      setRoomCatId('');
+    }
+    setIsRoomModalOpen(true);
+  };
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName || !catPrice) return;
 
     try {
-      await api.createRoomCategory({
-        nome: catName,
-        valorBase: parseFloat(catPrice),
-        capacidade: parseInt(catCap),
-        comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
-      });
+      if (editingCatId) {
+        await api.updateRoomCategory(editingCatId, {
+          nome: catName,
+          valorBase: parseFloat(catPrice),
+          capacidade: parseInt(catCap),
+          comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
+        });
+        
+        addAuditLog({
+          id: 'a_' + Date.now(),
+          usuario: user?.nome || 'Admin',
+          data: new Date().toISOString(),
+          acao: 'ATUALIZAR',
+          entidade: 'ROOM_CATEGORY',
+          detalhes: `Categoria atualizada: ${catName}`
+        });
+        alerts.success('Categoria atualizada!');
+      } else {
+        await api.createRoomCategory({
+          nome: catName,
+          valorBase: parseFloat(catPrice),
+          capacidade: parseInt(catCap),
+          comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
+        });
 
-      addAuditLog({
-        id: 'a_' + Date.now(),
-        usuario: user?.nome || 'Admin',
-        data: new Date().toISOString(),
-        acao: 'CRIAR',
-        entidade: 'ROOM_CATEGORY',
-        detalhes: `Nova categoria criada: ${catName}`
-      });
+        addAuditLog({
+          id: 'a_' + Date.now(),
+          usuario: user?.nome || 'Admin',
+          data: new Date().toISOString(),
+          acao: 'CRIAR',
+          entidade: 'ROOM_CATEGORY',
+          detalhes: `Nova categoria criada: ${catName}`
+        });
+        alerts.success('Categoria criada!');
+      }
 
       setIsCatModalOpen(false);
-      setCatName(''); setCatPrice(''); setCatCap('2');
-      alerts.success('Categoria criada!');
+      setCatName(''); setCatPrice(''); setCatCap('2'); setEditingCatId(null);
     } catch (err: any) {
-      alerts.error('Erro ao criar categoria', err.message);
+      alerts.error(editingCatId ? 'Erro ao atualizar categoria' : 'Erro ao criar categoria', err.message);
     }
   };
 
@@ -113,27 +161,44 @@ export default function QuartosPage() {
     if (!roomNum || !roomCatId) return;
 
     try {
-      await api.createRoom({
-        numero: roomNum,
-        categoryId: roomCatId,
-        status: 'DISPONIVEL',
-        observacoes: ''
-      });
+      if (editingRoomId) {
+        await api.updateRoom(editingRoomId, {
+          numero: roomNum,
+          categoryId: roomCatId
+        });
+        
+        addAuditLog({
+          id: 'a_' + Date.now(),
+          usuario: user?.nome || 'Admin',
+          data: new Date().toISOString(),
+          acao: 'ATUALIZAR',
+          entidade: 'ROOM',
+          detalhes: `Quarto atualizado: ${roomNum}`
+        });
+        alerts.success('Quarto atualizado!');
+      } else {
+        await api.createRoom({
+          numero: roomNum,
+          categoryId: roomCatId,
+          status: 'DISPONIVEL',
+          observacoes: ''
+        });
 
-      addAuditLog({
-        id: 'a_' + Date.now(),
-        usuario: user?.nome || 'Admin',
-        data: new Date().toISOString(),
-        acao: 'CRIAR',
-        entidade: 'ROOM',
-        detalhes: `Novo quarto criado: ${roomNum}`
-      });
+        addAuditLog({
+          id: 'a_' + Date.now(),
+          usuario: user?.nome || 'Admin',
+          data: new Date().toISOString(),
+          acao: 'CRIAR',
+          entidade: 'ROOM',
+          detalhes: `Novo quarto criado: ${roomNum}`
+        });
+        alerts.success('Quarto criado!');
+      }
 
       setIsRoomModalOpen(false);
-      setRoomNum(''); setRoomCatId('');
-      alerts.success('Quarto criado!');
+      setRoomNum(''); setRoomCatId(''); setEditingRoomId(null);
     } catch (err: any) {
-      alerts.error('Erro ao criar quarto', err.message);
+      alerts.error(editingRoomId ? 'Erro ao atualizar quarto' : 'Erro ao criar quarto', err.message);
     }
   };
 
@@ -193,7 +258,7 @@ export default function QuartosPage() {
       {activeTab === 'CATEGORIES' && (
         <div className="space-y-6">
           <div className="flex justify-end">
-            <button onClick={() => setIsCatModalOpen(true)} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
+            <button onClick={() => handleOpenCatModal()} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
               <Plus className="w-4 h-4" /> Nova Categoria
             </button>
           </div>
@@ -235,9 +300,14 @@ export default function QuartosPage() {
                       <span className="block text-[9px] uppercase tracking-widest text-white/40 mb-1">Diária Base</span>
                       <span className="text-lg font-bold text-emerald-400 font-mono">R$ {cat.valorBase.toFixed(2)}</span>
                     </div>
-                    <button onClick={() => openEditCat(cat)} className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
-                      <ImageIcon className="w-3.5 h-3.5" /> Fotos
-                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleOpenCatModal(cat)} className="px-3 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => openEditCat(cat)} className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
+                        <ImageIcon className="w-3.5 h-3.5" /> Fotos
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -250,7 +320,7 @@ export default function QuartosPage() {
       {activeTab === 'ROOMS' && (
         <div className="space-y-6">
           <div className="flex justify-end">
-            <button onClick={() => setIsRoomModalOpen(true)} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
+            <button onClick={() => handleOpenRoomModal()} className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2">
               <Plus className="w-4 h-4" /> Adicionar Quarto Físico
             </button>
           </div>
@@ -296,6 +366,9 @@ export default function QuartosPage() {
                           <button onClick={() => handleEditRoom(room.id, room.status)} className="text-[10px] uppercase font-bold tracking-widest text-white/30 hover:text-brand transition-colors">
                             Editar Status
                           </button>
+                          <button onClick={() => handleOpenRoomModal(room)} className="text-white/30 hover:text-white transition-colors">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                           <button onClick={() => handleDeleteRoom(room.id)} className="text-white/30 hover:text-red-400 transition-colors">
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -314,7 +387,7 @@ export default function QuartosPage() {
       {isCatModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6">Nova Categoria</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{editingCatId ? 'Editar Categoria' : 'Nova Categoria'}</h2>
             <form onSubmit={handleCreateCategory} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
@@ -332,7 +405,7 @@ export default function QuartosPage() {
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setIsCatModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Criar Categoria</button>
+                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">{editingCatId ? 'Salvar Alterações' : 'Criar Categoria'}</button>
               </div>
             </form>
           </motion.div>
@@ -391,7 +464,7 @@ export default function QuartosPage() {
       {isRoomModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6">Cadastrar Quarto Físico</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{editingRoomId ? 'Editar Quarto Físico' : 'Cadastrar Quarto Físico'}</h2>
             <form onSubmit={handleCreateRoom} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número / Identificação</label>
@@ -406,7 +479,7 @@ export default function QuartosPage() {
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setIsRoomModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Cadastrar Quarto</button>
+                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">{editingRoomId ? 'Salvar Alterações' : 'Cadastrar Quarto'}</button>
               </div>
             </form>
           </motion.div>

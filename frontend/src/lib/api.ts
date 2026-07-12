@@ -233,6 +233,12 @@ export const api = {
     await this.getRoomCategories();
     return res;
   },
+  
+  async updateRoomCategory(id: string, data: any) {
+    const res = await request(`/rooms/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    await this.getRoomCategories();
+    return res;
+  },
 
   async createRoom(data: any) {
     const res = await request('/rooms', { method: 'POST', body: JSON.stringify(data) });
