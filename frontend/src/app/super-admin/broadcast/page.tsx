@@ -49,6 +49,35 @@ const mockAnnouncements: Announcement[] = [
 export default function BroadcastPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
   const [searchTerm, setSearchTerm] = useState('');
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetchMaintenance();
+  }, []);
+
+  const fetchMaintenance = async () => {
+    try {
+      const { api } = await import('../../../lib/api');
+      const res = await api.getGlobalMaintenance();
+      setMaintenanceMode(res.maintenanceMode);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleMaintenance = async () => {
+    const newValue = !maintenanceMode;
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.setGlobalMaintenance(newValue);
+      setMaintenanceMode(newValue);
+    } catch (e) {
+      console.error('Erro ao atualizar modo de manutenção');
+    }
+  };
 
   const toggleActive = (id: string) => {
     setAnnouncements(announcements.map(a => a.id === id ? { ...a, isActive: !a.isActive } : a));
@@ -79,10 +108,36 @@ export default function BroadcastPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
-            Central de Anúncios
+            Avisos Globais e Manutenção
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Crie comunicados e release notes para todos os tenants da plataforma.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Gerencie comunicados e coloque o sistema em modo de manutenção.</p>
         </div>
+      </div>
+
+      <div className="bg-red-500/10 border border-red-500/30 rounded-[24px] p-6 flex items-center justify-between shadow-[0_0_40px_-15px_rgba(239,68,68,0.2)]">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-6 h-6 text-red-500" />
+          </div>
+          <div>
+            <h2 className="text-white font-bold text-lg">Modo de Manutenção Global</h2>
+            <p className="text-white/50 text-sm mt-1">Ao ativar, todos os tenants serão desconectados e verão uma tela de "Sistema em Manutenção". Apenas o Super Admin poderá logar.</p>
+          </div>
+        </div>
+        <button 
+          onClick={toggleMaintenance}
+          className={`relative w-16 h-8 rounded-full transition-colors flex items-center shrink-0 ${maintenanceMode ? 'bg-red-500' : 'bg-white/10'}`}
+        >
+          <motion.div 
+            className="w-6 h-6 bg-white rounded-full shadow-md"
+            animate={{ x: maintenanceMode ? 36 : 4 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          />
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-white/5 pt-6">
+        <h2 className="text-lg font-bold text-white">Comunicados Ativos</h2>
         <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-[12px] font-bold tracking-wide transition-colors flex items-center gap-2">
           <Plus className="w-4 h-4" /> Novo Anúncio
         </button>

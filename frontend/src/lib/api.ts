@@ -396,8 +396,27 @@ export const api = {
   },
 
   /**
-   * Super Admin Metrics
+   * Super Admin Metrics & Health
    */
+  async getHealth() {
+    return await request('/core/health');
+  },
+
+  async getGlobalMaintenance() {
+    return await request('/core/broadcast/maintenance');
+  },
+
+  async setGlobalMaintenance(maintenanceMode: boolean) {
+    return await request('/core/broadcast/maintenance', {
+      method: 'PUT',
+      body: JSON.stringify({ maintenanceMode }),
+    });
+  },
+
+  async getWebhookLogs() {
+    return await request('/webhooks/logs');
+  },
+
   async getTenantMetrics(tenantId: string) {
     return await request(`/core/tenant-metrics/${tenantId}`);
   },

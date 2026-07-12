@@ -449,8 +449,32 @@ export default function SuperAdminTenants() {
                       </label>
                     ))}
                   </div>
+                </div>
+
+                <div className="border-t border-white/5 pt-4">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Monitoramento de Uso (Quotas)</label>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                        <span>Armazenamento (Fotos e Docs)</span>
+                        <span>450 MB / 1 GB</span>
+                      </div>
+                      <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full w-[45%]"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                        <span>Requisições de API (Mensal)</span>
+                        <span className="text-amber-400">8.900 / 10.000</span>
+                      </div>
+                      <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div className="bg-amber-500 h-full w-[89%]"></div>
+                      </div>
+                    </div>
+                  </div>
                   <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                    Você pode habilitar recursos avulsos para este tenant sem precisar forçar o upgrade de plano.
+                    Você pode oferecer pacotes de upsell caso o cliente atinja o limite.
                   </p>
                 </div>
 

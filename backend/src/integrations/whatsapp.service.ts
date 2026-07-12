@@ -44,20 +44,12 @@ export class WhatsappService {
       this.logger.log(`Rodando em DEV: Forçando log da mensagem simulada.`);
     }
 
-    // 2. Mock do envio real (Log)
-    this.logger.log(`========================================================`);
-    this.logger.log(`MENSAGEM DE WHATSAPP ENVIADA [Mock/Log]`);
-    this.logger.log(`De (Hotel ID): ${hotelId}`);
-    this.logger.log(`Para (Celular): ${toPhone}`);
-    this.logger.log(`Conteúdo:\n${message}`);
-    this.logger.log(`========================================================`);
+    // Executa a requisição apenas se tiver as chaves
+    if (!integration || !integration.whatsappApiUrl || !integration.whatsappToken) {
+      return false; // Silenciosamente falha (ou lança erro dependendo da regra de negócio)
+    }
 
-    if (
-      integration &&
-      integration.whatsappApiUrl &&
-      integration.whatsappToken
-    ) {
-      try {
+    try {
         await axios.post(
           integration.whatsappApiUrl,
           {
@@ -80,11 +72,10 @@ export class WhatsappService {
         this.logger.log(
           `[WHATSAPP] Mensagem enviada com sucesso para ${toPhone} via API.`,
         );
-      } catch (error: any) {
-        this.logger.error(
-          `[WHATSAPP] Falha ao enviar para API ${integration.whatsappApiUrl}: ${error.message}`,
-        );
-      }
+    } catch (error: any) {
+      this.logger.error(
+        `[WHATSAPP] Falha ao enviar para API ${integration.whatsappApiUrl}: ${error.message}`,
+      );
     }
 
     return true;

@@ -2,16 +2,29 @@
 
 import React, { useMemo } from 'react';
 import { useSuperAdminStore } from '../../store/useSuperAdminStore';
-import { DollarSign, Activity, Users, Building2, ArrowUpRight, TrendingUp, AlertTriangle, Wallet, CreditCard, CheckCircle2, Clock, ArrowRight, Zap } from 'lucide-react';
+import { DollarSign, Activity, Users, Building2, ArrowUpRight, TrendingUp, AlertTriangle, Wallet, CreditCard, CheckCircle2, Clock, ArrowRight, Zap, Database, ServerCrash, Download, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function SuperAdminDashboard() {
   const { sistemaClients, invoices, fetchClients } = useSuperAdminStore();
 
+  const [healthData, setHealthData] = React.useState<any>(null);
+
   React.useEffect(() => {
     fetchClients();
+    fetchHealth();
   }, [fetchClients]);
+
+  const fetchHealth = async () => {
+    try {
+      const { api } = await import('../../lib/api');
+      const res = await api.getHealth();
+      setHealthData(res);
+    } catch (e) {
+      console.error('Health Check falhou', e);
+    }
+  };
 
   const kpis = useMemo(() => {
     const realClients = sistemaClients.filter(c => c.id !== '11111111-1111-1111-1111-111111111111');
@@ -211,6 +224,54 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
 
+        {/* System Health Check Widget */}
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none" />
+          <div>
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2 mb-6">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Saúde do Servidor
+            </h3>
+            <div className="space-y-5">
+              <div>
+                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                  <span>Uso de CPU (VPS)</span>
+                  <span className="text-white">{healthData ? healthData.cpuUsagePercentage.toFixed(1) : 0}%</span>
+                </div>
+                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                  <div className="bg-emerald-500 h-full transition-all" style={{ width: `${healthData ? healthData.cpuUsagePercentage : 0}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                  <span>Memória RAM ({healthData ? healthData.memoryTotalGB : 0}GB)</span>
+                  <span className="text-white">{healthData ? healthData.memoryUsedGB : 0} GB</span>
+                </div>
+                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                  <div className="bg-emerald-500 h-full transition-all" style={{ width: `${healthData ? healthData.memoryUsagePercentage : 0}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold flex-col gap-1">
+                  <div className="flex justify-between w-full">
+                    <span className="flex items-center gap-1.5"><Database className="w-3 h-3 text-indigo-400"/> PostgreSQL (Produção)</span>
+                    <span className="text-emerald-400">{healthData ? healthData.postgresStatus : 'OFFLINE'}</span>
+                  </div>
+                  <div className="flex justify-between w-full">
+                    <span className="flex items-center gap-1.5"><ServerCrash className="w-3 h-3 text-red-400"/> Redis (Cache)</span>
+                    <span className="text-emerald-400">{healthData ? healthData.redisStatus : 'OFFLINE'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button className="w-full mt-6 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-white/10">
+            <Download className="w-3.5 h-3.5" /> Forçar Backup SQL
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Invoices Widget */}
         <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 flex flex-col">
           <div className="flex justify-between items-center mb-6">

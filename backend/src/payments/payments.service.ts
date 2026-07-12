@@ -49,19 +49,7 @@ export class PaymentsService {
       let pointOfInteraction;
 
       if (!token || provider !== 'MERCADO_PAGO') {
-        // Fallback Mock se o HOTEL não configurou seu gateway ou se é outro não implementado
-        this.logger.log(
-          `Hotel ${reservation.hotelId} has no MP Token or uses another provider. Generating MOCK Pix Payment...`,
-        );
-        resultId = 999999999 + Math.floor(Math.random() * 1000);
-        pointOfInteraction = {
-          transaction_data: {
-            qr_code:
-              '00020126580014br.gov.bcb.pix0136mock-pix-key-123-456-7890520400005303986540510.005802BR5915Hotel Sol Praia6009Sao Paulo62070503***6304ABCD',
-            qr_code_base64:
-              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAwAB/AL+f4R4AAAAAElFTkSuQmCC',
-          },
-        };
+        throw new Error('O Hotel não possui um Gateway de Pagamento configurado (Mercado Pago). Vá em Integrações para configurar.');
       } else if (provider === 'MERCADO_PAGO') {
         const client = this.getMpClient(token);
         const payment = new MercadoPagoPayment(client);
@@ -118,12 +106,8 @@ export class PaymentsService {
     const provider = paymentRecord.hotel.integration?.paymentGatewayProvider;
     let isApproved = false;
 
-    if (
-      !token ||
-      provider !== 'MERCADO_PAGO' ||
-      id.toString().startsWith('999')
-    ) {
-      isApproved = Math.random() > 0.5; // 50% de chance de aprovar no mock
+    if (!token || provider !== 'MERCADO_PAGO') {
+      throw new Error('Gateway de pagamento não configurado para o hotel.');
     } else if (provider === 'MERCADO_PAGO') {
       try {
         const client = this.getMpClient(token);

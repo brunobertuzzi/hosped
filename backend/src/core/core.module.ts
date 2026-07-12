@@ -11,6 +11,8 @@ import { UploadController } from './upload/upload.controller';
 import { BillingTask } from './tasks/billing.task';
 
 import { PlansController } from './plans.controller';
+import { HealthController } from './health.controller';
+import { BroadcastController } from './broadcast.controller';
 
 @Global()
 @Module({
@@ -19,6 +21,8 @@ import { PlansController } from './plans.controller';
     TenantsController,
     UploadController,
     PlansController,
+    HealthController,
+    BroadcastController,
   ],
   providers: [
     PrismaService,
