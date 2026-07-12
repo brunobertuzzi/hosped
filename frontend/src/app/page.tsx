@@ -17,7 +17,7 @@ const featuresList = [
     icon: Globe, 
     title: 'Motor de Reservas', 
     desc: 'Venda diretamente no seu site sem pagar comissões para OTAs. Totalmente customizável.',
-    longDesc: 'Pare de pagar comissões altas. Tenha um site de reservas próprio onde seu cliente pode ver as fotos do quarto, escolher a data e pagar com Pix ou cartão de crédito a qualquer hora do dia ou da noite.'
+    longDesc: 'Pare de pagar comissões altas. Tenha um site de reservas com a cara da sua marca. Integre avaliações reais de hóspedes do Google, mapa de localização e botão de WhatsApp para contato direto.'
   },
   { 
     icon: Calendar, 
@@ -349,8 +349,8 @@ export default function SaasLandingPage() {
                 <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4 text-purple-400">
                   <Palette className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Site Próprio (White-Label)</h3>
-                <p className="text-white/40 text-sm leading-relaxed">Mude as cores e coloque a sua logomarca no seu site de vendas, tudo sem precisar contratar um programador.</p>
+                <h3 className="text-xl font-bold mb-2">Site de Vendas Personalizado</h3>
+                <p className="text-white/40 text-sm leading-relaxed">Mude as cores, adicione sua logomarca, conecte os feedbacks do Google e coloque seu telefone e WhatsApp em destaque. Tudo sem precisar de um programador.</p>
               </div>
               <div className="mt-8 flex gap-3 opacity-50 group-hover:opacity-100 transition-opacity">
                 <div className="w-8 h-8 rounded-full bg-indigo-500 border-2 border-white/20" />
