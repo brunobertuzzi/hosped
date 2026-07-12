@@ -29,6 +29,16 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  // Configuração de CORS para o Frontend
+  app.enableCors({
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://frontend-production-2b45.up.railway.app',
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
   // Segurança HTTP básica
   app.use(helmet());
 
@@ -44,15 +54,8 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   app.useGlobalFilters(new GlobalExceptionFilter(prismaService));
 
-  app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://frontend-production-2b45.up.railway.app',
-    ],
-    credentials: true,
-  });
-
-  const port = process.env.PORT ?? 3001;
+  // Escutar na porta definida pelo Railway no host 0.0.0.0
+  const port = process.env.PORT || 8080;
   await app.listen(port, '0.0.0.0');
   console.log(`API Hoteleira rodando com sucesso em: http://localhost:${port}`);
 }
