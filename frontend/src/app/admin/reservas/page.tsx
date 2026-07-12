@@ -11,7 +11,7 @@ import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
 
 export default function AdminReservasPage() {
-  const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user } = useActiveBranchData();
+  const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -69,10 +69,17 @@ export default function AdminReservasPage() {
     const finalValue = newRes.valorPersonalizado ? Number(newRes.valorPersonalizado) : valorCalculado;
     
     try {
+      const guest = guests.find(g => g.id === newRes.guestId);
+      if (!guest) throw new Error('Hóspede não encontrado');
+      
       await request('/reservations', {
         method: 'POST',
         body: JSON.stringify({
-          guestId: newRes.guestId,
+          guestName: guest.nome,
+          guestDocument: guest.documento,
+          guestEmail: guest.email,
+          guestTelefone: guest.telefone,
+          branchId: selectedBranchId,
           categoryId: newRes.categoryId,
           dataCheckIn: newRes.checkIn,
           dataCheckOut: newRes.checkOut,
