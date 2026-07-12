@@ -14,21 +14,55 @@ export default function SuperAdminDashboard() {
   }, [fetchClients]);
 
   const kpis = useMemo(() => {
-    const activeClients = sistemaClients.filter(c => c.status === 'ACTIVE');
+    const realClients = sistemaClients.filter(c => c.id !== '11111111-1111-1111-1111-111111111111');
+    const realInvoices = invoices.filter(i => i.tenantId !== '11111111-1111-1111-1111-111111111111');
+
+    const activeClients = realClients.filter(c => c.status === 'ACTIVE');
     const totalMRR = activeClients.reduce((sum, c) => sum + c.mrr, 0);
     const totalBranches = activeClients.reduce((sum, c) => sum + c.branchesCount, 0);
-    const suspended = sistemaClients.filter(c => c.status === 'SUSPENDED').length;
+    const suspended = realClients.filter(c => c.status === 'SUSPENDED').length;
     const arr = totalMRR * 12;
 
-    const totalClients = sistemaClients.length;
+    const totalClients = realClients.length;
     const churnRate = totalClients > 0 ? (suspended / totalClients) * 100 : 0;
     const arpu = activeClients.length > 0 ? totalMRR / activeClients.length : 0;
 
-    const pendingRevenue = invoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.amount, 0);
-    const collectedRevenue = invoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.amount, 0);
+    const pendingRevenue = realInvoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.amount, 0);
+    const collectedRevenue = realInvoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.amount, 0);
 
     return { totalMRR, arr, activeCount: activeClients.length, totalBranches, suspended, churnRate, arpu, pendingRevenue, collectedRevenue };
   }, [sistemaClients, invoices]);
+
+  const chartData = useMemo(() => {
+    const validClients = sistemaClients.filter(
+      c => c.id !== '11111111-1111-1111-1111-111111111111' && c.status !== 'CHURNED'
+    );
+    
+    const months = [];
+    const revenues = [];
+    const today = new Date();
+    
+    // Generate last 7 months data (cumulative MRR)
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthStr = d.toLocaleString('pt-BR', { month: 'short' });
+      months.push(monthStr.charAt(0).toUpperCase() + monthStr.slice(1, 3));
+      
+      // Clients created before the end of this month
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59);
+      
+      const mrr = validClients
+        .filter(c => new Date(c.createdAt) <= endOfMonth)
+        .reduce((acc, c) => acc + c.mrr, 0);
+        
+      revenues.push(mrr);
+    }
+    
+    const maxRev = Math.max(...revenues, 1); 
+    const heights = revenues.map(r => (r / maxRev) * 100);
+    
+    return { months, revenues, heights };
+  }, [sistemaClients]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
@@ -154,10 +188,10 @@ export default function SuperAdminDashboard() {
             </div>
             
             <div className="w-full h-full flex items-end justify-between px-2 gap-2 z-10">
-              {[40, 55, 45, 70, 65, 85, 100].map((h, i) => (
+              {chartData.heights.map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col justify-end items-center group relative h-full">
-                  <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                    R$ {(h * 150).toFixed(0)}
+                  <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    R$ {chartData.revenues[i].toFixed(2)}
                   </div>
                   <motion.div 
                     initial={{ height: 0 }}
@@ -172,7 +206,7 @@ export default function SuperAdminDashboard() {
             </div>
 
             <div className="w-full flex justify-between px-4 text-[10px] font-medium text-white/30 mt-4 z-10 border-t border-white/5 pt-3">
-              <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span><span>Jul</span>
+              {chartData.months.map((m, i) => <span key={i}>{m}</span>)}
             </div>
           </div>
         </div>

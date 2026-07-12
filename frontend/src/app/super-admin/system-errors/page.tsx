@@ -27,7 +27,7 @@ export default function SystemErrorsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTenant, setSelectedTenant] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
+
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -55,13 +55,7 @@ export default function SystemErrorsPage() {
       
     const matchTenant = selectedTenant ? log.hotelId === selectedTenant : true;
     
-    // Some logs might not have a statusCode, treat them as 500 for filtering purposes
-    const code = log.statusCode || 500;
-    let matchStatus = true;
-    if (selectedStatus === '4xx') matchStatus = code >= 400 && code < 500;
-    if (selectedStatus === '5xx') matchStatus = code >= 500 && code < 600;
-
-    return matchSearch && matchTenant && matchStatus;
+    return matchSearch && matchTenant;
   });
 
   return (
@@ -83,18 +77,6 @@ export default function SystemErrorsPage() {
             setSelectedTenant={setSelectedTenant} 
           />
           
-          <div className="relative">
-            <Filter className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white outline-none cursor-pointer appearance-none"
-            >
-              <option value="" className="bg-[#0a0a0a]">Todos Status</option>
-              <option value="4xx" className="bg-[#0a0a0a]">Erros 4xx</option>
-              <option value="5xx" className="bg-[#0a0a0a]">Erros 5xx</option>
-            </select>
-          </div>
 
           <button onClick={fetchLogs} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 border border-white/10">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />

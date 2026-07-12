@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   Building, Activity, Server, Users, DollarSign, 
-  Settings, LogOut, Hexagon, Terminal, Radio, ToggleLeft
+  Settings, LogOut, Hexagon, Terminal, Radio, ToggleLeft, Menu, X
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
 
@@ -14,6 +14,11 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const router = useRouter();
   const { user, setUser } = useTenantStore();
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!user || user.role !== 'PLATFORM_OWNER') {
@@ -47,9 +52,23 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         .active-tab { background-color: rgba(99, 102, 241, 0.1); color: #818cf8; border-right: 2px solid #818cf8; }
       `}</style>
 
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-40 md:hidden backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Cyber/Sistema Sidebar */}
-      <div className="w-64 bg-[#050505] border-r border-white/5 flex flex-col justify-between shrink-0 z-20">
-        <div className="p-6">
+      <div className={`fixed inset-y-0 left-0 z-50 md:relative w-[280px] md:w-64 bg-[#050505] border-r border-white/5 flex flex-col justify-between shrink-0 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} overflow-y-auto`}>
+        <div className="p-6 relative">
+          <button 
+            className="md:hidden absolute top-6 right-6 text-white/50 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
           <div className="flex items-center gap-3 mb-10">
             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 glow-sistema">
               <Hexagon className="w-5 h-5 text-indigo-400" />
@@ -121,7 +140,24 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-y-auto relative">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none" />
-        <main className="p-10 relative z-10">
+        
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#030014]/80 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+              <Hexagon className="w-4 h-4 text-indigo-400" />
+            </div>
+            <span className="text-sm font-bold text-white/90">God Mode</span>
+          </div>
+          <button 
+            className="p-2 -mr-2 text-white/70 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        <main className="p-4 md:p-10 relative z-10">
           <div className="max-w-6xl mx-auto">
             {children}
           </div>

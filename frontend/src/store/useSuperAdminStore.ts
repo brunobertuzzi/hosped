@@ -15,6 +15,7 @@ export interface SistemaClient {
   branchesCount: number;
   nextBillingDate?: string;
   cardLast4?: string;
+  features?: string[];
 }
 
 export interface SistemaInvoice {

@@ -40,9 +40,43 @@ export default function SuperAdminTenants() {
   const [doc, setDoc] = useState('');
   const [email, setEmail] = useState('');
   const [plan, setPlan] = useState<TenantPlan>('STARTUP');
-
-  // Form states (Edit)
+  const [addFeatures, setAddFeatures] = useState<string[]>([]);
   const [editPlan, setEditPlan] = useState<TenantPlan>('STARTUP');
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editMrr, setEditMrr] = useState(0);
+  const [editStatus, setEditStatus] = useState<TenantStatus>('ACTIVE');
+  const [editFeatures, setEditFeatures] = useState<string[]>([]);
+
+  const AVAILABLE_FEATURES = [
+    { id: 'WHITE_LABEL', label: 'White-Label (Hosped Injector)' },
+    { id: 'WEBHOOKS', label: 'Webhooks & API' },
+    { id: 'GANTT_CHART', label: 'Mapa de Ocupação (Gantt)' },
+    { id: 'MULTIPLE_BRANCHES', label: 'Múltiplas Filiais' }
+  ];
+
+  const handleAddPlanChange = (newPlan: TenantPlan) => {
+    setPlan(newPlan);
+    if (newPlan === 'STARTUP') setAddFeatures([]);
+    if (newPlan === 'PRO') setAddFeatures(['GANTT_CHART', 'WEBHOOKS']);
+    if (newPlan === 'ENTERPRISE') setAddFeatures(['WHITE_LABEL', 'WEBHOOKS', 'GANTT_CHART', 'MULTIPLE_BRANCHES']);
+  };
+
+  const toggleAddFeature = (featureId: string) => {
+    setAddFeatures(prev => 
+      prev.includes(featureId) 
+        ? prev.filter(f => f !== featureId)
+        : [...prev, featureId]
+    );
+  };
+
+  const toggleFeature = (featureId: string) => {
+    setEditFeatures(prev => 
+      prev.includes(featureId) 
+        ? prev.filter(f => f !== featureId)
+        : [...prev, featureId]
+    );
+  };
 
   const filteredClients = sistemaClients.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -63,11 +97,12 @@ export default function SuperAdminTenants() {
         document: doc,
         email,
         plan,
-        mrr
+        mrr,
+        features: addFeatures
       });
       await fetchClients();
       setIsAddModalOpen(false);
-      setName(''); setDoc(''); setEmail(''); setPlan('STARTUP');
+      setName(''); setDoc(''); setEmail(''); setPlan('STARTUP'); setAddFeatures([]);
     } catch (err) {
       alert('Erro ao criar tenant: ' + (err as Error).message);
     }
@@ -86,18 +121,29 @@ export default function SuperAdminTenants() {
   const handleEditOpen = (client: SistemaClient) => {
     setEditingClient(client);
     setEditPlan(client.plan);
+    setEditName(client.name);
+    setEditEmail(client.email);
+    setEditMrr(client.mrr);
+    setEditStatus(client.status);
+    setEditFeatures(client.features || []);
     setIsEditModalOpen(true);
   };
 
   const handleEditSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingClient) return;
-    let mrr = 150;
-    if (editPlan === 'PRO') mrr = 450;
-    if (editPlan === 'ENTERPRISE') mrr = 1500;
     
     try {
-      await api.updateTenant(editingClient.id, { plan: editPlan, mrr });
+      await api.updateTenant(editingClient.id, { 
+        plan: editPlan, 
+        mrr: Number(editMrr),
+        name: editName,
+        email: editEmail,
+        features: editFeatures
+      });
+      if (editStatus !== editingClient.status) {
+        await api.updateTenantStatus(editingClient.id, editStatus);
+      }
       await fetchClients();
       setIsEditModalOpen(false);
     } catch (err) {
@@ -237,10 +283,6 @@ export default function SuperAdminTenants() {
                   </td>
                   <td className="py-4 px-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => toggleStatus(client.id, client.status)} className="p-2 hover:bg-white/5 rounded-lg text-white/40 transition-colors tooltip-trigger" title="Alterar Status">
-                        {client.status === 'ACTIVE' ? <ShieldAlert className="w-4 h-4 hover:text-red-400" /> : <CheckCircle2 className="w-4 h-4 hover:text-emerald-400" />}
-                      </button>
-
                       {/* Novos 3 Botões */}
                       <button 
                         onClick={() => handleEditOpen(client)}
@@ -304,8 +346,8 @@ export default function SuperAdminTenants() {
                     <input required type="text" value={doc} onChange={e => setDoc(formatCNPJ(e.target.value))} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 font-mono" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Plano</label>
-                    <select required value={plan} onChange={e => setPlan(e.target.value as TenantPlan)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Plano Inicial</label>
+                    <select required value={plan} onChange={e => handleAddPlanChange(e.target.value as TenantPlan)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
                       <option value="STARTUP">STARTUP (R$ 150)</option>
                       <option value="PRO">PRO (R$ 450)</option>
                       <option value="ENTERPRISE">ENTERPRISE (R$ 1500)</option>
@@ -316,6 +358,24 @@ export default function SuperAdminTenants() {
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail Administrativo</label>
                   <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Recursos Extras Habilitados</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {AVAILABLE_FEATURES.map(feat => (
+                      <label key={feat.id} onClick={() => toggleAddFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${addFeatures.includes(feat.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${addFeatures.includes(feat.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
+                          {addFeatures.includes(feat.id) && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className="text-[10px] uppercase font-bold text-white/80">{feat.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
+                    Você pode alterar essas permissões a qualquer momento editando este tenant.
+                  </p>
+                </div>
+
                 <div className="pt-6 flex gap-3">
                   <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
                   <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Cadastrar</button>
@@ -330,23 +390,73 @@ export default function SuperAdminTenants() {
       <AnimatePresence>
         {isEditModalOpen && editingClient && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-sm bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative overflow-hidden">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-md bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500" />
               <h2 className="text-xl font-bold text-white mb-2">Editar Tenant</h2>
-              <p className="text-[11px] text-white/40 mb-6">{editingClient.name}</p>
+              <p className="text-[11px] text-white/40 mb-6 font-mono">ID: {editingClient.id}</p>
               
-              <form onSubmit={handleEditSave} className="space-y-5">
+              <form onSubmit={handleEditSave} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Plano (Upgrade/Downgrade)</label>
-                  <select required value={editPlan} onChange={e => setEditPlan(e.target.value as TenantPlan)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
-                    <option value="STARTUP">STARTUP (R$ 150)</option>
-                    <option value="PRO">PRO (R$ 450)</option>
-                    <option value="ENTERPRISE">ENTERPRISE (R$ 1500)</option>
-                  </select>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">Nome / Razão Social</label>
+                  <input required type="text" value={editName} onChange={e => setEditName(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
-                <div className="pt-6 flex gap-3">
+                
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">E-mail de Contato</label>
+                  <input required type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">Plano Atual</label>
+                    <select required value={editPlan} onChange={e => {
+                        setEditPlan(e.target.value as TenantPlan);
+                        // Auto update MRR based on plan selection to help the user
+                        if (e.target.value === 'STARTUP') setEditMrr(150);
+                        if (e.target.value === 'PRO') setEditMrr(450);
+                        if (e.target.value === 'ENTERPRISE') setEditMrr(1500);
+                      }} 
+                      className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer"
+                    >
+                      <option value="STARTUP">STARTUP</option>
+                      <option value="PRO">PRO</option>
+                      <option value="ENTERPRISE">ENTERPRISE</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">Status</label>
+                    <select required value={editStatus} onChange={e => setEditStatus(e.target.value as TenantStatus)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                      <option value="ACTIVE">Ativo</option>
+                      <option value="SUSPENDED">Suspenso</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">Receita Fixa (MRR) R$</label>
+                  <input required type="number" step="0.01" value={editMrr} onChange={e => setEditMrr(Number(e.target.value))} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Recursos Extras Habilitados</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {AVAILABLE_FEATURES.map(feat => (
+                      <label key={feat.id} onClick={() => toggleFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
+                          {editFeatures.includes(feat.id) && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className="text-[10px] uppercase font-bold text-white/80">{feat.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
+                    Você pode habilitar recursos avulsos para este tenant sem precisar forçar o upgrade de plano.
+                  </p>
+                </div>
+
+                <div className="pt-4 flex gap-3">
                   <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                  <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Salvar</button>
+                  <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Salvar Alterações</button>
                 </div>
               </form>
             </motion.div>

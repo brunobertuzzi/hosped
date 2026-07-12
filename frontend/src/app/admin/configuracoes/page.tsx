@@ -15,6 +15,12 @@ const COLOR_PRESETS = [
   { name: 'Esmeralda', hex: '#10b981' },
   { name: 'Ametista', hex: '#8b5cf6' },
   { name: 'Carmim', hex: '#e11d48' },
+  { name: 'Safira', hex: '#1d4ed8' },
+  { name: 'Turquesa', hex: '#06b6d4' },
+  { name: 'Rose Gold', hex: '#b76e79' },
+  { name: 'Coral', hex: '#f97316' },
+  { name: 'Jade', hex: '#059669' },
+  { name: 'Platina', hex: '#94a3b8' },
 ];
 
 export default function ConfiguracoesPage() {
@@ -403,36 +409,85 @@ export default function ConfiguracoesPage() {
         <div className="md:col-span-1">
           <div className="glass-panel p-6 rounded-[24px] border border-white/5 space-y-6 sticky top-6">
             <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 border-b border-white/5 pb-4">
-              <LayoutTemplate className="w-4 h-4 text-brand" /> Live Preview
+              <LayoutTemplate className="w-4 h-4 text-brand" /> Live Preview do Portal
             </h3>
 
-            <div className="space-y-4">
-              {/* Fake Component */}
+            <div className="space-y-4" style={{ fontFamily: fontFamily === 'serif' ? 'Playfair Display, serif' : fontFamily === 'mono' ? 'Fira Code, monospace' : 'Inter, sans-serif' }}>
+              
               <div 
-                className="p-5 rounded-2xl border transition-colors duration-500 bg-black relative overflow-hidden"
-                style={{ borderColor: `${primaryColor}40` }}
+                className="rounded-2xl border transition-all duration-500 relative overflow-hidden shadow-2xl flex flex-col"
+                style={{ borderColor: `${primaryColor}40`, backgroundColor: backgroundColor, minHeight: '320px' }}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[40px] opacity-20 pointer-events-none" style={{ backgroundColor: primaryColor }} />
-                
-                <h4 className="text-white font-bold text-sm mb-2">{hotelName}</h4>
-                <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Teste de Contraste</p>
-                
-                <button 
-                  className="w-full py-2.5 rounded-lg text-black font-bold text-[10px] uppercase tracking-widest transition-all"
-                  style={{ backgroundColor: primaryColor, boxShadow: `0 0 20px ${primaryColor}40` }}
-                >
-                  Botão Primário
-                </button>
+                {/* Navbar Mock */}
+                <div className="h-12 border-b border-white/10 flex items-center justify-between px-4 bg-black/20 z-30 relative backdrop-blur-md">
+                  <div className="h-6 flex items-center gap-2">
+                    <div className="w-6 h-6 rounded border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden shrink-0">
+                      {logoUrl ? <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <Store className="w-3 h-3 text-white/50" />}
+                    </div>
+                    <span className="text-[10px] font-bold text-white truncate max-w-[80px]">{hotelName || 'HOSPED'}</span>
+                  </div>
+                  <div className="flex gap-2 opacity-50">
+                    <div className="w-3 h-0.5 bg-white rounded-full" />
+                    <div className="w-3 h-0.5 bg-white rounded-full" />
+                  </div>
+                </div>
+
+                {/* Hero Mock */}
+                <div className={`flex-1 flex ${heroVariant === 'split' ? 'flex-row' : 'flex-col items-center justify-center text-center'} relative overflow-hidden`}>
+                  
+                  {heroVariant === 'standard' ? (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-transparent z-10" style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), ${backgroundColor})` }} />
+                      <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400')" }} />
+                      
+                      <div className="relative z-20 p-6 flex flex-col items-center">
+                        <h4 className="text-white font-bold text-2xl mb-2 tracking-tight drop-shadow-xl">{hotelName || 'Nome do Hotel'}</h4>
+                        <p className="text-white/80 text-[10px] mb-6 drop-shadow-md max-w-[80%] leading-relaxed">
+                          {slogan || 'O seu slogan aparecerá aqui. Adicione uma frase de impacto.'}
+                        </p>
+                        <button 
+                          className="px-6 py-2 rounded-full text-black font-bold text-[9px] uppercase tracking-widest transition-all hover:scale-105"
+                          style={{ backgroundColor: primaryColor, boxShadow: `0 0 20px ${primaryColor}60` }}
+                        >
+                          Fazer Reserva
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-1/2 p-5 flex flex-col justify-center relative z-20">
+                        <h4 className="text-white font-bold text-lg mb-2 tracking-tight">{hotelName || 'Nome do Hotel'}</h4>
+                        <p className="text-white/60 text-[9px] mb-5 leading-relaxed line-clamp-3">
+                          {slogan || 'O seu slogan aparecerá aqui. Adicione uma frase de impacto.'}
+                        </p>
+                        <button 
+                          className="w-max px-4 py-2 rounded-lg text-black font-bold text-[8px] uppercase tracking-widest transition-all hover:scale-105"
+                          style={{ backgroundColor: primaryColor, boxShadow: `0 0 15px ${primaryColor}60` }}
+                        >
+                          Reservar
+                        </button>
+                      </div>
+                      <div className="w-1/2 relative">
+                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400')" }} />
+                        {/* Gradient fade para o background selecionado */}
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${backgroundColor} 0%, transparent 100%)` }} />
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Accent glow on the bottom right */}
+                  <div className="absolute bottom-[-10%] right-[-10%] w-32 h-32 rounded-full blur-[50px] opacity-30 pointer-events-none z-10" style={{ backgroundColor: primaryColor }} />
+                </div>
               </div>
 
-              <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl mt-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
-                    <Shield className="w-3.5 h-3.5 text-white/50" />
+                  <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center bg-white/5">
+                    <Palette className="w-3.5 h-3.5 text-white/50" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 block">Acesso Global</span>
-                    <span className="text-[11px] text-white/30">O tema é replicado na nuvem.</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 block mb-0.5">Preview em Tempo Real</span>
+                    <span className="text-[10px] text-white/40">O tema escolhido refletirá na página de vendas instantaneamente após salvar.</span>
                   </div>
                 </div>
               </div>

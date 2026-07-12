@@ -33,7 +33,23 @@ export default function PlansPage() {
   const [maxRooms, setMaxRooms] = useState('');
   const [maxUsers, setMaxUsers] = useState('');
   const [featuresText, setFeaturesText] = useState('');
+  const [systemFeatures, setSystemFeatures] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
+
+  const AVAILABLE_FEATURES = [
+    { id: 'WHITE_LABEL', label: 'White-Label (Hosped Injector)' },
+    { id: 'WEBHOOKS', label: 'Webhooks & API' },
+    { id: 'GANTT_CHART', label: 'Mapa de Ocupação (Gantt)' },
+    { id: 'MULTIPLE_BRANCHES', label: 'Múltiplas Filiais' }
+  ];
+
+  const toggleSystemFeature = (featureId: string) => {
+    setSystemFeatures(prev => 
+      prev.includes(featureId) 
+        ? prev.filter(f => f !== featureId)
+        : [...prev, featureId]
+    );
+  };
 
   useEffect(() => {
     fetchPlans();
@@ -61,6 +77,7 @@ export default function PlansPage() {
       setMaxRooms(plan.maxRooms?.toString() || '-1');
       setMaxUsers(plan.maxUsers.toString());
       setFeaturesText(plan.features ? plan.features.join('\n') : '');
+      setSystemFeatures(plan.systemFeatures || []);
       setIsActive(plan.isActive);
     } else {
       setEditingPlan(null);
@@ -71,6 +88,7 @@ export default function PlansPage() {
       setMaxRooms('20');
       setMaxUsers('5');
       setFeaturesText('');
+      setSystemFeatures([]);
       setIsActive(true);
     }
     setIsModalOpen(true);
@@ -93,6 +111,7 @@ export default function PlansPage() {
         maxRooms: parseInt(maxRooms, 10),
         maxUsers: parseInt(maxUsers, 10),
         features: featuresText.split('\n').filter(f => f.trim() !== ''),
+        systemFeatures,
         isActive,
       };
 
@@ -403,9 +422,23 @@ export default function PlansPage() {
                     </div>
 
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Recursos (um por linha)</label>
+                      <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Módulos do Sistema Habilitados</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {AVAILABLE_FEATURES.map(feat => (
+                          <label key={feat.id} onClick={() => toggleSystemFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500/10 border-purple-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500 border-purple-500' : 'border-white/20'}`}>
+                              {systemFeatures.includes(feat.id) && <CheckCircle2 className="w-3 h-3 text-white" />}
+                            </div>
+                            <span className="text-[10px] uppercase font-bold text-white/80">{feat.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Recursos (Bulas Comerciais, um por linha)</label>
                       <textarea 
-                        rows={4}
+                        rows={3}
                         value={featuresText} onChange={e => setFeaturesText(e.target.value)}
                         placeholder="Gestão de reservas&#10;Motor de reservas&#10;Nota Fiscal Eletrônica"
                         className="w-full input-premium rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 resize-none"
