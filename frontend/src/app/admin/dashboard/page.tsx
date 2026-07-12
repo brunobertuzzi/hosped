@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
+import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const { 
@@ -37,7 +38,46 @@ export default function AdminDashboardPage() {
 
     const lowStockAlerts = inventory.filter(i => i.quantidade < i.estoqueMinimo);
 
-    return { occupancyRate, monthRevenue, checkInsToday, checkOutsToday, lowStockAlerts, occupiedRoomsCount, totalRoomsCount };
+    // Calc last 7 days volume
+    const last7Days = Array.from({length: 7}).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toISOString().substring(0, 10);
+    });
+
+    const graphData = last7Days.map(dateStr => {
+      return reservations.filter(r => 
+        r.dataCheckIn.substring(0, 10) <= dateStr && 
+        r.dataCheckOut.substring(0, 10) >= dateStr &&
+        r.status !== 'CANCELADA'
+      ).length;
+    });
+
+    const maxGraph = Math.max(...graphData, 10);
+    // Map to SVG coordinates: viewBox 0 0 100 40
+    // X goes from 0 to 100 in 6 steps (0, 16.6, 33.3, 50, 66.6, 83.3, 100)
+    // Y goes from 35 (0 value) to 5 (max value)
+    const points = graphData.map((val, i) => {
+      const x = (i / 6) * 100;
+      const y = 35 - (val / maxGraph) * 30;
+      return `${x},${y}`;
+    });
+
+    // Create a smooth curve command (simple polyline for now, but formatted nicely)
+    const pathD = `M ${points.map((p, i) => i === 0 ? p : `L ${p}`).join(' ')}`;
+    const pathFill = `M ${points[0].split(',')[0]} 40 L ${points.map((p, i) => i === 0 ? p : `L ${p}`).join(' ')} L ${points[points.length-1].split(',')[0]} 40 Z`;
+
+    const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const graphLabels = last7Days.map(dStr => {
+      const dateObj = new Date(dStr + 'T12:00:00');
+      return daysOfWeek[dateObj.getDay()];
+    });
+
+    return { 
+      occupancyRate, monthRevenue, checkInsToday, checkOutsToday, 
+      lowStockAlerts, occupiedRoomsCount, totalRoomsCount,
+      pathD, pathFill, graphLabels
+    };
   }, [rooms, reservations, inventory]);
 
   const handleCleaningComplete = async (roomId: string) => {
@@ -76,12 +116,24 @@ export default function AdminDashboardPage() {
       className="space-y-10 pb-20"
     >
       {/* Header Premium */}
-      <div className="flex items-end justify-between border-b border-white/5 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-white/5 pb-6 gap-4">
         <div>
           <h1 className="text-[28px] font-semibold text-white tracking-tight flex items-center gap-3">
             Visão Geral <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Ao Vivo</span>
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Indicadores financeiros e operacionais em tempo real.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/reservas">
+            <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2">
+              <Plus className="w-3.5 h-3.5" /> Nova Reserva
+            </button>
+          </Link>
+          <Link href="/admin/hospedes">
+            <button className="px-4 py-2 bg-brand text-white border border-brand text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2 shadow-lg shadow-brand/20">
+              <Plus className="w-3.5 h-3.5" /> Novo Hóspede
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -121,8 +173,8 @@ export default function AdminDashboardPage() {
               {metrics.monthRevenue.toFixed(2)}
             </span>
             <div className="text-[11px] text-white/30 mt-1 font-medium flex items-center gap-1.5">
-              <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> 12%</span> 
-              vs. mês anterior
+              <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> Vivo</span> 
+              Neste mês
             </div>
           </div>
         </div>
@@ -156,7 +208,7 @@ export default function AdminDashboardPage() {
         {/* Gráfico Curva */}
         <div className="glass-panel p-6 lg:col-span-2">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-8 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-white/60" /> Volume Diário (7 dias)
+            <Activity className="w-4 h-4 text-white/60" /> Volume Diário de Ocupação (Últimos 7 dias)
           </h3>
           <div className="h-56 relative w-full flex flex-col justify-between">
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
@@ -173,12 +225,14 @@ export default function AdminDashboardPage() {
                   <stop offset="100%" stopColor="var(--brand-primary)" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
-              <path d="M 0 35 Q 15 28 30 25 T 60 15 T 90 20 T 100 12 L 100 40 L 0 40 Z" fill="url(#brand-grad)" />
-              <path d="M 0 35 Q 15 28 30 25 T 60 15 T 90 20 T 100 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d={metrics.pathFill} fill="url(#brand-grad)" />
+              <path d={metrics.pathD} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
             <div className="w-full flex justify-between text-[10px] font-medium text-white/30 mt-auto pt-4 z-10">
-              <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span className="text-white/60">Dom</span>
+              {metrics.graphLabels.map((lbl, idx) => (
+                <span key={idx} className={idx === 6 ? "text-white/60 font-bold" : ""}>{lbl}</span>
+              ))}
             </div>
           </div>
         </div>
