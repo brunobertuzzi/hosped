@@ -38,7 +38,8 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-
+ENV PORT=8080
+EXPOSE 8080
 
 CMD ["sh", "-c", "\
   echo \"[Entrypoint] Resolvendo migration com falha anterior...\" && \
