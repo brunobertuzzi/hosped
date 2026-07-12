@@ -81,6 +81,20 @@ enum WebhookStatus {
   FALHA
 }
 
+enum InvoiceStatus {
+  PENDENTE
+  PAGO
+  ATRASADO
+  CANCELADO
+}
+
+enum AnnouncementType {
+  INFO
+  WARNING
+  SUCCESS
+  RELEASE_NOTES
+}
+
 model Hotel {
   id                   String    @id @default(uuid())
   nome                 String
@@ -120,12 +134,13 @@ model Hotel {
   systemErrorLogs    SystemErrorLog[]
 
   // Novas Relacoes (Sistema V2)
-  tariffs            Tariff[]
-  seasons            Season[]
-  expenses           Expense[]
-  cleaningTasks      CleaningTask[]
-  webhookEvents      WebhookEvent[]
-  icalSyncs          IcalSync[]
+  tariffs        Tariff[]
+  seasons        Season[]
+  expenses       Expense[]
+  cleaningTasks  CleaningTask[]
+  webhookEvents  WebhookEvent[]
+  icalSyncs      IcalSync[]
+  systemInvoices SystemInvoice[]
 }
 
 model Branch {
@@ -268,12 +283,12 @@ model Reservation {
   consumptions Consumption[]
   payments     Payment[]
 
+  @@unique([hotelId, otaReservationId])
   @@index([hotelId])
   @@index([branchId])
   @@index([guestId])
   @@index([roomId])
   @@index([branchId, categoryId, status, dataCheckIn, dataCheckOut]) // Otimização para overbooking
-  @@unique([hotelId, otaReservationId])
 }
 
 model InventoryItem {
@@ -430,13 +445,13 @@ model SystemErrorLog {
 }
 
 model Season {
-  id        String   @id @default(uuid())
-  hotelId   String   @map("hotel_id")
-  nome      String   // Ex: Alta Temporada, Baixa Temporada, Feriado
+  id         String   @id @default(uuid())
+  hotelId    String   @map("hotel_id")
+  nome       String // Ex: Alta Temporada, Baixa Temporada, Feriado
   dataInicio DateTime
-  dataFim   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  dataFim    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   hotel   Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   tariffs Tariff[]
@@ -445,14 +460,14 @@ model Season {
 }
 
 model Tariff {
-  id             String   @id @default(uuid())
-  hotelId        String   @map("hotel_id")
-  seasonId       String   @map("season_id")
-  categoryId     String   @map("category_id")
-  valor          Decimal  @db.Decimal(10, 2)
-  minimoNoites   Int      @default(1)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String   @id @default(uuid())
+  hotelId      String   @map("hotel_id")
+  seasonId     String   @map("season_id")
+  categoryId   String   @map("category_id")
+  valor        Decimal  @db.Decimal(10, 2)
+  minimoNoites Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   hotel    Hotel        @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   season   Season       @relation(fields: [seasonId], references: [id], onDelete: Cascade)
@@ -463,17 +478,17 @@ model Tariff {
 }
 
 model Expense {
-  id            String   @id @default(uuid())
-  hotelId       String   @map("hotel_id")
-  descricao     String
-  valor         Decimal  @db.Decimal(10, 2)
+  id             String        @id @default(uuid())
+  hotelId        String        @map("hotel_id")
+  descricao      String
+  valor          Decimal       @db.Decimal(10, 2)
   dataVencimento DateTime
   dataPagamento  DateTime?
-  status        ExpenseStatus @default(PENDENTE)
-  categoria     String   // FIXA, VARIAVEL, IMPOSTO
-  fornecedor    String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status         ExpenseStatus @default(PENDENTE)
+  categoria      String // FIXA, VARIAVEL, IMPOSTO
+  fornecedor     String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
 
@@ -481,17 +496,17 @@ model Expense {
 }
 
 model CleaningTask {
-  id            String   @id @default(uuid())
-  hotelId       String   @map("hotel_id")
-  roomId        String   @map("room_id")
-  responsavelId String?  @map("responsavel_id")
+  id            String         @id @default(uuid())
+  hotelId       String         @map("hotel_id")
+  roomId        String         @map("room_id")
+  responsavelId String?        @map("responsavel_id")
   status        CleaningStatus @default(PENDENTE)
-  tipoLimpeza   String   // EX: "TROCADE_ENXOVAL", "LIMPEZA_SAIDA", "LIMPEZA_GERAL"
+  tipoLimpeza   String // EX: "TROCADE_ENXOVAL", "LIMPEZA_SAIDA", "LIMPEZA_GERAL"
   observacoes   String?
   iniciadaEm    DateTime?
   finalizadaEm  DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   hotel       Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   room        Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
@@ -502,15 +517,15 @@ model CleaningTask {
 }
 
 model WebhookEvent {
-  id          String   @id @default(uuid())
-  hotelId     String?  @map("hotel_id")
-  provider    String   // "MERCADO_PAGO", "CLOUDBEDS"
+  id          String        @id @default(uuid())
+  hotelId     String?       @map("hotel_id")
+  provider    String // "MERCADO_PAGO", "CLOUDBEDS"
   eventType   String
   payload     Json
   status      WebhookStatus @default(RECEBIDO)
   errorReason String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   hotel Hotel? @relation(fields: [hotelId], references: [id], onDelete: Cascade)
 
@@ -518,25 +533,25 @@ model WebhookEvent {
 }
 
 model IcalSync {
-  id           String   @id @default(uuid())
-  hotelId      String   @map("hotel_id")
-  roomId       String?  @map("room_id")
-  categoryId   String?  @map("category_id")
-  
-  // URLs to fetch from OTAs
-  importUrls   String[] // Array of iCal URLs from Airbnb, Booking, etc.
-  
-  // URL to expose to OTAs (auto-generated token)
-  exportToken  String   @unique @default(uuid())
-  
-  lastSyncAt   DateTime?
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String  @id @default(uuid())
+  hotelId    String  @map("hotel_id")
+  roomId     String? @map("room_id")
+  categoryId String? @map("category_id")
 
-  hotel        Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  room         Room?         @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  category     RoomCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  // URLs to fetch from OTAs
+  importUrls String[] // Array of iCal URLs from Airbnb, Booking, etc.
+
+  // URL to expose to OTAs (auto-generated token)
+  exportToken String @unique @default(uuid())
+
+  lastSyncAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hotel    Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  room     Room?         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  category RoomCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([hotelId])
 }
@@ -553,4 +568,43 @@ model SystemPlan {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model SystemInvoice {
+  id          String        @id @default(uuid())
+  hotelId     String        @map("hotel_id")
+  amount      Decimal       @db.Decimal(10, 2)
+  status      InvoiceStatus @default(PENDENTE)
+  dueDate     DateTime
+  paidAt      DateTime?
+  periodStart DateTime?
+  periodEnd   DateTime?
+  paymentLink String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([hotelId])
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  name        String   @unique // ex: "BETA_CHANNEL_MANAGER"
+  description String?
+  isEnabled   Boolean  @default(false)
+  tenantIds   String[] // Array of hotelIds that have this feature enabled se nao for global
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemAnnouncement {
+  id          String           @id @default(uuid())
+  title       String
+  content     String
+  type        AnnouncementType @default(INFO)
+  isActive    Boolean          @default(true)
+  targetPlans String[] // Vazio = todos os planos
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }

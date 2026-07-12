@@ -134,11 +134,10 @@ export default function IntegracoesPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight mb-2 flex items-center gap-3">
-          <CloudLightning className="w-8 h-8 text-brand" />
-          Integrações
+        <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+          App Store e Integrações
         </h1>
-        <p className="text-white/60 text-sm max-w-2xl">
+        <p className="text-white/60 text-sm max-w-2xl mt-2">
           Conecte o seu hotel aos melhores serviços do mercado. Sincronize avaliações, canais de venda e otimize a comunicação com seus hóspedes.
         </p>
       </header>

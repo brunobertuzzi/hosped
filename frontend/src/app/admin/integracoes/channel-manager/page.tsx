@@ -165,7 +165,7 @@ export default function ChannelManagerPage() {
           <ArrowLeft className="w-5 h-5 text-white/70" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             <Calendar className="w-8 h-8 text-brand" />
             Channel Manager (iCal)
           </h1>

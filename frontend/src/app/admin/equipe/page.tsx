@@ -120,7 +120,7 @@ export default function EquipePage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-[28px] font-semibold text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             Gestão de Equipe (RH)
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de acessos, permissões e cadastro de funcionários.</p>

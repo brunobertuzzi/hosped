@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
       {/* Header Premium */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-white/5 pb-6 gap-4">
         <div>
-          <h1 className="text-[28px] font-semibold text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             Visão Geral <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Ao Vivo</span>
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Indicadores financeiros e operacionais em tempo real.</p>
