@@ -9,6 +9,7 @@ export class UploadService {
   private readonly logger = new Logger(UploadService.name);
   private s3Client: S3Client | null = null;
   private readonly bucketName = process.env.AWS_S3_BUCKET || '';
+  private uploadDir = path.join(process.cwd(), 'uploads');
 
   constructor() {
     try {

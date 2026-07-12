@@ -44,7 +44,7 @@ export class WebhooksController {
       }
     });
 
-    return logs.map(l => ({
+    return logs.map((l: any) => ({
       id: l.id,
       tenantId: l.hotelId,
       tenantName: l.hotel.nome,
