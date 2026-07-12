@@ -75,12 +75,8 @@ function OnboardingContent() {
   const handleRealPayment = async (paymentData: any) => {
     setLoading(true);
     try {
-      // Por enquanto, no MVP, vamos simular que o MP aprovou direto no frontend
-      // Em produção, isso bateria num endpoint /payments/checkout
       console.log('Dados do MP processados: ', paymentData);
-      setTimeout(() => {
-        finishTenantCreation(getSelectedPlanPrice(), 'REAL_CARD');
-      }, 1500);
+      await finishTenantCreation(getSelectedPlanPrice(), 'REAL_CARD', paymentData);
     } catch (error) {
       console.error(error);
       alert('Erro ao se comunicar com o Mercado Pago.');
@@ -96,7 +92,7 @@ function OnboardingContent() {
     }, 2500);
   };
 
-  const finishTenantCreation = async (mrr: number, last4: string) => {
+  const finishTenantCreation = async (mrr: number, last4: string, paymentData?: any) => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const response = await fetch(`${API_URL}/auth/register`, {
@@ -109,7 +105,8 @@ function OnboardingContent() {
           userName,
           password: userPassword,
           plan,
-          mrr
+          mrr,
+          paymentData
         })
       });
 

@@ -78,8 +78,10 @@ export class TenantsController {
   async seedDefaultHotel() {
     const defaultHotelId = '11111111-1111-1111-1111-111111111111';
     const defaultBranchId = '22222222-2222-2222-2222-222222222222';
-    
-    let existingHotel = await this.prisma.client.hotel.findUnique({ where: { id: defaultHotelId } });
+
+    let existingHotel = await this.prisma.client.hotel.findUnique({
+      where: { id: defaultHotelId },
+    });
     if (!existingHotel) {
       try {
         existingHotel = await this.prisma.client.hotel.create({
@@ -101,19 +103,20 @@ export class TenantsController {
                 estado: 'SP',
                 telefone: '11999999999',
                 email: `contato-${Date.now()}@hotelexemplo.com`,
-              }
-            }
-          }
+              },
+            },
+          },
         });
       } catch (e: any) {
         return { success: false, error: e.message || String(e) };
       }
     }
 
-    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || 'brunobertuzzib@gmail.com';
+    const superAdminEmail =
+      process.env.SUPER_ADMIN_EMAIL || 'brunobertuzzib@gmail.com';
     await this.prisma.client.user.updateMany({
       where: { email: superAdminEmail },
-      data: { hotelId: defaultHotelId, branchId: defaultBranchId }
+      data: { hotelId: defaultHotelId, branchId: defaultBranchId },
     });
 
     return { success: true, hotel: existingHotel };
@@ -210,10 +213,12 @@ export class TenantsController {
     @Request() req: any,
   ) {
     this.checkSuperAdmin(req);
-    
+
     const { password } = body;
     if (!password) {
-      throw new BadRequestException('A senha do administrador é obrigatória para excluir um Tenant.');
+      throw new BadRequestException(
+        'A senha do administrador é obrigatória para excluir um Tenant.',
+      );
     }
 
     const admin = await this.prisma.client.user.findUnique({
@@ -230,14 +235,16 @@ export class TenantsController {
     }
 
     try {
-      // Exclui o hotel. Assumindo que onDelete: Cascade está configurado no Prisma schema 
+      // Exclui o hotel. Assumindo que onDelete: Cascade está configurado no Prisma schema
       // ou que a exclusão vai funcionar para os relacionamentos associados.
       await this.prisma.client.hotel.delete({
         where: { id },
       });
       return { success: true, message: 'Tenant excluído com sucesso.' };
     } catch (error) {
-      throw new BadRequestException('Erro ao excluir tenant: Pode haver dados vinculados que impedem a exclusão automática.');
+      throw new BadRequestException(
+        'Erro ao excluir tenant: Pode haver dados vinculados que impedem a exclusão automática.',
+      );
     }
   }
 }

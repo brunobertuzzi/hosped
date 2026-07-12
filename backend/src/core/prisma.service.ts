@@ -14,9 +14,15 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   public client: any;
 
   constructor(private readonly tenantService: TenantService) {
-    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || process.env.SUPABASE_DB_URL;
+    const connectionString =
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_PRISMA_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.SUPABASE_DB_URL;
     if (!connectionString) {
-      throw new Error('Uma variável de ambiente de banco de dados (DATABASE_URL, POSTGRES_PRISMA_URL, etc) é obrigatória.');
+      throw new Error(
+        'Uma variável de ambiente de banco de dados (DATABASE_URL, POSTGRES_PRISMA_URL, etc) é obrigatória.',
+      );
     }
 
     // Inicializar o pool do node-postgres (pg)
@@ -95,6 +101,33 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
                 if (_args.create) _args.create = { ..._args.create, hotelId };
                 if (_args.update) _args.update = { ..._args.update, hotelId };
                 if (_args.where) _args.where = { ..._args.where, hotelId };
+              }
+            } else {
+              // Se não há hotelId no contexto e o usuário não é PLATFORM_OWNER, 
+              // forçamos um ID inválido para não vazar dados de outros tenants.
+              const fakeHotelId = 'INVALID_TENANT_ID_NO_ACCESS';
+              if (_args.where !== undefined) {
+                _args.where = { ..._args.where, hotelId: fakeHotelId };
+              } else if (
+                [
+                  'findMany',
+                  'findFirst',
+                  'findUnique',
+                  'findFirstOrThrow',
+                  'findUniqueOrThrow',
+                  'update',
+                  'delete',
+                  'updateMany',
+                  'deleteMany',
+                  'count',
+                  'aggregate',
+                  'groupBy',
+                ].includes(operation)
+              ) {
+                _args.where = { hotelId: fakeHotelId };
+              }
+              if (operation === 'create' && _args.data) {
+                _args.data = { ..._args.data, hotelId: fakeHotelId };
               }
             }
 

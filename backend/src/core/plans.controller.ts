@@ -51,7 +51,11 @@ export class PlansController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async updatePlan(@Request() req: any, @Param('id') id: string, @Body() data: any) {
+  async updatePlan(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
     this.checkSuperAdmin(req);
     return await this.prisma.client.systemPlan.update({
       where: { id },

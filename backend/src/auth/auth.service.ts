@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../core/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { MercadoPagoConfig, Payment } from 'mercadopago';
 
 @Injectable()
 export class AuthService {
@@ -71,13 +72,66 @@ export class AuthService {
   }
 
   async register(data: any) {
-    const { companyName, companyDoc, email, userName, password } = data;
+    const {
+      companyName,
+      companyDoc,
+      email,
+      userName,
+      password,
+      plan,
+      mrr,
+      paymentData,
+    } = data;
 
     // Verificar se email já existe
     const exists = await this.prisma.client.user.findUnique({
       where: { email },
     });
     if (exists) throw new BadRequestException('E-mail já está em uso.');
+
+    // Processamento real do Mercado Pago se os dados de pagamento existirem
+    if (paymentData && paymentData.token) {
+      const mpToken = process.env.MP_ACCESS_TOKEN;
+      if (!mpToken) {
+        throw new BadRequestException(
+          'Token do Mercado Pago não configurado no servidor.',
+        );
+      }
+
+      try {
+        const client = new MercadoPagoConfig({ accessToken: mpToken });
+        const mpPayment = new Payment(client);
+
+        const paymentResponse = await mpPayment.create({
+          body: {
+            transaction_amount: Number(mrr || 150),
+            description: `Assinatura Hosped - ${plan || 'Plano Base'}`,
+            payment_method_id: paymentData.payment_method_id,
+            payer: {
+              email: paymentData.payer?.email || email,
+              identification: paymentData.payer?.identification,
+            },
+            token: paymentData.token,
+            installments: paymentData.installments || 1,
+            issuer_id: paymentData.issuer_id,
+          },
+        });
+
+        if (
+          paymentResponse.status !== 'approved' &&
+          paymentResponse.status !== 'in_process'
+        ) {
+          throw new BadRequestException(
+            `Pagamento não aprovado. Status: ${paymentResponse.status}`,
+          );
+        }
+      } catch (err: any) {
+        console.error('Erro no checkout do Mercado Pago:', err);
+        throw new BadRequestException(
+          'Falha ao processar o pagamento com o Mercado Pago. Verifique os dados do cartão.',
+        );
+      }
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -205,8 +259,8 @@ export class AuthService {
         status: 'ATIVO',
         createdAt: new Date(),
         updatedAt: new Date(),
-        hotel: hotel as any,
-        branch: hotel.branches[0] as any,
+        hotel: hotel,
+        branch: hotel.branches[0],
       };
     }
 
@@ -318,7 +372,7 @@ export class AuthService {
       where: { id, hotelId },
     });
     if (!user) throw new BadRequestException('Usuário não encontrado');
-    
+
     // Check if email is already in use by another user
     if (data.email && data.email !== user.email) {
       const emailExists = await this.prisma.client.user.findUnique({
@@ -350,23 +404,33 @@ export class AuthService {
     const user = await this.prisma.client.user.findUnique({
       where: { email },
     });
-    
-    // Always return success to prevent email enumeration attacks
-    if (!user) return { success: true, message: 'Se o e-mail existir, um link será enviado.' };
 
-    const secret = (process.env.JWT_SECRET || 'fallback-secret') + user.password;
-    const token = this.jwtService.sign({ sub: user.id, email: user.email }, { secret, expiresIn: '15m' });
+    // Always return success to prevent email enumeration attacks
+    if (!user)
+      return {
+        success: true,
+        message: 'Se o e-mail existir, um link será enviado.',
+      };
+
+    const secret =
+      (process.env.JWT_SECRET || 'fallback-secret') + user.password;
+    const token = this.jwtService.sign(
+      { sub: user.id, email: user.email },
+      { secret, expiresIn: '15m' },
+    );
 
     // In a real application, you would send an email here.
     // For this MVP/Sistema, we will just print it to console and return the token so the frontend can simulate the email or redirect for testing.
     const resetLink = `http://localhost:3000/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-    console.log(`\n\n[SIMULATED EMAIL] Password reset link for ${user.email}: \n${resetLink}\n\n`);
+    console.log(
+      `\n\n[SIMULATED EMAIL] Password reset link for ${user.email}: \n${resetLink}\n\n`,
+    );
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       message: 'Se o e-mail existir, um link será enviado.',
       // Returning token only for development/testing ease
-      _dev_token: token 
+      _dev_token: token,
     };
   }
 
@@ -376,7 +440,8 @@ export class AuthService {
     });
     if (!user) throw new BadRequestException('Token inválido ou expirado.');
 
-    const secret = (process.env.JWT_SECRET || 'fallback-secret') + user.password;
+    const secret =
+      (process.env.JWT_SECRET || 'fallback-secret') + user.password;
     try {
       this.jwtService.verify(token, { secret });
     } catch (e) {

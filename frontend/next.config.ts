@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 if (!process.env.NEXT_PUBLIC_API_URL) {
   process.env.NEXT_PUBLIC_API_URL = 'https://backend-production-c6fe.up.railway.app';
 }
-// @ts-ignore
+// @ts-expect-error next-pwa missing types
 import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {

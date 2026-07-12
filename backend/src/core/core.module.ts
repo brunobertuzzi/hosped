@@ -14,7 +14,12 @@ import { PlansController } from './plans.controller';
 
 @Global()
 @Module({
-  controllers: [TenantMetricsController, TenantsController, UploadController, PlansController],
+  controllers: [
+    TenantMetricsController,
+    TenantsController,
+    UploadController,
+    PlansController,
+  ],
   providers: [
     PrismaService,
     TenantService,

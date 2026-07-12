@@ -18,7 +18,8 @@ import { Permissions } from '../auth/permissions.decorator';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  // Public (scoped via query/hotel context in middleware + Prisma extension)
+  // Scoped via AuthGuard
+  @UseGuards(AuthGuard)
   @Get()
   async findAllRooms() {
     return this.roomsService.findAllRooms();
@@ -35,7 +36,8 @@ export class RoomsController {
     );
   }
 
-  // Public (scoped via query/hotel context)
+  // Scoped via AuthGuard
+  @UseGuards(AuthGuard)
   @Get('categories')
   async findAllCategories() {
     return this.roomsService.findAllCategories();

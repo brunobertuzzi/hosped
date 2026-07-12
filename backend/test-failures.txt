@@ -1,0 +1,896 @@
+﻿node.exe : FAIL test/e2e/yield.e2e-spec.ts (5.845 s)
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\Bruno\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL test/e2e/y...ec.ts (5.845 s) 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ÔùÅ Console
+
+    console.log
+      NestJS server is already running on port 3001. Skipping spawn.
+
+      at Object.<anonymous> (e2e-setup.ts:12:15)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 1. should apply high season tariff 
+(R$300) when booking within high season dates
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 2. should apply low season tariff (R$140) 
+when booking within low season dates
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 3. should use base rate (R$200) when no 
+seasonal tariff matches the dates
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 4. should enforce minimum nights rule 
+from tariff (3 nights minimum for high season)
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 5. should calculate correct total for a 
+partial season overlap
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 6. should return correct tariff info via 
+booking-engine availability endpoint
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 7. should apply different tariffs per 
+category correctly
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 8. should create a new season and tariff 
+and apply it on subsequent bookings
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 9. should update an existing tariff and 
+have subsequent bookings use the new rate
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+  ÔùÅ Yield Management E2E Tests ÔÇ║ 10. should handle season with no tariffs 
+gracefully by falling back to base rate
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 39 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 40 |[39m
+    [31m[1m>[22m[39m[90m 41 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 42 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 43 |[39m
+     [90m 44 |[39m     [36mconst[39m h [33m=[39m [36mawait[39m 
+prisma[33m.[39mhotel[33m.[39mcreate({[0m
+
+      at e2e/yield.e2e-spec.ts:41:3
+      at Object.<anonymous> (e2e/yield.e2e-spec.ts:35:1)
+
+FAIL test/e2e/cross-feature.e2e-spec.ts (5.474 s)
+  ÔùÅ Console
+
+    console.log
+      NestJS server is already running on port 3001. Skipping spawn.
+
+      at Object.<anonymous> (e2e-setup.ts:12:15)
+
+  ÔùÅ Cross-Feature E2E Tests ÔÇ║ 1. RLS + Overbooking: should enforce tenant 
+isolation while preventing overbooking concurrently
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 27 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 30 |[39m     [36mawait[39m 
+prisma[33m.[39mtariff[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 31 |[39m     [36mawait[39m 
+prisma[33m.[39mseason[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 32 |[39m     [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m[0m
+
+      at e2e/cross-feature.e2e-spec.ts:29:3
+      at Object.<anonymous> (e2e/cross-feature.e2e-spec.ts:23:1)
+
+  ÔùÅ Cross-Feature E2E Tests ÔÇ║ 2. RLS + Payment: should isolate payment 
+operations per tenant
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 27 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 30 |[39m     [36mawait[39m 
+prisma[33m.[39mtariff[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 31 |[39m     [36mawait[39m 
+prisma[33m.[39mseason[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 32 |[39m     [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m[0m
+
+      at e2e/cross-feature.e2e-spec.ts:29:3
+      at Object.<anonymous> (e2e/cross-feature.e2e-spec.ts:23:1)
+
+  ÔùÅ Cross-Feature E2E Tests ÔÇ║ 3. Yield + Overbooking: should correctly 
+apply tariff pricing and enforce capacity limits
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 27 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 30 |[39m     [36mawait[39m 
+prisma[33m.[39mtariff[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 31 |[39m     [36mawait[39m 
+prisma[33m.[39mseason[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 32 |[39m     [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m[0m
+
+      at e2e/cross-feature.e2e-spec.ts:29:3
+      at Object.<anonymous> (e2e/cross-feature.e2e-spec.ts:23:1)
+
+  ÔùÅ Cross-Feature E2E Tests ÔÇ║ 4. Payment + Overbooking: should create 
+payment for a reservation and ensure capacity is consumed
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 27 |[39m   [36mlet[39m token[33m:[39m string[33m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 30 |[39m     [36mawait[39m 
+prisma[33m.[39mtariff[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 31 |[39m     [36mawait[39m 
+prisma[33m.[39mseason[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m
+     [90m 32 |[39m     [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome[33m:[39m [32m'E2E Cross Hotel'[39m } } 
+})[33m;[39m[0m
+
+      at e2e/cross-feature.e2e-spec.ts:29:3
+      at Object.<anonymous> (e2e/cross-feature.e2e-spec.ts:23:1)
+
+FAIL test/e2e/rls.e2e-spec.ts (5.468 s)
+  ÔùÅ Console
+
+    console.log
+      NestJS server is already running on port 3001. Skipping spawn.
+
+      at Object.<anonymous> (e2e-setup.ts:12:15)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 1. should reject requests without 
+tenant headers on tenant-specific endpoints
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 2. should return only Hotel A 
+rooms when header x-hotel-id is set to Hotel A
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 3. should return only Hotel B 
+rooms when header x-hotel-id is set to Hotel B
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 4. should prevent Hotel A from 
+reading a room category belonging to Hotel B
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 5. should allow public booking 
+engine access without authentication but scope to the public hotel endpoint
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 6. should enforce tenant 
+isolation using JWT token hotelId even if header specifies a different hotel
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 7. should allow PLATFORM_OWNER to 
+bypass tenant isolation and fetch all hotels or logs
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 8. should guarantee 
+AsyncLocalStorage isolation across concurrent request contexts
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 9. should override any tenant ID 
+passed in request body with user own tenant ID in creation endpoints
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+  ÔùÅ Row-Level Security (RLS) E2E Tests ÔÇ║ 10. should isolate branch access 
+for branch-specific queries
+
+    thrown: "Exceeded timeout of 5000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a 
+long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 41 |[39m   [36mlet[39m tokenPlatformOwner[33m:[39m 
+string[33m;[39m
+     [90m 42 |[39m
+    [31m[1m>[22m[39m[90m 43 |[39m   beforeAll([36masync[39m () 
+[33m=>[39m {
+     [90m    |[39m   [31m[1m^[22m[39m
+     [90m 44 |[39m     [36mawait[39m cleanup()[33m;[39m
+     [90m 45 |[39m
+     [90m 46 |[39m     [90m// Create Hotel A[39m[0m
+
+      at e2e/rls.e2e-spec.ts:43:3
+      at Object.<anonymous> (e2e/rls.e2e-spec.ts:34:1)
+
+FAIL test/e2e/real-world.e2e-spec.ts
+  ÔùÅ Console
+
+    console.log
+      NestJS server is already running on port 3001. Skipping spawn.
+
+      at Object.<anonymous> (e2e-setup.ts:12:15)
+
+  ÔùÅ Real-World Scenario E2E Tests ÔÇ║ 3. Multi-tenant data isolation in a 
+real-world hotel group: two hotels operate independently
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.hotel.create()` invocation in
+    
+C:\Users\Bruno\Desktop\hosped\backend\test\e2e\real-world.e2e-spec.ts:139:35
+
+      136 });
+      137 
+      138 it('3. Multi-tenant data isolation in a real-world hotel group: two 
+hotels operate independently', async () => {
+    ÔåÆ 139   const hB = await prisma.hotel.create(
+    Unique constraint failed on the fields: (`"documentoFiscal"`)
+
+    [0m [90m 137 |[39m
+     [90m 138 |[39m   it([32m'3. Multi-tenant data isolation in a 
+real-world hotel group: two hotels operate independently'[39m[33m,[39m 
+[36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 139 |[39m     [36mconst[39m hB [33m=[39m 
+[36mawait[39m prisma[33m.[39mhotel[33m.[39mcreate({
+     [90m     |[39m                [31m[1m^[22m[39m
+     [90m 140 |[39m       data[33m:[39m {
+     [90m 141 |[39m         nome[33m:[39m [32m'Sister 
+Hotel'[39m[33m,[39m
+     [90m 142 |[39m         razaoSocial[33m:[39m [32m'Sister Hotel 
+LTDA'[39m[33m,[39m[0m
+
+      at zr.handleRequestError 
+(../node_modules/@prisma/client/src/runtime/RequestHandler.ts:237:13)
+      at zr.handleAndLogRequestError 
+(../node_modules/@prisma/client/src/runtime/RequestHandler.ts:183:12)
+      at zr.request 
+(../node_modules/@prisma/client/src/runtime/RequestHandler.ts:152:12)
+      at a 
+(../node_modules/@prisma/client/src/runtime/getPrismaClient.ts:963:24)
+      at Object.<anonymous> (e2e/real-world.e2e-spec.ts:139:16)
+
+FAIL test/e2e/mercado-pago.e2e-spec.ts
+  ÔùÅ Console
+
+    console.log
+      NestJS server is already running on port 3001. Skipping spawn.
+
+      at Object.<anonymous> (e2e-setup.ts:12:15)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 1. should request a PIX 
+payment link for a reservation and receive mock details
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 2. should return payment 
+status
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 3. should successfully 
+process webhook events
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 4. should reject status 
+checks for non-existent payment transactions
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 5. should verify that the 
+webhook endpoint returns 200/201 OK
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 6. should simulate 
+webhook updating payment to approved
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 7. should trigger welcome 
+message when reservation transition to CONFIRMADA
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 8. should support real 
+Mercado Pago client configuration when API keys are available on hotel 
+integration
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 9. should log a warning 
+if payment generation fails or returns empty data
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+  ÔùÅ Mercado Pago Payment Integration E2E Tests ÔÇ║ 10. should isolate 
+integrations between hotels, ensuring Hotel A cannot use integrations of Hotel 
+B
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:41:11)
+
+
+  ÔùÅ Test suite failed to run
+
+    ReferenceError: nome is not defined
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m [36masync[39m [36mfunction[39m 
+cleanup(name[33m:[39m string) {
+    [31m[1m>[22m[39m[90m  9 |[39m   [36mawait[39m 
+prisma[33m.[39mpayment[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m    |[39m                                                       
+[31m[1m^[22m[39m
+     [90m 10 |[39m   [36mawait[39m 
+prisma[33m.[39mreservation[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 11 |[39m   [36mawait[39m 
+prisma[33m.[39mroom[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m
+     [90m 12 |[39m   [36mawait[39m 
+prisma[33m.[39mroomCategory[33m.[39mdeleteMany({ where[33m:[39m { 
+hotel[33m:[39m { nome } } })[33m;[39m[0m
+
+      at cleanup (e2e/mercado-pago.e2e-spec.ts:9:55)
+      at Object.<anonymous> (e2e/mercado-pago.e2e-spec.ts:95:32)
+
+
+Test Suites: 5 failed, 1 passed, 6 total
+Tests:       35 failed, 14 passed, 49 total
+Snapshots:   0 total
+Time:        20.764 s
+Ran all test suites.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't 
+stopped in your tests. Consider running Jest with `--detectOpenHandles` to 
+troubleshoot this issue.

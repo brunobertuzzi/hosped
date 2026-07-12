@@ -29,7 +29,9 @@ export class HousekeepingGateway
     const hotelId = client.handshake.query.hotelId as string;
     if (hotelId) {
       client.join(hotelId);
-      console.log(`[Housekeeping] Client ${client.id} joined hotel room: ${hotelId}`);
+      console.log(
+        `[Housekeeping] Client ${client.id} joined hotel room: ${hotelId}`,
+      );
     }
   }
 
@@ -39,7 +41,8 @@ export class HousekeepingGateway
 
   @SubscribeMessage('update_room_status')
   async handleRoomStatusUpdate(
-    @MessageBody() data: { roomId: string; status: RoomStatus; hotelId: string },
+    @MessageBody()
+    data: { roomId: string; status: RoomStatus; hotelId: string },
     @ConnectedSocket() client: Socket,
   ) {
     try {

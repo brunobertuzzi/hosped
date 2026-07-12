@@ -134,15 +134,36 @@ export class ReservationsService {
           });
         }
 
-        // Calcula o valor total no backend de forma segura
-        const checkInMs = checkInDate.getTime();
-        const checkOutMs = checkOutDate.getTime();
+        // Calcula o valor total no backend de forma segura com suporte a tarifas de temporada (Yield)
+        const tariffs = await tx.tariff.findMany({
+          where: { categoryId, hotelId: hotelIdForTx },
+          include: { season: true },
+        });
+
+        let calculatedValorTotal = new Prisma.Decimal(0);
+        const start = new Date(checkInDate);
+        const end = new Date(checkOutDate);
         const noites = Math.ceil(
-          (checkOutMs - checkInMs) / (1000 * 60 * 60 * 24),
+          (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
         );
-        const calculatedValorTotal = new Prisma.Decimal(category.valorBase).mul(
-          noites > 0 ? noites : 1,
-        );
+
+        for (let i = 0; i < (noites > 0 ? noites : 1); i++) {
+          const currentDate = new Date(start);
+          currentDate.setDate(start.getDate() + i);
+
+          const activeTariff = tariffs.find((t: any) => {
+            const sStart = new Date(t.season.dataInicio);
+            const sEnd = new Date(t.season.dataFim);
+            return currentDate >= sStart && currentDate <= sEnd;
+          });
+
+          const nightPrice = activeTariff
+            ? activeTariff.valor
+            : category.valorBase;
+          calculatedValorTotal = calculatedValorTotal.add(
+            new Prisma.Decimal(nightPrice),
+          );
+        }
 
         // 7. Criar a reserva (explicit hotelId defensive + extension)
         const reservation = await tx.reservation.create({

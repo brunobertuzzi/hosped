@@ -49,16 +49,16 @@ export class IntegrationsService {
   ) {
     return this.prisma.client.hotelIntegration.upsert({
       where: { hotelId },
-      create: { 
-        hotelId, 
-        paymentGatewayProvider: provider, 
-        paymentGatewayToken: token, 
-        paymentGatewayPubKey: pubKey 
+      create: {
+        hotelId,
+        paymentGatewayProvider: provider,
+        paymentGatewayToken: token,
+        paymentGatewayPubKey: pubKey,
       },
-      update: { 
-        paymentGatewayProvider: provider, 
-        paymentGatewayToken: token, 
-        paymentGatewayPubKey: pubKey 
+      update: {
+        paymentGatewayProvider: provider,
+        paymentGatewayToken: token,
+        paymentGatewayPubKey: pubKey,
       },
     });
   }

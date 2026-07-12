@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -20,15 +21,25 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
+    let status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
+    let message: any =
       exception instanceof HttpException
         ? exception.getResponse()
         : 'Erro Interno do Servidor';
+
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2002') {
+        status = HttpStatus.BAD_REQUEST;
+        const target = exception.meta?.target || 'campo único';
+        message = {
+          message: `O valor informado já está cadastrado no sistema.`,
+        };
+      }
+    }
 
     const errorMessage =
       typeof message === 'object' ? JSON.stringify(message) : String(message);

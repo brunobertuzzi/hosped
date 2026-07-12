@@ -13,11 +13,17 @@ async function bootstrap() {
   const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
   const missing = requiredEnvVars.filter((v) => !process.env[v]);
   if (missing.length > 0) {
-    console.error(`ERRO FATAL: Variáveis de ambiente obrigatórias ausentes: ${missing.join(', ')}`);
+    console.error(
+      `ERRO FATAL: Variáveis de ambiente obrigatórias ausentes: ${missing.join(', ')}`,
+    );
     process.exit(1);
   }
-  if (process.env.JWT_SECRET === 'troque_por_uma_chave_secreta_forte_32chars+') {
-    console.error('ERRO FATAL: JWT_SECRET ainda está com o valor padrão. Defina um segredo forte antes de subir em produção.');
+  if (
+    process.env.JWT_SECRET === 'troque_por_uma_chave_secreta_forte_32chars+'
+  ) {
+    console.error(
+      'ERRO FATAL: JWT_SECRET ainda está com o valor padrão. Defina um segredo forte antes de subir em produção.',
+    );
     process.exit(1);
   }
 
@@ -41,7 +47,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://frontend-production-2b45.up.railway.app'
+      'https://frontend-production-2b45.up.railway.app',
     ],
     credentials: true,
   });

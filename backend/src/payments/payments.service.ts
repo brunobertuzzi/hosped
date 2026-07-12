@@ -15,7 +15,9 @@ export class PaymentsService {
     // A chave ambiente agora é usada EXCLUSIVAMENTE para o dono do Sistema cobrar a mensalidade dos hotéis
     const sistemaToken = process.env.SISTEMA_PAYMENT_TOKEN || '';
     if (!sistemaToken) {
-      this.logger.warn('SISTEMA_PAYMENT_TOKEN NOT FOUND. Sistema Monthly Billing may fail or run in mock mode.');
+      this.logger.warn(
+        'SISTEMA_PAYMENT_TOKEN NOT FOUND. Sistema Monthly Billing may fail or run in mock mode.',
+      );
     }
   }
 
@@ -48,7 +50,9 @@ export class PaymentsService {
 
       if (!token || provider !== 'MERCADO_PAGO') {
         // Fallback Mock se o HOTEL não configurou seu gateway ou se é outro não implementado
-        this.logger.log(`Hotel ${reservation.hotelId} has no MP Token or uses another provider. Generating MOCK Pix Payment...`);
+        this.logger.log(
+          `Hotel ${reservation.hotelId} has no MP Token or uses another provider. Generating MOCK Pix Payment...`,
+        );
         resultId = 999999999 + Math.floor(Math.random() * 1000);
         pointOfInteraction = {
           transaction_data: {
@@ -114,7 +118,11 @@ export class PaymentsService {
     const provider = paymentRecord.hotel.integration?.paymentGatewayProvider;
     let isApproved = false;
 
-    if (!token || provider !== 'MERCADO_PAGO' || id.toString().startsWith('999')) {
+    if (
+      !token ||
+      provider !== 'MERCADO_PAGO' ||
+      id.toString().startsWith('999')
+    ) {
       isApproved = Math.random() > 0.5; // 50% de chance de aprovar no mock
     } else if (provider === 'MERCADO_PAGO') {
       try {

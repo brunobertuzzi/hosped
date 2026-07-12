@@ -111,11 +111,7 @@ export class AuthController {
     @Body() data: any,
     @Request() req: any,
   ) {
-    return this.authService.updateTeamMember(
-      id,
-      data,
-      req.user?.hotelId,
-    );
+    return this.authService.updateTeamMember(id, data, req.user?.hotelId);
   }
 
   @Post('forgot-password')
@@ -124,7 +120,13 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() data: { email: string, token: string, password: string }) {
-    return this.authService.resetPassword(data.email, data.token, data.password);
+  async resetPassword(
+    @Body() data: { email: string; token: string; password: string },
+  ) {
+    return this.authService.resetPassword(
+      data.email,
+      data.token,
+      data.password,
+    );
   }
 }

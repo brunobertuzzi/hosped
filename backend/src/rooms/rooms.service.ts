@@ -30,17 +30,19 @@ export class RoomsService {
     const context = this.tenantService.getContext();
     if (context && context.hotelId) {
       const hotel = await this.prisma.client.hotel.findUnique({
-        where: { id: context.hotelId }
+        where: { id: context.hotelId },
       });
       if (hotel) {
         const systemPlan = await this.prisma.client.systemPlan.findUnique({
-          where: { name: hotel.plan }
+          where: { name: hotel.plan },
         });
-        
+
         if (systemPlan && systemPlan.maxRooms !== -1) {
           const roomCount = await this.prisma.client.room.count();
           if (roomCount >= systemPlan.maxRooms) {
-            throw new BadRequestException(`Limite do plano ${hotel.plan} atingido (Máximo ${systemPlan.maxRooms} quartos). Faça upgrade para adicionar mais quartos.`);
+            throw new BadRequestException(
+              `Limite do plano ${hotel.plan} atingido (Máximo ${systemPlan.maxRooms} quartos). Faça upgrade para adicionar mais quartos.`,
+            );
           }
         }
       }

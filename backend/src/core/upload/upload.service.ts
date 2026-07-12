@@ -17,7 +17,9 @@ export class UploadService {
         fs.mkdirSync(this.uploadDir, { recursive: true });
       }
     } catch (error) {
-      this.logger.warn('Não foi possível criar o diretório de uploads (Serverless environment).');
+      this.logger.warn(
+        'Não foi possível criar o diretório de uploads (Serverless environment).',
+      );
     }
   }
 
