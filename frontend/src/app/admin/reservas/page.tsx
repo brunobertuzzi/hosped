@@ -251,11 +251,11 @@ export default function AdminReservasPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in</label>
-                        <input type="date" value={newRes.checkIn} onChange={e => setNewRes({...newRes, checkIn: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono" />
+                        <input type="date" value={newRes.checkIn} onChange={e => setNewRes({...newRes, checkIn: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-out</label>
-                        <input type="date" value={newRes.checkOut} onChange={e => setNewRes({...newRes, checkOut: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono" />
+                        <input type="date" value={newRes.checkOut} onChange={e => setNewRes({...newRes, checkOut: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
                       </div>
                     </div>
                     <button onClick={() => setStep(2)} disabled={!newRes.checkIn || !newRes.checkOut} className="w-full py-3 bg-white/10 hover:bg-white/20 text-white text-[13px] font-bold rounded-xl transition-all disabled:opacity-50">Continuar</button>
@@ -267,7 +267,7 @@ export default function AdminReservasPage() {
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 2: Hóspede (CRM)</h3>
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Buscar Hóspede Cadastrado</label>
-                      <select value={newRes.guestId} onChange={e => setNewRes({...newRes, guestId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer">
+                      <select value={newRes.guestId} onChange={e => setNewRes({...newRes, guestId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
                         <option value="" className="bg-black">-- Selecione um Hóspede --</option>
                         {guests.map(g => <option key={g.id} value={g.id} className="bg-black">{g.nome} ({g.documento})</option>)}
                       </select>
@@ -286,7 +286,7 @@ export default function AdminReservasPage() {
                     
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Categoria de Quarto</label>
-                      <select value={newRes.categoryId} onChange={e => setNewRes({...newRes, categoryId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer">
+                      <select value={newRes.categoryId} onChange={e => setNewRes({...newRes, categoryId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
                         <option value="" className="bg-black">-- Selecione a Acomodação --</option>
                         {roomCategories.map(c => <option key={c.id} value={c.id} className="bg-black">{c.nome} - R$ {c.valorBase.toFixed(2)}/dia</option>)}
                       </select>

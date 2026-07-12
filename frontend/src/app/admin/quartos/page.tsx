@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
-import { api } from '../../../lib/api';
+import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
 
 export default function QuartosPage() {
@@ -33,31 +33,33 @@ export default function QuartosPage() {
   const [roomNum, setRoomNum] = useState('');
   const [roomCatId, setRoomCatId] = useState('');
 
-  const handleCreateCategory = (e: React.FormEvent) => {
+  const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName || !catPrice) return;
 
-    const newCat = {
-      id: 'cat_' + Date.now(),
-      nome: catName,
-      valorBase: parseFloat(catPrice),
-      capacidade: parseInt(catCap),
-      comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV'],
-      fotos: []
-    };
+    try {
+      await api.createRoomCategory({
+        nome: catName,
+        valorBase: parseFloat(catPrice),
+        capacidade: parseInt(catCap),
+        comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
+      });
 
-    addRoomCategory(newCat);
-    addAuditLog({
-      id: 'a_' + Date.now(),
-      usuario: user?.nome || 'Admin',
-      data: new Date().toISOString(),
-      acao: 'CRIAR',
-      entidade: 'ROOM_CATEGORY',
-      detalhes: `Nova categoria criada: ${catName}`
-    });
+      addAuditLog({
+        id: 'a_' + Date.now(),
+        usuario: user?.nome || 'Admin',
+        data: new Date().toISOString(),
+        acao: 'CRIAR',
+        entidade: 'ROOM_CATEGORY',
+        detalhes: `Nova categoria criada: ${catName}`
+      });
 
-    setIsCatModalOpen(false);
-    setCatName(''); setCatPrice(''); setCatCap('2');
+      setIsCatModalOpen(false);
+      setCatName(''); setCatPrice(''); setCatCap('2');
+      alerts.success('Categoria criada!');
+    } catch (err: any) {
+      alerts.error('Erro ao criar categoria', err.message);
+    }
   };
 
   const openEditCat = (cat: any) => {
@@ -78,46 +80,61 @@ export default function QuartosPage() {
     setEditingCatFotos(editingCatFotos.filter((_, i) => i !== idx));
   };
 
-  const handleSavePhotos = (e: React.FormEvent) => {
+  const handleSavePhotos = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingCatId) {
-      updateRoomCategoryPhotos(editingCatId, editingCatFotos);
-      addAuditLog({
-        id: 'a_' + Date.now(),
-        usuario: user?.nome || 'Admin',
-        data: new Date().toISOString(),
-        acao: 'ATUALIZAR',
-        entidade: 'ROOM_CATEGORY',
-        detalhes: `Fotos da categoria atualizadas.`
-      });
+      // The updateRoomCategoryPhotos from store might be fake too, but let's assume we need an API call for it if we had one. 
+      // Actually, api.ts doesn't have updateRoomCategory. Let's stick to the store one for photos for now, or use request directly.
+      try {
+        await request(`/rooms/categories/${editingCatId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ fotos: editingCatFotos })
+        });
+        await api.getRoomCategories();
+        
+        addAuditLog({
+          id: 'a_' + Date.now(),
+          usuario: user?.nome || 'Admin',
+          data: new Date().toISOString(),
+          acao: 'ATUALIZAR',
+          entidade: 'ROOM_CATEGORY',
+          detalhes: `Fotos da categoria atualizadas.`
+        });
+        alerts.success('Fotos atualizadas!');
+      } catch(err: any) {
+         alerts.error('Erro ao salvar fotos', err.message);
+      }
     }
     setIsCatEditModalOpen(false);
   };
 
-  const handleCreateRoom = (e: React.FormEvent) => {
+  const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomNum || !roomCatId) return;
 
-    const newRoom = {
-      id: 'r_' + Date.now(),
-      numero: roomNum,
-      categoryId: roomCatId,
-      status: 'DISPONIVEL',
-      observacoes: ''
-    };
+    try {
+      await api.createRoom({
+        numero: roomNum,
+        categoryId: roomCatId,
+        status: 'DISPONIVEL',
+        observacoes: ''
+      });
 
-    addRoom(newRoom);
-    addAuditLog({
-      id: 'a_' + Date.now(),
-      usuario: user?.nome || 'Admin',
-      data: new Date().toISOString(),
-      acao: 'CRIAR',
-      entidade: 'ROOM',
-      detalhes: `Novo quarto criado: ${roomNum}`
-    });
+      addAuditLog({
+        id: 'a_' + Date.now(),
+        usuario: user?.nome || 'Admin',
+        data: new Date().toISOString(),
+        acao: 'CRIAR',
+        entidade: 'ROOM',
+        detalhes: `Novo quarto criado: ${roomNum}`
+      });
 
-    setIsRoomModalOpen(false);
-    setRoomNum(''); setRoomCatId('');
+      setIsRoomModalOpen(false);
+      setRoomNum(''); setRoomCatId('');
+      alerts.success('Quarto criado!');
+    } catch (err: any) {
+      alerts.error('Erro ao criar quarto', err.message);
+    }
   };
 
   const handleDeleteRoom = async (id: string) => {
@@ -301,16 +318,16 @@ export default function QuartosPage() {
             <form onSubmit={handleCreateCategory} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
-                <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Diária Base (R$)</label>
-                  <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono" />
+                  <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Capacidade (Pessoas)</label>
-                  <input required type="number" min="1" max="10" value={catCap} onChange={e => setCatCap(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                  <input required type="number" min="1" max="10" value={catCap} onChange={e => setCatCap(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
                 </div>
               </div>
               <div className="pt-4 flex gap-3">
@@ -382,7 +399,7 @@ export default function QuartosPage() {
               </div>
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vincular a Categoria</label>
-                <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer">
+                <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
                   <option value="" disabled>Selecione uma Categoria...</option>
                   {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {c.valorBase.toFixed(2)})</option>)}
                 </select>

@@ -203,17 +203,17 @@ export default function EquipePage() {
             <form onSubmit={handleSaveUser} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Completo</label>
-                <input required type="text" value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                <input required type="text" value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
               </div>
               
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail Corporativo</label>
-                <input required type="email" value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                <input required type="email" value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
               </div>
 
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Papel / Função</label>
-                <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer">
+                <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
                   {roles.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
                 </select>
               </div>

@@ -103,13 +103,13 @@ export default function AuditoriaPage() {
             <input type="text" placeholder="Filtrar operador, id ou descrição..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white placeholder-white/30 outline-none focus:border-brand transition-colors" />
           </div>
           <div>
-            <select value={selectedAction} onChange={e => setSelectedAction(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer appearance-none">
+            <select value={selectedAction} onChange={e => setSelectedAction(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer appearance-none">
               <option value="ALL" className="bg-black">Todas as Operações</option>
               {actionTypes.filter(act => act !== 'ALL').map(act => <option key={act} value={act} className="bg-black">{act}</option>)}
             </select>
           </div>
           <div>
-            <select value={selectedEntity} onChange={e => setSelectedEntity(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand cursor-pointer appearance-none">
+            <select value={selectedEntity} onChange={e => setSelectedEntity(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer appearance-none">
               <option value="ALL" className="bg-black">Todos os Modelos</option>
               {entityTypes.filter(ent => ent !== 'ALL').map(ent => <option key={ent} value={ent} className="bg-black">{ent}</option>)}
             </select>
