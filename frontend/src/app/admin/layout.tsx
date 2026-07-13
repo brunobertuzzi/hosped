@@ -170,7 +170,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
 
               <div className="pt-6 mt-6 border-t border-white/5">
-                <Link href={`/${hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
+                <Link href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
                   <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
                 </Link>
               </div>
