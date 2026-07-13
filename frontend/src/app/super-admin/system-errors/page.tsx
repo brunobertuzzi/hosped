@@ -27,6 +27,8 @@ export default function SystemErrorsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTenant, setSelectedTenant] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
 
   const fetchLogs = async () => {
@@ -55,7 +57,22 @@ export default function SystemErrorsPage() {
       
     const matchTenant = selectedTenant ? log.hotelId === selectedTenant : true;
     
-    return matchSearch && matchTenant;
+    let matchDate = true;
+    if (startDate || endDate) {
+      const logDate = new Date(log.createdAt).getTime();
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        if (logDate < start.getTime()) matchDate = false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        if (logDate > end.getTime()) matchDate = false;
+      }
+    }
+    
+    return matchSearch && matchTenant && matchDate;
   });
 
   return (
@@ -70,7 +87,22 @@ export default function SystemErrorsPage() {
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Exceções críticas e falhas do servidor (HTTP 500+).</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap justify-end">
+          <div className="flex items-center gap-2">
+            <input 
+              type="date" 
+              value={startDate} 
+              onChange={e => setStartDate(e.target.value)} 
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500" 
+            />
+            <span className="text-white/30 text-[10px]">Até</span>
+            <input 
+              type="date" 
+              value={endDate} 
+              onChange={e => setEndDate(e.target.value)} 
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500" 
+            />
+          </div>
           <TenantFilterDropdown 
             sistemaClients={sistemaClients} 
             selectedTenant={selectedTenant} 

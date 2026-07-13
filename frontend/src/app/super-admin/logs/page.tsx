@@ -13,6 +13,8 @@ export default function SystemLogsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTenant, setSelectedTenant] = useState<string>('');
   const [selectedAction, setSelectedAction] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   const fetchLogs = async () => {
@@ -38,13 +40,13 @@ export default function SystemLogsPage() {
     
     // Polling a cada 5 segundos para simular "real-time" se nenhum termo de busca estiver ativo
     const interval = setInterval(() => {
-      if (!searchTerm) {
+      if (!searchTerm && !startDate && !endDate) {
         fetchLogs();
       }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [selectedTenant, searchTerm]);
+  }, [selectedTenant, searchTerm, startDate, endDate]);
 
   const filteredLogs = logs.filter(log => {
     const matchSearch = 
@@ -56,7 +58,23 @@ export default function SystemLogsPage() {
       log?.id?.toLowerCase().includes(searchTerm.toLowerCase());
       
     const matchAction = selectedAction ? log?.acao?.includes(selectedAction) : true;
-    return matchSearch && matchAction;
+    
+    let matchDate = true;
+    if (startDate || endDate) {
+      const logDate = new Date(log.createdAt).getTime();
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        if (logDate < start.getTime()) matchDate = false;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        if (logDate > end.getTime()) matchDate = false;
+      }
+    }
+
+    return matchSearch && matchAction && matchDate;
   });
 
   const getLevelColor = (acao: string) => {
@@ -77,7 +95,22 @@ export default function SystemLogsPage() {
           <p className="text-[13px] text-white/40 mt-1 font-medium">Console em tempo real de eventos em todas as redes (Tenants).</p>
         </div>
         
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap justify-end">
+          <div className="flex items-center gap-2">
+            <input 
+              type="date" 
+              value={startDate} 
+              onChange={e => setStartDate(e.target.value)} 
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500" 
+            />
+            <span className="text-white/30 text-[10px]">Até</span>
+            <input 
+              type="date" 
+              value={endDate} 
+              onChange={e => setEndDate(e.target.value)} 
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500" 
+            />
+          </div>
           <TenantFilterDropdown 
             sistemaClients={sistemaClients} 
             selectedTenant={selectedTenant} 
