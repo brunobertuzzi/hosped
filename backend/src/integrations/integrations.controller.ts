@@ -17,21 +17,21 @@ export class IntegrationsController {
   @UseGuards(AuthGuard)
   @Get()
   getIntegration(@Request() req: any) {
-    const hotelId = req.hotelId; // Injetado pelo tenant middleware
+    const hotelId = req.user?.hotelId; // Injetado pelo tenant middleware
     return this.integrationsService.getHotelIntegration(hotelId);
   }
 
   @UseGuards(AuthGuard)
   @Post('google')
   updateGooglePlaceId(@Body('placeId') placeId: string, @Request() req: any) {
-    const hotelId = req.hotelId;
+    const hotelId = req.user?.hotelId;
     return this.integrationsService.updateGoogleConfig(hotelId, placeId);
   }
 
   @UseGuards(AuthGuard)
   @Post('whatsapp')
   updateWhatsapp(@Body() body: any, @Request() req: any) {
-    const hotelId = req.hotelId;
+    const hotelId = req.user?.hotelId;
     return this.integrationsService.updateWhatsappConfig(
       hotelId,
       body.whatsappApiUrl,
@@ -43,7 +43,7 @@ export class IntegrationsController {
   @UseGuards(AuthGuard)
   @Post('payment-gateway')
   updatePaymentGateway(@Body() body: any, @Request() req: any) {
-    const hotelId = req.hotelId;
+    const hotelId = req.user?.hotelId;
     return this.integrationsService.updatePaymentGatewayConfig(
       hotelId,
       body.provider,

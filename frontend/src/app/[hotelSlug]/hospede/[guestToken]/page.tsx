@@ -47,6 +47,12 @@ export default function GuestPanelPage() {
     }
   }, [guestToken, reservations, guests]);
 
+  useEffect(() => {
+    if (hotel?.nome) {
+      document.title = hotel.nome;
+    }
+  }, [hotel?.nome]);
+
   // Design System Injector
   const primaryColor = hotel.cores?.primary || '#f59e0b';
   const bgColor = hotel.cores?.secondary || '#050505';

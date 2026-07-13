@@ -63,7 +63,18 @@ export class IntegrationsService {
     });
   }
 
-  async fetchGoogleReviews(hotelId: string) {
+  async fetchGoogleReviews(hotelIdOrSlug: string) {
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(hotelIdOrSlug);
+    let hotelId = hotelIdOrSlug;
+    
+    if (!isUuid) {
+      const hotel = await this.prisma.client.hotel.findUnique({
+        where: { slug: hotelIdOrSlug },
+        select: { id: true }
+      });
+      if (hotel) hotelId = hotel.id;
+    }
+
     const integration = await this.prisma.client.hotelIntegration.findUnique({
       where: { hotelId },
     });

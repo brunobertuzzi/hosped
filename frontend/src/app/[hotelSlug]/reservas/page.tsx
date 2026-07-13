@@ -97,6 +97,7 @@ function BookingEngineContent() {
             roomCategories: hdata.roomCategories || [],
             rooms: hdata.rooms || [],
           });
+          document.title = hdata.hotel.nome || 'Hosped';
           const initial = initialBranchId || hdata.branches[0]?.id;
           if (initial) setSelectedBranchId(initial);
         } else {

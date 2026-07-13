@@ -40,6 +40,7 @@ export default function TenantLandingPage() {
             hotel: data.hotel,
             branches: data.branches,
           });
+          document.title = data.hotel.nome || 'Hosped';
         }
       } catch (err) {
         console.warn('Falha ao carregar dados do hotel:', err);
