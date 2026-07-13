@@ -29,8 +29,6 @@ import { FeatureFlagsController } from './feature-flags.controller';
   providers: [
     PrismaService,
     TenantService,
-    AuthService,
-    JwtService,
     UploadService,
     BillingTask,
   ],

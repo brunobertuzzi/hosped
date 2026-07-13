@@ -9,6 +9,20 @@ import * as os from 'os';
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
+  @Get('public')
+  async getPublicHealth() {
+    let postgresStatus = 'OFFLINE';
+    let errorMessage = '';
+    try {
+      await this.prisma.client.$queryRaw`SELECT 1`;
+      postgresStatus = 'ONLINE';
+    } catch (e: any) {
+      postgresStatus = 'OFFLINE';
+      errorMessage = e.message;
+    }
+    return { status: 'ONLINE', postgresStatus, errorMessage };
+  }
+
   @Get()
   async getHealth(@Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
