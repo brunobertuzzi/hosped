@@ -457,19 +457,19 @@ export default function SuperAdminTenants() {
                     <div>
                       <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
                         <span>Armazenamento (Fotos e Docs)</span>
-                        <span>450 MB / 1 GB</span>
+                        <span>{editingClient.storageUsedMB || 0} MB / {(editingClient.storageLimitMB || 1024) >= 1024 ? `${(editingClient.storageLimitMB || 1024) / 1024} GB` : `${editingClient.storageLimitMB} MB`}</span>
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                        <div className="bg-emerald-500 h-full w-[45%]"></div>
+                        <div className="bg-emerald-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.storageUsedMB || 0) / (editingClient.storageLimitMB || 1024)) * 100, 100)}%` }}></div>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
                         <span>Requisições de API (Mensal)</span>
-                        <span className="text-amber-400">8.900 / 10.000</span>
+                        <span className="text-amber-400">{editingClient.apiRequestsCount || 0} / {editingClient.apiRequestsLimit || 10000}</span>
                       </div>
                       <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                        <div className="bg-amber-500 h-full w-[89%]"></div>
+                        <div className="bg-amber-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.apiRequestsCount || 0) / (editingClient.apiRequestsLimit || 10000)) * 100, 100)}%` }}></div>
                       </div>
                     </div>
                   </div>

@@ -58,6 +58,10 @@ export class TenantsController {
       createdAt: hotel.createdAt,
       branchesCount: hotel._count.branches,
       nextBillingDate: hotel.nextBillingDate,
+      storageUsedMB: hotel.storageUsedMB,
+      storageLimitMB: hotel.storageLimitMB,
+      apiRequestsCount: hotel.apiRequestsCount,
+      apiRequestsLimit: hotel.apiRequestsLimit,
     }));
   }
 

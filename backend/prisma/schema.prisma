@@ -116,6 +116,12 @@ model Hotel {
   status               String    @default("ACTIVE")
   mrr                  Float     @default(150.0)
   nextBillingDate      DateTime?
+  
+  storageUsedMB        Float     @default(0)
+  storageLimitMB       Float     @default(1024)
+  apiRequestsCount     Int       @default(0)
+  apiRequestsLimit     Int       @default(10000)
+
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 

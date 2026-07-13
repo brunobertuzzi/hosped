@@ -16,6 +16,10 @@ export interface SistemaClient {
   nextBillingDate?: string;
   cardLast4?: string;
   features?: string[];
+  storageUsedMB?: number;
+  storageLimitMB?: number;
+  apiRequestsCount?: number;
+  apiRequestsLimit?: number;
 }
 
 export interface SistemaInvoice {
