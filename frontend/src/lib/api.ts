@@ -481,6 +481,31 @@ export const api = {
     });
   },
 
+  // ================= FEATURE FLAGS =================
+  async getFeatureFlags() {
+    return await request('/core/feature-flags');
+  },
+
+  async createFeatureFlag(data: any) {
+    return await request('/core/feature-flags', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateFeatureFlag(id: string, data: any) {
+    return await request(`/core/feature-flags/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteFeatureFlag(id: string) {
+    return await request(`/core/feature-flags/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   // ================= INTEGRAÇÕES =================
 
   async getIntegrationSettings() {

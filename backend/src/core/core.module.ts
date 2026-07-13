@@ -13,6 +13,7 @@ import { BillingTask } from './tasks/billing.task';
 import { PlansController } from './plans.controller';
 import { HealthController } from './health.controller';
 import { BroadcastController } from './broadcast.controller';
+import { FeatureFlagsController } from './feature-flags.controller';
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { BroadcastController } from './broadcast.controller';
     PlansController,
     HealthController,
     BroadcastController,
+    FeatureFlagsController,
   ],
   providers: [
     PrismaService,

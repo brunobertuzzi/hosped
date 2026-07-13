@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Calendar as CalendarIcon, Search, Plus, Filter, MoreVertical, 
+import {
+  Calendar as CalendarIcon, Search, Plus, Filter, MoreVertical,
   CheckCircle, XCircle, Clock, User, DoorOpen, CreditCard, ArrowRight, Save, ShoppingBag
 } from 'lucide-react';
 import { useActiveBranchData } from '../../../store/useTenantStore';
@@ -12,10 +12,10 @@ import { alerts } from '../../../lib/alerts';
 
 export default function AdminReservasPage() {
   const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -51,7 +51,7 @@ export default function AdminReservasPage() {
   }, [reservations, guests, searchTerm, statusFilter]);
 
   const selectedCategory = useMemo(() => roomCategories.find(c => c.id === newRes.categoryId), [newRes.categoryId, roomCategories]);
-  
+
   const dias = useMemo(() => {
     if(!newRes.checkIn || !newRes.checkOut) return 0;
     const diff = new Date(newRes.checkOut).getTime() - new Date(newRes.checkIn).getTime();
@@ -65,13 +65,13 @@ export default function AdminReservasPage() {
       alerts.error('Atenção', 'Preencha todos os campos obrigatórios.');
       return;
     }
-    
+
     const finalValue = newRes.valorPersonalizado ? Number(newRes.valorPersonalizado) : valorCalculado;
-    
+
     try {
       const guest = guests.find(g => g.id === newRes.guestId);
       if (!guest) throw new Error('Hóspede não encontrado');
-      
+
       await request('/reservations', {
         method: 'POST',
         body: JSON.stringify({
@@ -146,7 +146,7 @@ export default function AdminReservasPage() {
 
     try {
       await api.addConsumption(posResId, posItemId, parseInt(posQty));
-      
+
       const item = inventory.find(i => i.id === posItemId);
       addAuditLog({
         id: 'a_' + Date.now(),
@@ -177,10 +177,10 @@ export default function AdminReservasPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">Reservas (PMS)</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">Reservas</h1>
           <p className="text-[13px] text-white/50">Gerencie e crie reservas do balcão e telefone.</p>
         </div>
-        
+
         <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_15px_-3px_var(--brand-primary)]">
           <Plus className="w-4 h-4" /> Nova Reserva
         </button>
@@ -194,7 +194,7 @@ export default function AdminReservasPage() {
               <input type="text" placeholder="Buscar por localizador ou hóspede..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-[13px] text-white outline-none focus:border-brand transition-colors" />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
             {['ALL', 'CONFIRMADA', 'HOSPEDADO', 'CANCELADA'].map(status => (
               <button key={status} onClick={() => setStatusFilter(status)} className={`px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap transition-all border ${statusFilter === status ? 'bg-brand/10 border-brand/30 text-brand' : 'bg-transparent border-white/10 text-white/50 hover:bg-white/5'}`}>
@@ -281,7 +281,7 @@ export default function AdminReservasPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-              
+
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
                 <div>
                   <h2 className="text-lg font-bold text-white tracking-tight">Nova Reserva Manual</h2>
@@ -291,7 +291,7 @@ export default function AdminReservasPage() {
               </div>
 
               <div className="p-6 overflow-y-auto flex-1 space-y-8">
-                
+
                 {/* Etapas Progress */}
                 <div className="flex items-center gap-2">
                   {[1, 2, 3].map(i => (
@@ -337,7 +337,7 @@ export default function AdminReservasPage() {
                 {step === 3 && (
                   <div className="space-y-6">
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 3: Acomodação e Tarifa</h3>
-                    
+
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Categoria de Quarto</label>
                       <select value={newRes.categoryId} onChange={e => setNewRes({...newRes, categoryId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
@@ -355,7 +355,7 @@ export default function AdminReservasPage() {
                         <span>Tarifa Padrão (Sem desconto)</span>
                         <span className="font-mono">R$ {valorCalculado.toFixed(2)}</span>
                       </div>
-                      
+
                       <div className="pt-4 border-t border-white/5">
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-brand mb-2">Tarifa Balcão Especial (Sobrescrever valor total)</label>
                         <input type="number" placeholder={`Ex: ${valorCalculado}`} value={newRes.valorPersonalizado} onChange={e => setNewRes({...newRes, valorPersonalizado: e.target.value})} className="w-full bg-brand/5 border border-brand/20 rounded-xl px-4 py-3 text-[13px] text-brand outline-none focus:border-brand font-mono" />
@@ -383,7 +383,7 @@ export default function AdminReservasPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsPosModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
-              
+
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
                 <div>
                   <h2 className="text-lg font-bold text-white tracking-tight">Lançar Consumo (PDV)</h2>

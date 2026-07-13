@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Building2, Activity, Calendar, Package, ShieldCheck, LogOut, MapPin, 
+import {
+  Building2, Activity, Calendar, Package, ShieldCheck, LogOut, MapPin,
   ChevronRight, AlertTriangle, Moon, Palette, CheckCircle2, CloudLightning,
   Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X
 } from 'lucide-react';
@@ -16,9 +16,9 @@ import { CommandPalette } from '../../components/CommandPalette';
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { 
-    user, hotel, branches, selectedBranchId, isOffline, 
-    setSelectedBranchId, setUser, setHotelColors 
+  const {
+    user, hotel, branches, selectedBranchId, isOffline,
+    setSelectedBranchId, setUser, setHotelColors
   } = useTenantStore();
 
   const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);
@@ -92,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile Backdrop */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 z-40 md:hidden backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -102,7 +102,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className={`fixed md:relative inset-y-0 left-0 z-50 flex shrink-0 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} py-5 pl-5 pr-5 md:pr-0 w-[280px] md:w-auto`}>
         <aside className="w-full md:w-64 glass-card border border-white/5 rounded-[24px] flex flex-col justify-between p-5 overflow-y-auto h-[calc(100vh-40px)] relative bg-[#0a0a0a] md:bg-transparent">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-          
+
           <div className="space-y-10 relative z-10">
             {/* Logo e Info Hotel */}
             <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'HOUSEKEEPING'].includes(user.role) && (
                 <Link href="/admin/governanca" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/governanca' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <Sparkles className="w-4 h-4" /> Governança (Limpeza)
+                  <Sparkles className="w-4 h-4" /> Governança
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'INVENTORY'].includes(user.role) && (
@@ -192,7 +192,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button onClick={handleLogout} className="w-full flex items-center gap-2 text-xs font-medium text-white/40 hover:text-red-400 px-2 py-1.5 rounded-lg transition-colors">
               <LogOut className="w-3.5 h-3.5" /> Encerrar Sessão
             </button>
-            <button 
+            <button
               className="md:hidden absolute top-4 right-4 text-white/50 hover:text-white"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -210,7 +210,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Topbar Superior */}
         <header className="h-[88px] flex items-center justify-between px-4 md:px-10 sticky top-0 z-30 shrink-0 bg-black/40 backdrop-blur-xl border-b border-white/[0.02]">
           <div className="flex items-center gap-2 md:gap-3">
-            <button 
+            <button
               className="md:hidden p-2 -ml-2 text-white/70 hover:text-white"
               onClick={() => setIsMobileMenuOpen(true)}
             >
@@ -220,7 +220,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <MapPin className="w-4 h-4 text-white/40" />
               <div className="flex flex-col">
                 <span className="text-[8px] uppercase font-bold tracking-widest text-white/30">Operação Local</span>
-                <select 
+                <select
                   value={selectedBranchId}
                   onChange={e => setSelectedBranchId(e.target.value)}
                   className="bg-transparent text-[11px] md:text-[13px] font-bold text-white/80 outline-none cursor-pointer border-none appearance-none hover:text-white transition-colors w-24 md:w-48 truncate"
@@ -234,7 +234,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-6">
-            
+
             {/* Color Theme Selector */}
             <div className="relative">
               <button
@@ -243,7 +243,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <Palette className="w-3 h-3 text-brand" /> Tema
               </button>
-              
+
               {isThemePanelOpen && (
                 <div className="absolute right-0 mt-3 w-48 glass-panel p-3 z-30">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">

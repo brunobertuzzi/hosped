@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Shield, Plus, MoreVertical, 
+import {
+  Users, Shield, Plus, MoreVertical,
   UserCheck, UserX, Mail, Key
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ export default function EquipePage() {
     { id: 'HOTEL_OWNER', label: 'Dono / Administrador', color: 'text-amber-500', bg: 'bg-amber-500/10' },
     { id: 'MANAGER', label: 'Gerente Geral', color: 'text-purple-400', bg: 'bg-purple-500/10' },
     { id: 'RECEPTIONIST', label: 'Recepção / Front Desk', color: 'text-brand', bg: 'bg-brand/10' },
-    { id: 'HOUSEKEEPING', label: 'Governança (Limpeza)', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+    { id: 'HOUSEKEEPING', label: 'Governança', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { id: 'MAINTENANCE', label: 'Técnico de Manutenção', color: 'text-blue-400', bg: 'bg-blue-500/10' },
   ];
 
@@ -116,7 +116,7 @@ export default function EquipePage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
@@ -125,7 +125,7 @@ export default function EquipePage() {
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de acessos, permissões e cadastro de funcionários.</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2"
         >
@@ -139,7 +139,7 @@ export default function EquipePage() {
           const roleData = roles.find(r => r.id === u.role) || roles[2];
           return (
             <div key={u.id} className={`glass-card p-6 border relative overflow-hidden transition-all ${u.status === 'ATIVO' ? 'border-white/10 hover:border-white/20' : 'border-red-500/20 opacity-70 grayscale'}`}>
-              
+
               {/* Badge Status */}
               <div className="absolute top-4 right-4 flex items-center gap-2">
                 <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded-md ${u.status === 'ATIVO' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
@@ -167,14 +167,14 @@ export default function EquipePage() {
               </div>
 
               <div className="flex gap-2 border-t border-white/5 pt-4">
-                <button 
+                <button
                   onClick={() => openModal(u)}
                   className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-lg text-white/40 transition-colors"
                   title="Editar Funcionário"
                 >
                   <MoreVertical className="w-4 h-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => toggleStatus(u.id, u.status, u.nome)}
                   className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 ${
                     u.status === 'ATIVO' ? 'bg-white/5 text-red-400 hover:bg-red-500/10' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
@@ -199,13 +199,13 @@ export default function EquipePage() {
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Users className="w-5 h-5 text-brand" /> {editingUserId ? 'Editar Funcionário' : 'Novo Funcionário'}
             </h2>
-            
+
             <form onSubmit={handleSaveUser} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Completo</label>
                 <input required type="text" value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
               </div>
-              
+
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail Corporativo</label>
                 <input required type="email" value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Users, Search, Filter, History, Mail, Phone, 
+import {
+  Users, Search, Filter, History, Mail, Phone,
   MapPin, Star, ChevronRight, BedDouble, Edit, Plus, XCircle, Save
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -73,7 +73,7 @@ export default function HospedesPage() {
       const guestReservations = reservations.filter(r => r.guestId === guest.id);
       const totalGasto = guestReservations.reduce((sum, res) => sum + Number(res.valorTotal), 0);
       const isVip = totalGasto > 1000 || guestReservations.length >= 3;
-      
+
       return {
         ...guest,
         totalReservations: guestReservations.length,
@@ -85,8 +85,8 @@ export default function HospedesPage() {
   }, [guests, reservations]);
 
   const filteredGuests = useMemo(() => {
-    return guestsWithMetrics.filter(g => 
-      g.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    return guestsWithMetrics.filter(g =>
+      g.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       g.documento.includes(searchTerm) ||
       g.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -97,12 +97,12 @@ export default function HospedesPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            CRM & Base de Hóspedes
+            Hóspedes
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Gestão de relacionamento corporativo e fidelidade.</p>
         </div>
@@ -118,17 +118,17 @@ export default function HospedesPage() {
 
       {/* Busca e Tabela Principal */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Lista de Hóspedes */}
         <div className="lg:col-span-2 space-y-6">
           <div className="relative">
             <Search className="absolute left-4 top-3.5 w-4 h-4 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Pesquisar por nome, CPF ou e-mail..." 
-              value={searchTerm} 
-              onChange={e => setSearchTerm(e.target.value)} 
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white placeholder-white/30 outline-none focus:border-brand transition-colors" 
+            <input
+              type="text"
+              placeholder="Pesquisar por nome, CPF ou e-mail..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white placeholder-white/30 outline-none focus:border-brand transition-colors"
             />
           </div>
 
@@ -145,8 +145,8 @@ export default function HospedesPage() {
                 </thead>
                 <tbody className="divide-y divide-white/[0.02]">
                   {filteredGuests.map(guest => (
-                    <tr 
-                      key={guest.id} 
+                    <tr
+                      key={guest.id}
                       onClick={() => setSelectedGuestId(guest.id)}
                       className={`cursor-pointer transition-colors group ${selectedGuestId === guest.id ? 'bg-white/[0.05]' : 'hover:bg-white/[0.02]'}`}
                     >
@@ -179,7 +179,7 @@ export default function HospedesPage() {
         <div className="lg:col-span-1">
           <AnimatePresence mode="wait">
             {selectedGuest ? (
-              <motion.div 
+              <motion.div
                 key={selectedGuest.id}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -285,7 +285,7 @@ export default function HospedesPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
-              
+
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
                 <div>
                   <h2 className="text-lg font-bold text-white tracking-tight">{editingGuestId ? 'Editar Hóspede' : 'Novo Hóspede'}</h2>
