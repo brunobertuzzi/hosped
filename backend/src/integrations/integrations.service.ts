@@ -85,23 +85,32 @@ export class IntegrationsService {
       );
     }
 
-    // AQUI ENTRARIA A CHAMADA REAL PARA A API DO GOOGLE PLACES
-    // Ex: GET https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${API_KEY}
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey) {
+      // Retornar fallback temporário se a chave não estiver configurada no servidor ainda
+      return [
+        {
+          author_name: 'Cliente Satisfeito',
+          rating: 5,
+          text: 'Melhor hotel que já fiquei! Atendimento excelente.',
+          time: Math.floor(Date.now() / 1000) - 86400,
+        }
+      ];
+    }
 
-    // Retornando Mock para exemplificação
-    return [
-      {
-        author_name: 'Cliente Satisfeito',
-        rating: 5,
-        text: 'Melhor hotel que já fiquei! Atendimento excelente.',
-        time: Math.floor(Date.now() / 1000) - 86400,
-      },
-      {
-        author_name: 'Maria Silva',
-        rating: 5,
-        text: 'Quartos muito limpos e café da manhã maravilhoso.',
-        time: Math.floor(Date.now() / 1000) - 172800,
-      },
-    ];
+    try {
+      const axios = require('axios');
+      const response = await axios.default.get(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${integration.googlePlaceId}&fields=reviews&language=pt-BR&key=${apiKey}`
+      );
+
+      if (response.data.status === 'OK' && response.data.result && response.data.result.reviews) {
+        return response.data.result.reviews;
+      }
+      return [];
+    } catch (error) {
+      console.error('Erro ao buscar reviews do Google:', error);
+      return [];
+    }
   }
 }
