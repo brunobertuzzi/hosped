@@ -19,18 +19,10 @@ export default function SystemLogsPage() {
     try {
       setLoading(true);
       const data = await api.getSuperAdminLogs(selectedTenant || undefined);
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         setLogs(data);
       } else {
-        // Fallback robusto para demonstração de Audit Trail
-        const mockAuditLogs = [
-          { id: 'log-1', acao: 'DELETE_RESERVATION', entidade: 'RESERVA', hotel: { nome: 'Hotel Master' }, user: { nome: 'Carlos Silva', email: 'carlos@hotelmaster.com' }, dadosAnteriores: { status: 'CONFIRMADA', id: 442 }, dadosNovos: { status: 'CANCELADA' }, createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
-          { id: 'log-2', acao: 'UPDATE_CONFIG', entidade: 'TENANT_SETTINGS', hotel: { nome: 'Pousada Sol' }, user: { nome: 'Ana Souza', email: 'ana@pousadasol.com' }, dadosAnteriores: { enableInvoice: false }, dadosNovos: { enableInvoice: true }, createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
-          { id: 'log-3', acao: 'CREATE_ROOM', entidade: 'QUARTO', hotel: { nome: 'Resort Beach' }, user: { nome: 'Gerente Resort', email: 'admin@resort.com' }, dadosAnteriores: null, dadosNovos: { numero: 405, tipo: 'LUXO' }, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() },
-          { id: 'log-4', acao: 'LOGIN_ATTEMPT', entidade: 'AUTH', hotel: { nome: 'Sistema' }, user: { nome: 'Super Admin', email: 'admin@admin.com' }, dadosAnteriores: null, dadosNovos: { ip: '192.168.0.1', success: true }, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() },
-          { id: 'log-5', acao: 'FAILED_WEBHOOK', entidade: 'INTEGRATION', hotel: { nome: 'Hotel Master' }, user: { nome: 'System API', email: 'api@hosped.com' }, dadosAnteriores: { endpoint: 'https://webhook.site/xxx' }, dadosNovos: { error: 'TIMEOUT 504' }, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() },
-        ];
-        setLogs(mockAuditLogs);
+        setLogs([]);
       }
     } catch (err) {
       console.error('Falha ao buscar logs', err);
