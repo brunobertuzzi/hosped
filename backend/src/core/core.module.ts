@@ -4,6 +4,7 @@ import { TenantService } from './tenant.service';
 import { TenantMetricsController } from './tenant-metrics.controller';
 import { TenantsController } from './tenants.controller';
 import { AuthService } from '../auth/auth.service';
+import { AuthModule } from '../auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 
 import { UploadService } from './upload/upload.service';
@@ -17,6 +18,7 @@ import { FeatureFlagsController } from './feature-flags.controller';
 
 @Global()
 @Module({
+  imports: [AuthModule],
   controllers: [
     TenantMetricsController,
     TenantsController,
