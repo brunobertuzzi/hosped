@@ -46,6 +46,7 @@
     "express": "^5.2.1",
     "helmet": "^8.2.0",
     "ical-generator": "^11.0.0",
+    "ioredis": "^5.11.1",
     "mercadopago": "^3.0.0",
     "multer": "^2.2.0",
     "node-ical": "^0.26.1",
