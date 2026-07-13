@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Plus, Search, Megaphone, Info, AlertTriangle, CheckCircle2, Calendar, Trash2 } from 'lucide-react';
+import { Plus, Search, Megaphone, Info, AlertTriangle, CheckCircle2, Calendar, Trash2, Loader2, X } from 'lucide-react';
 
 type AnnouncementType = 'INFO' | 'WARNING' | 'SUCCESS' | 'RELEASE_NOTES';
 
@@ -16,51 +16,32 @@ interface Announcement {
   createdAt: string;
 }
 
-const mockAnnouncements: Announcement[] = [
-  {
-    id: 'ann_1',
-    title: 'Nova Funcionalidade: Gestão de Inadimplência',
-    content: 'Agora você pode acompanhar as faturas pendentes dos seus clientes diretamente pelo novo módulo financeiro.',
-    type: 'RELEASE_NOTES',
-    isActive: true,
-    targetPlans: ['PRO', 'ENTERPRISE'],
-    createdAt: '2023-10-25T10:00:00Z'
-  },
-  {
-    id: 'ann_2',
-    title: 'Manutenção Programada (Mercado Pago)',
-    content: 'Ocorrerá uma manutenção na integração com o Mercado Pago neste Domingo das 02:00 às 04:00.',
-    type: 'WARNING',
-    isActive: true,
-    targetPlans: [],
-    createdAt: '2023-10-24T15:30:00Z'
-  },
-  {
-    id: 'ann_3',
-    title: 'Bem-vindos ao Hosped v2!',
-    content: 'Estamos felizes em anunciar a nova interface para todos os usuários.',
-    type: 'INFO',
-    isActive: false,
-    targetPlans: [],
-    createdAt: '2023-09-01T09:00:00Z'
-  }
-];
-
 export default function BroadcastPage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    fetchMaintenance();
+  // Add modal state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [newType, setNewType] = useState<AnnouncementType>('INFO');
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  const fetchMaintenance = async () => {
+  const fetchData = async () => {
     try {
+      setLoading(true);
       const { api } = await import('../../../lib/api');
-      const res = await api.getGlobalMaintenance();
-      setMaintenanceMode(res.maintenanceMode);
+      const [maintRes, annRes] = await Promise.all([
+        api.getGlobalMaintenance(),
+        api.getAnnouncements()
+      ]);
+      setMaintenanceMode(maintRes.maintenanceMode);
+      setAnnouncements(annRes || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -79,8 +60,47 @@ export default function BroadcastPage() {
     }
   };
 
-  const toggleActive = (id: string) => {
-    setAnnouncements(announcements.map(a => a.id === id ? { ...a, isActive: !a.isActive } : a));
+  const toggleActive = async (id: string, currentStatus: boolean, announcement: Announcement) => {
+    try {
+      setAnnouncements(announcements.map(a => a.id === id ? { ...a, isActive: !currentStatus } : a));
+      const { api } = await import('../../../lib/api');
+      await api.updateAnnouncement(id, { ...announcement, isActive: !currentStatus });
+    } catch (err) {
+      alert('Erro ao atualizar status');
+      fetchData(); // revert on fail
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Deseja realmente excluir este anúncio?')) return;
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.deleteAnnouncement(id);
+      setAnnouncements(announcements.filter(a => a.id !== id));
+    } catch (err) {
+      alert('Erro ao excluir anúncio');
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.createAnnouncement({
+        title: newTitle,
+        content: newContent,
+        type: newType,
+        isActive: true,
+        targetPlans: []
+      });
+      setIsAddModalOpen(false);
+      setNewTitle('');
+      setNewContent('');
+      setNewType('INFO');
+      fetchData();
+    } catch (err: any) {
+      alert('Erro ao criar anúncio: ' + (err.message || 'Erro desconhecido'));
+    }
   };
 
   const filteredAnnouncements = announcements.filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -138,7 +158,7 @@ export default function BroadcastPage() {
 
       <div className="flex items-center justify-between border-t border-white/5 pt-6">
         <h2 className="text-lg font-bold text-white">Comunicados Ativos</h2>
-        <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-[12px] font-bold tracking-wide transition-colors flex items-center gap-2">
+        <button onClick={() => setIsAddModalOpen(true)} className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-[12px] font-bold tracking-wide transition-colors flex items-center gap-2">
           <Plus className="w-4 h-4" /> Novo Anúncio
         </button>
       </div>
@@ -158,63 +178,108 @@ export default function BroadcastPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <AnimatePresence>
-            {filteredAnnouncements.map((announcement) => (
-              <motion.div 
-                layout
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                key={announcement.id} 
-                className={`border rounded-2xl p-5 flex flex-col relative overflow-hidden transition-all ${announcement.isActive ? 'bg-white/[0.03] border-white/10 hover:border-indigo-500/30' : 'bg-black/40 border-white/5 opacity-60'}`}
-              >
-                {!announcement.isActive && (
-                  <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
-                )}
-                
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${getTypeStyle(announcement.type)}`}>
-                      {getTypeIcon(announcement.type)}
-                      {announcement.type}
-                    </span>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <div 
-                        onClick={() => toggleActive(announcement.id)}
-                        className={`w-8 h-4 rounded-full relative transition-colors ${announcement.isActive ? 'bg-indigo-500' : 'bg-white/20'}`}
-                      >
-                        <motion.div 
-                          layout
-                          className={`w-2.5 h-2.5 bg-white rounded-full absolute top-[3px] ${announcement.isActive ? 'left-[18px]' : 'left-[3px]'}`}
-                        />
-                      </div>
-                    </label>
-                  </div>
+          {loading && announcements.length === 0 ? (
+            <div className="col-span-full py-12 flex flex-col items-center justify-center">
+               <Loader2 className="w-6 h-6 text-indigo-500 animate-spin mb-4" />
+               <span className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Carregando anúncios...</span>
+            </div>
+          ) : (
+            <AnimatePresence>
+              {filteredAnnouncements.map((announcement) => (
+                <motion.div 
+                  layout
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  key={announcement.id} 
+                  className={`border rounded-2xl p-5 flex flex-col relative overflow-hidden transition-all ${announcement.isActive ? 'bg-white/[0.03] border-white/10 hover:border-indigo-500/30' : 'bg-black/40 border-white/5 opacity-60'}`}
+                >
+                  {!announcement.isActive && (
+                    <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
+                  )}
                   
-                  <h3 className="text-[15px] font-bold text-white mb-2 leading-tight">{announcement.title}</h3>
-                  <p className="text-[12px] text-white/50 mb-6 line-clamp-3 leading-relaxed">{announcement.content}</p>
-                  
-                  <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/30 font-mono">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(announcement.createdAt).toLocaleDateString('pt-BR')}
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${getTypeStyle(announcement.type)}`}>
+                        {getTypeIcon(announcement.type)}
+                        {announcement.type}
+                      </span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <div 
+                          onClick={() => toggleActive(announcement.id, announcement.isActive, announcement)}
+                          className={`w-8 h-4 rounded-full relative transition-colors ${announcement.isActive ? 'bg-indigo-500' : 'bg-white/20'}`}
+                        >
+                          <motion.div 
+                            layout
+                            className={`w-2.5 h-2.5 bg-white rounded-full absolute top-[3px] ${announcement.isActive ? 'left-[18px]' : 'left-[3px]'}`}
+                          />
+                        </div>
+                      </label>
                     </div>
                     
-                    <button className="text-white/20 hover:text-red-400 transition-colors">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <h3 className="text-[15px] font-bold text-white mb-2 leading-tight">{announcement.title}</h3>
+                    <p className="text-[12px] text-white/50 mb-6 line-clamp-3 leading-relaxed">{announcement.content}</p>
+                    
+                    <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
+                      <div className="flex items-center gap-1.5 text-[10px] text-white/30 font-mono">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(announcement.createdAt).toLocaleDateString('pt-BR')}
+                      </div>
+                      
+                      <button onClick={() => handleDelete(announcement.id)} className="text-white/20 hover:text-red-400 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
-        {filteredAnnouncements.length === 0 && (
+        {!loading && filteredAnnouncements.length === 0 && (
           <div className="py-12 text-center text-white/30 text-xs font-medium uppercase tracking-widest border border-dashed border-white/5 rounded-2xl">
             Nenhum anúncio encontrado
           </div>
         )}
       </div>
+
+      {/* Modal Add Announcement */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+              <button onClick={() => setIsAddModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500" />
+              <h2 className="text-xl font-bold text-white mb-6">Criar Novo Anúncio</h2>
+              <form onSubmit={handleCreate} className="space-y-5">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Título do Anúncio</label>
+                  <input required type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Tipo de Anúncio</label>
+                  <select required value={newType} onChange={e => setNewType(e.target.value as AnnouncementType)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                    <option value="INFO">Informativo</option>
+                    <option value="RELEASE_NOTES">Novidades / Release Notes</option>
+                    <option value="WARNING">Aviso / Manutenção</option>
+                    <option value="SUCCESS">Sucesso</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Mensagem (Conteúdo)</label>
+                  <textarea required value={newContent} onChange={e => setNewContent(e.target.value)} rows={4} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div className="pt-6 flex gap-3">
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Publicar</button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -413,6 +413,31 @@ export const api = {
     });
   },
 
+  // ================= ANNOUNCEMENTS =================
+  async getAnnouncements() {
+    return await request('/core/broadcast/announcements');
+  },
+
+  async createAnnouncement(data: any) {
+    return await request('/core/broadcast/announcements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateAnnouncement(id: string, data: any) {
+    return await request(`/core/broadcast/announcements/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteAnnouncement(id: string) {
+    return await request(`/core/broadcast/announcements/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   async getWebhookLogs() {
     return await request('/webhooks/logs');
   },
