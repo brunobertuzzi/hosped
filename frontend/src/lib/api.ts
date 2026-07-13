@@ -487,10 +487,10 @@ export const api = {
     return await request('/integrations');
   },
 
-  async updateGooglePlaceId(placeId: string) {
+  async updateGooglePlaceId(placeId: string, apiKey: string) {
     return await request('/integrations/google', {
       method: 'POST',
-      body: JSON.stringify({ placeId }),
+      body: JSON.stringify({ placeId, apiKey }),
     });
   },
 

@@ -20,11 +20,11 @@ export class IntegrationsService {
     return integration;
   }
 
-  async updateGoogleConfig(hotelId: string, placeId: string) {
+  async updateGoogleConfig(hotelId: string, placeId: string, apiKey: string) {
     return this.prisma.client.hotelIntegration.upsert({
       where: { hotelId },
-      create: { hotelId, googlePlaceId: placeId },
-      update: { googlePlaceId: placeId },
+      create: { hotelId, googlePlaceId: placeId, googleApiKey: apiKey },
+      update: { googlePlaceId: placeId, googleApiKey: apiKey },
     });
   }
 
@@ -85,14 +85,14 @@ export class IntegrationsService {
       );
     }
 
-    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    const apiKey = integration.googleApiKey || process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
-      // Retornar fallback temporário se a chave não estiver configurada no servidor ainda
+      // Retornar fallback temporário se a chave não estiver configurada
       return [
         {
           author_name: 'Cliente Satisfeito',
           rating: 5,
-          text: 'Melhor hotel que já fiquei! Atendimento excelente.',
+          text: 'Ótima estadia! (Para exibir avaliações reais, configure sua chave de API no painel).',
           time: Math.floor(Date.now() / 1000) - 86400,
         }
       ];

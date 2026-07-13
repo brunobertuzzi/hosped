@@ -411,6 +411,7 @@ model HotelIntegration {
   id                     String   @id @default(uuid())
   hotelId                String   @unique @map("hotel_id")
   googlePlaceId          String? // Avaliações do Google
+  googleApiKey           String? // Chave de API própria do Google Places do cliente
   tripAdvisorId          String? // Avaliações do Tripadvisor
   whatsappToken          String? // API do WhatsApp
   whatsappNumber         String?

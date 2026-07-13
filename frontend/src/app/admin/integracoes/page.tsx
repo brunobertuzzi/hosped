@@ -12,6 +12,7 @@ const MySwal = withReactContent(Swal);
 export default function IntegracoesPage() {
   const [loading, setLoading] = useState(true);
   const [googlePlaceId, setGooglePlaceId] = useState('');
+  const [googleApiKey, setGoogleApiKey] = useState('');
   const [isSavingGoogle, setIsSavingGoogle] = useState(false);
 
   const [whatsappApiUrl, setWhatsappApiUrl] = useState('');
@@ -34,6 +35,7 @@ export default function IntegracoesPage() {
       const data = await api.getIntegrationSettings();
       if (data) {
         if (data.googlePlaceId) setGooglePlaceId(data.googlePlaceId);
+        if (data.googleApiKey) setGoogleApiKey(data.googleApiKey);
         if (data.whatsappApiUrl) setWhatsappApiUrl(data.whatsappApiUrl);
         if (data.whatsappToken) setWhatsappToken(data.whatsappToken);
         if (data.whatsappNumber) setWhatsappNumber(data.whatsappNumber);
@@ -107,7 +109,7 @@ export default function IntegracoesPage() {
 
     try {
       setIsSavingGoogle(true);
-      await api.updateGooglePlaceId(googlePlaceId);
+      await api.updateGooglePlaceId(googlePlaceId, googleApiKey);
       MySwal.fire({
         title: 'Sucesso!',
         text: 'Integração com Google Reviews salva com sucesso.',
@@ -174,6 +176,22 @@ export default function IntegracoesPage() {
               />
               <p className="text-[10px] text-white/40">
                 O Place ID pode ser encontrado na ferramenta do Google Maps Platform.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                <Settings2 className="w-3 h-3" /> Google Places API Key
+              </label>
+              <input
+                type="text"
+                placeholder="Ex: AIzaSyB..."
+                value={googleApiKey}
+                onChange={(e) => setGoogleApiKey(e.target.value)}
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+              />
+              <p className="text-[10px] text-white/40">
+                Sua chave de API do Google Cloud para habilitar a busca das avaliações.
               </p>
             </div>
 

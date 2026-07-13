@@ -23,9 +23,9 @@ export class IntegrationsController {
 
   @UseGuards(AuthGuard)
   @Post('google')
-  updateGooglePlaceId(@Body('placeId') placeId: string, @Request() req: any) {
+  updateGooglePlaceId(@Body('placeId') placeId: string, @Body('apiKey') apiKey: string, @Request() req: any) {
     const hotelId = req.user?.hotelId;
-    return this.integrationsService.updateGoogleConfig(hotelId, placeId);
+    return this.integrationsService.updateGoogleConfig(hotelId, placeId, apiKey);
   }
 
   @UseGuards(AuthGuard)
