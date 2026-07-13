@@ -393,7 +393,7 @@ export default function QuartosPage() {
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
                 <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Diária Base (R$)</label>
                   <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
@@ -433,7 +433,7 @@ export default function QuartosPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
                 {editingCatFotos.map((url, idx) => (
                   <div key={idx} className="relative group aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
                     <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image')} />

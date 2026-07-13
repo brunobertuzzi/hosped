@@ -144,7 +144,7 @@ export default function SaasLandingPage() {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
             </div>
             {/* Mockup Body */}
-            <div className="p-6 grid grid-cols-4 gap-4 h-[400px]">
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-[400px]">
               <div className="col-span-1 border-r border-white/5 pr-4 space-y-4">
                 <div className="h-10 bg-white/5 rounded-xl animate-pulse" style={{ animationDelay: '0ms' }} />
                 <div className="h-10 bg-indigo-500/20 rounded-xl relative overflow-hidden">
@@ -154,7 +154,7 @@ export default function SaasLandingPage() {
                 <div className="h-10 bg-white/5 rounded-xl animate-pulse" style={{ animationDelay: '600ms' }} />
               </div>
               <div className="col-span-3 space-y-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="h-24 bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col justify-end">
                     <div className="w-1/2 h-2 bg-white/20 rounded-full mb-2" />
                     <div className="w-3/4 h-4 bg-white/40 rounded-full" />

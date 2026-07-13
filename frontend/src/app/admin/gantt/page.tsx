@@ -370,7 +370,7 @@ export default function AdminGanttPage() {
               </div>
 
               <div className="space-y-6 mt-6">
-                <div className="grid grid-cols-2 gap-4 bg-white/[0.02] p-5 rounded-2xl border border-white/5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white/[0.02] p-5 rounded-2xl border border-white/5">
                   <div>
                     <span className="text-[10px] uppercase tracking-widest font-bold text-white/30 block mb-1">Hóspede</span>
                     <span className="font-bold text-white/90 text-[13px]">{guests.find(g => g.id === selectedResForDetail.guestId)?.nome}</span>
@@ -381,7 +381,7 @@ export default function AdminGanttPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
                   <div className="bg-white/[0.02] p-3 rounded-xl border border-white/5">
                     <span className="text-[9px] uppercase tracking-widest font-bold text-white/30 block mb-1">Entrada</span>
                     <span className="font-bold text-white/80 text-xs">{selectedResForDetail.dataCheckIn}</span>
@@ -413,7 +413,7 @@ export default function AdminGanttPage() {
                   <button onClick={() => { setCheckInRoomId(rooms.find(r => r.status === 'DISPONIVEL')?.id || ''); setIsCheckInModalOpen(true); }} className="w-full py-3.5 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">Realizar Check-in</button>
                 )}
                 {selectedResForDetail.status === 'HOSPEDADO' && (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onClick={() => { setConsumptionItemId(inventory[0]?.id || ''); setIsConsumptionModalOpen(true); }} className="py-3 bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/10 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">Lançar Consumo</button>
                     <button onClick={triggerCheckOut} className="py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">Checkout</button>
                   </div>

@@ -276,7 +276,7 @@ export default function EstoquePage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }} className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl space-y-6">
               <h2 className="text-base font-bold text-white flex items-center gap-2"><Package className="w-4 h-4 text-brand" /> Cadastrar Produto</h2>
-              <div className="grid grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="col-span-2">
                   <label className="block text-white/40 mb-1.5 font-bold uppercase tracking-widest text-[10px]">Nome</label>
                   <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white outline-none" />

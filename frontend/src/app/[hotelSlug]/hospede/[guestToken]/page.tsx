@@ -184,7 +184,7 @@ export default function GuestPanelPage() {
               <Bed className="w-6 h-6 text-white/20" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button className="flex flex-col items-center justify-center gap-4 p-5 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-colors border border-white/10 hover:border-emerald-500/30 group">
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                   <DoorOpen className="w-6 h-6" />
@@ -199,7 +199,7 @@ export default function GuestPanelPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button onClick={() => setShowExtrato(true)} className="flex flex-col items-center justify-center gap-4 p-5 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-colors border border-white/10 hover:border-white/30 group">
                 <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                   <Receipt className="w-6 h-6" />

@@ -302,7 +302,7 @@ export default function AdminReservasPage() {
                 {step === 1 && (
                   <div className="space-y-6">
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 1: Datas</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in</label>
                         <input type="date" value={newRes.checkIn} onChange={e => setNewRes({...newRes, checkIn: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />

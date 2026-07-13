@@ -358,7 +358,7 @@ export default function PlansPage() {
 
               <div className="p-6 overflow-y-auto custom-scrollbar">
                 <form id="plan-form" onSubmit={handleSave} className="space-y-5">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Nome do Plano</label>
                       <input 
@@ -423,7 +423,7 @@ export default function PlansPage() {
 
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Módulos do Sistema Habilitados</label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {AVAILABLE_FEATURES.map(feat => (
                           <label key={feat.id} onClick={() => toggleSystemFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500/10 border-purple-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
                             <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500 border-purple-500' : 'border-white/20'}`}>

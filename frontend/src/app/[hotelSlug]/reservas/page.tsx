@@ -478,7 +478,7 @@ function BookingEngineContent() {
                     <span className="text-[9px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md">Mercado Pago SSL</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button disabled={isWaitingPayment} onClick={() => setPaymentMethod('pix')} className={`p-4 rounded-xl border text-left flex flex-col justify-between h-24 transition-all ${paymentMethod === 'pix' ? 'border-brand bg-brand/5' : 'border-white/10 hover:bg-white/5 bg-transparent'} disabled:opacity-50`}>
                       <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Checkout Rápido</span>
                       <span className="text-[13px] font-bold text-white flex items-center gap-2">⚡ PIX</span>
@@ -515,7 +515,7 @@ function BookingEngineContent() {
 
                     {paymentMethod === 'card' && (
                       <motion.div key="card" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-5 overflow-hidden mt-6">
-                        <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                           <div className="col-span-2">
                             <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número do Cartão</label>
                             <input disabled={isWaitingPayment} type="text" placeholder="4444 5555 6666 7777" className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono disabled:opacity-50" />
@@ -539,7 +539,7 @@ function BookingEngineContent() {
                       <span className="text-[10px] text-white/40 uppercase font-bold tracking-widest block mb-1">Acomodação</span>
                       <span className="text-white font-bold">{selectedCategoryData?.nome}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                       <div>
                         <span className="text-[10px] text-white/40 uppercase font-bold tracking-widest block mb-1">Check-in</span>
                         <span className="text-white/80 font-mono font-medium">{checkInDate}</span>
@@ -597,7 +597,7 @@ function BookingEngineContent() {
                   <span className="text-[10px] text-white/40 uppercase font-bold tracking-widest">Localizador</span>
                   <span className="font-mono font-bold text-brand text-lg">{createdReservationCode}</span>
                 </div>
-                <div className="grid grid-cols-2 gap-5 text-[11px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-[11px]">
                   <div>
                     <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest block mb-1">Titular</span>
                     <span className="text-white/80 font-bold block truncate">{guestName}</span>

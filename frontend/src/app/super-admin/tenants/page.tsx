@@ -282,7 +282,7 @@ export default function SuperAdminTenants() {
                     )}
                   </td>
                   <td className="py-4 px-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       {/* Novos 3 Botões */}
                       <button 
                         onClick={() => handleEditOpen(client)}
@@ -340,7 +340,7 @@ export default function SuperAdminTenants() {
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Razão Social / Nome Fantasia</label>
                   <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">CNPJ</label>
                     <input required type="text" value={doc} onChange={e => setDoc(formatCNPJ(e.target.value))} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 font-mono" />
@@ -361,7 +361,7 @@ export default function SuperAdminTenants() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Recursos Extras Habilitados</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {AVAILABLE_FEATURES.map(feat => (
                       <label key={feat.id} onClick={() => toggleAddFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${addFeatures.includes(feat.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${addFeatures.includes(feat.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
@@ -406,7 +406,7 @@ export default function SuperAdminTenants() {
                   <input required type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1.5">Plano Atual</label>
                     <select required value={editPlan} onChange={e => {
@@ -439,7 +439,7 @@ export default function SuperAdminTenants() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Recursos Extras Habilitados</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {AVAILABLE_FEATURES.map(feat => (
                       <label key={feat.id} onClick={() => toggleFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
@@ -506,7 +506,7 @@ export default function SuperAdminTenants() {
                   <span className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Calculando no banco...</span>
                 </div>
               ) : metricsData ? (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
                     <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Usuários</div>
                     <div className="text-2xl font-bold text-white">{metricsData.usersCount}</div>

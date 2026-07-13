@@ -247,7 +247,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               
               {isThemePanelOpen && (
                 <div className="absolute right-0 mt-3 w-48 glass-panel p-3 z-30">
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                     {['#ffffff', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#06b6d4'].map(color => (
                       <button
                         key={color}

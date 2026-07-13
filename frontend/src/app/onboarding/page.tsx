@@ -361,7 +361,7 @@ function OnboardingContent() {
                       <input required type="text" value={cardName} onChange={e => setCardName(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 uppercase" placeholder="EX: JOAO DA SILVA" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Validade</label>
                         <input required type="text" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)} maxLength={5} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 font-mono text-center" placeholder="MM/AA" />

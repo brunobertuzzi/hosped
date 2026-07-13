@@ -223,7 +223,7 @@ export default function HospedesPage() {
 
                 <div className="pt-6 border-t border-white/5 space-y-4">
                   <h3 className="text-[10px] uppercase font-bold tracking-widest text-white/30">Métricas Vitais</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl">
                       <span className="block text-[9px] uppercase tracking-widest text-white/40 mb-1">Lifetime Value</span>
                       <span className="text-lg font-bold text-emerald-400 font-mono">R$ {selectedGuest.totalGasto.toFixed(2)}</span>

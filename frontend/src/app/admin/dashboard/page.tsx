@@ -306,7 +306,7 @@ export default function AdminDashboardPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {rooms.map(r => {
             const catName = roomCategories.find(c => c.id === r.categoryId)?.nome || '';
             
