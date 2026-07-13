@@ -26,7 +26,7 @@ export class HealthController {
 
     let postgresStatus = 'OFFLINE';
     try {
-      await this.prisma.$queryRaw`SELECT 1`;
+      await this.prisma.client.$queryRaw`SELECT 1`;
       postgresStatus = 'ONLINE';
     } catch (e) {
       postgresStatus = 'OFFLINE';
