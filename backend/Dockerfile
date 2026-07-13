@@ -46,7 +46,7 @@ CMD ["sh", "-c", "\
   npx prisma migrate resolve --rolled-back 20260711132500_add_system_plan 2>/dev/null && \
   echo \"[Entrypoint] Migration marcada como rolled back\" || true ; \
   echo \"[Entrypoint] Verificando migrações pendentes...\" && \
-  npx prisma migrate deploy ; \
+  npx prisma db push --accept-data-loss ; \
   echo \"[Entrypoint] Executando seed...\" && \
   (node dist_seed/seed.js || echo \"[Entrypoint] Seed finalizado (com avisos)\") && \
   echo \"[Entrypoint] Iniciando servidor...\" && \
