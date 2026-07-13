@@ -442,6 +442,16 @@ export const api = {
     return await request('/webhooks/logs');
   },
 
+  async getInvoices() {
+    return await request('/core/invoices');
+  },
+
+  async simulatePayment(invoiceId: string) {
+    return await request(`/core/invoices/${invoiceId}/simulate-payment`, {
+      method: 'POST',
+    });
+  },
+
   async getTenantMetrics(tenantId: string) {
     return await request(`/core/tenant-metrics/${tenantId}`);
   },

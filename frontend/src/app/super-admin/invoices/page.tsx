@@ -6,7 +6,7 @@ import { DollarSign, Search, CheckCircle2, AlertCircle, CreditCard, Clock, Loade
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function InvoicesPage() {
-  const { invoices, sistemaClients, processPayment } = useSuperAdminStore();
+  const { invoices, sistemaClients, processPayment, fetchInvoices, fetchClients } = useSuperAdminStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [loadingPayment, setLoadingPayment] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'FATURAS' | 'WEBHOOKS'>('FATURAS');
@@ -14,6 +14,7 @@ export default function InvoicesPage() {
   const [realWebhooks, setRealWebhooks] = useState<any[]>([]);
 
   React.useEffect(() => {
+    fetchInvoices();
     if (activeTab === 'WEBHOOKS') {
       fetchWebhooks();
     }

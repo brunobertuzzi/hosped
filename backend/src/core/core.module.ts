@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UploadService } from './upload/upload.service';
 import { UploadController } from './upload/upload.controller';
 import { BillingTask } from './tasks/billing.task';
+import { InvoicesController } from './invoices.controller';
 
 import { PlansController } from './plans.controller';
 import { HealthController } from './health.controller';
@@ -23,6 +24,7 @@ import { FeatureFlagsController } from './feature-flags.controller';
     TenantMetricsController,
     TenantsController,
     UploadController,
+    InvoicesController,
     PlansController,
     HealthController,
     BroadcastController,

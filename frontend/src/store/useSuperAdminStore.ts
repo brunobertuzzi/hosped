@@ -36,6 +36,7 @@ interface SuperAdminState {
   sistemaClients: SistemaClient[];
   invoices: SistemaInvoice[];
   fetchClients: () => Promise<void>;
+  fetchInvoices: () => Promise<void>;
   addInvoice: (invoice: SistemaInvoice) => void;
   processPayment: (tenantId: string, method: 'PIX'|'CREDIT_CARD', cardLast4?: string) => Promise<void>;
 }
@@ -55,25 +56,41 @@ export const useSuperAdminStore = create<SuperAdminState>()(
       }
     },
 
+    fetchInvoices: async () => {
+      try {
+        const { api } = await import('../lib/api');
+        const invoices = await api.getInvoices();
+        const mappedInvoices = invoices.map((inv: any) => ({
+          id: inv.id,
+          tenantId: inv.hotelId,
+          amount: parseFloat(inv.amount),
+          status: inv.status === 'PAGO' ? 'PAID' : inv.status === 'ATRASADO' ? 'OVERDUE' : 'PENDING',
+          dueDate: inv.dueDate,
+          paidAt: inv.paidAt,
+          paymentMethod: 'CREDIT_CARD', // default mock as it's not in db yet
+        }));
+        set({ invoices: mappedInvoices });
+      } catch (err) {
+        console.error("Falha ao buscar faturas", err);
+      }
+    },
+
     addInvoice: (invoice) => set((state) => ({
       invoices: [invoice, ...state.invoices]
     })),
 
     processPayment: async (tenantId, method, cardLast4) => {
-      // Simulate API call for payment gateway
-      return new Promise(resolve => setTimeout(() => {
-        set(state => ({
-          sistemaClients: state.sistemaClients.map(c => 
-            c.id === tenantId ? { ...c, cardLast4: cardLast4 || c.cardLast4, status: 'ACTIVE' } : c
-          ),
-          invoices: state.invoices.map(inv => 
-            (inv.tenantId === tenantId && inv.status !== 'PAID') 
-              ? { ...inv, status: 'PAID', paidAt: new Date().toISOString() } 
-              : inv
-          )
-        }));
-        resolve();
-      }, 1500));
+      try {
+        const { api } = await import('../lib/api');
+        // Find the pending invoice for this tenant
+        const pendingInvoice = get().invoices.find(inv => inv.tenantId === tenantId && inv.status !== 'PAID');
+        if (pendingInvoice) {
+          await api.simulatePayment(pendingInvoice.id);
+          get().fetchInvoices();
+        }
+      } catch (err) {
+        console.error("Falha ao processar pagamento", err);
+      }
     }
   })
 );

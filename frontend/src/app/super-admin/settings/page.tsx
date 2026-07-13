@@ -8,21 +8,60 @@ import { toast } from 'sonner';
 export default function GlobalSettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [activeAnnouncementId, setActiveAnnouncementId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Mock API keys states
   const [asaasKey, setAsaasKey] = useState('***************************');
   const [stripeKey, setStripeKey] = useState('sk_test_*******************');
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      toast.success('Configurações globais salvas com sucesso!');
-    }, 1200);
+  React.useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const { api } = await import('../../../lib/api');
+      const maintenanceRes = await api.getGlobalMaintenance();
+      setMaintenanceMode(maintenanceRes.maintenanceMode);
+
+      const announcements = await api.getAnnouncements();
+      const activeAnn = announcements.find((a: any) => a.isActive);
+      if (activeAnn) {
+        setBroadcastMessage(activeAnn.content);
+        setActiveAnnouncementId(activeAnn.id);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleClearCache = () => {
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.setGlobalMaintenance(maintenanceMode);
+      
+      if (broadcastMessage) {
+        if (activeAnnouncementId) {
+          await api.updateAnnouncement(activeAnnouncementId, { content: broadcastMessage, title: 'Aviso Global', isActive: true, type: 'WARNING' });
+        } else {
+          const ann = await api.createAnnouncement({ content: broadcastMessage, title: 'Aviso Global', isActive: true, type: 'WARNING' });
+          setActiveAnnouncementId(ann.id);
+        }
+      } else if (activeAnnouncementId) {
+        await api.updateAnnouncement(activeAnnouncementId, { content: '', isActive: false });
+      }
+
+      toast.success('Configurações globais salvas com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao salvar as configurações.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleClearCache = async () => {
     toast.success('Cache global invalidado com sucesso. Todos os tenants receberão a nova versão no próximo refresh.');
   };
 
