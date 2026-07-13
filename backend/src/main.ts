@@ -56,9 +56,9 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   app.useGlobalFilters(new GlobalExceptionFilter(prismaService));
 
-  // Escutar na porta definida pelo Railway no host 0.0.0.0
+  // Escutar na porta definida pelo Railway
   const port = process.env.PORT || 8080;
-  await app.listen(port, '0.0.0.0');
-  console.log(`API Hoteleira rodando com sucesso em: http://localhost:${port}`);
+  await app.listen(port);
+  console.log(`API Hoteleira rodando com sucesso na porta: ${port}`);
 }
 bootstrap();
