@@ -7,14 +7,15 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function SuperAdminDashboard() {
-  const { sistemaClients, invoices, fetchClients } = useSuperAdminStore();
+  const { sistemaClients, invoices, fetchClients, fetchInvoices } = useSuperAdminStore();
 
   const [healthData, setHealthData] = React.useState<any>(null);
 
   React.useEffect(() => {
     fetchClients();
+    fetchInvoices();
     fetchHealth();
-  }, [fetchClients]);
+  }, [fetchClients, fetchInvoices]);
 
   const fetchHealth = async () => {
     try {
