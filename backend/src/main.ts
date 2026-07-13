@@ -31,16 +31,18 @@ async function bootstrap() {
 
   // Configuração de CORS para o Frontend
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://frontend-production-2b45.up.railway.app',
-    ],
+    origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization, x-hotel-id, x-branch-id, x-user-id, x-user-role',
   });
 
   // Segurança HTTP básica
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   // Validação de DTOs global
   app.useGlobalPipes(
