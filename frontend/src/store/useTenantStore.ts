@@ -8,6 +8,7 @@ const INITIAL_HOTEL = {
   nome: 'Carregando...',
   razaoSocial: '',
   documentoFiscal: '',
+  slug: '',
   logo: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200',
   banner: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600',
   cores: { primary: '#3b82f6', secondary: '#1e293b' },

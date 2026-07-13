@@ -111,7 +111,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div>
                 <h2 className="text-sm font-semibold tracking-tight text-white/90">{hotel.nome}</h2>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Sistema Ativo</span>
               </div>
             </div>
 
@@ -262,19 +261,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Status indicators */}
-            <div className="hidden md:flex items-center gap-4 text-[11px] uppercase tracking-widest font-bold">
-              {isOffline ? (
-                <span className="flex items-center gap-1.5 text-amber-500/90">
-                  <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
-                  Modo Simulação
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5 text-emerald-400/90">
-                  <span className="relative flex h-2 w-2"><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
-                  Conexão Ativa
-                </span>
-              )}
-            </div>
+
           </div>
         </header>
 

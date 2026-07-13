@@ -156,15 +156,7 @@ export default function AuditoriaPage() {
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl flex items-start gap-3">
-          <Lock className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-          <div className="text-[11px] text-white/40 space-y-1">
-            <span className="font-bold text-white/70 block uppercase tracking-widest">PostgreSQL Row-Level Security</span>
-            <p className="leading-relaxed">
-              Todos os logs acima são criptograficamente assinados e filtrados no banco de dados. Administradores e operadores não possuem permissão técnica de leitura de logs de outras propriedades (tenants).
-            </p>
-          </div>
-        </div>
+
       </div>
 
     </motion.div>

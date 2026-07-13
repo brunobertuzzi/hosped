@@ -167,6 +167,7 @@ export class TenantsController {
             : undefined,
         diferenciais:
           body.diferenciais !== undefined ? body.diferenciais : undefined,
+        slug: body.slug !== undefined ? body.slug : undefined,
       },
     });
     return hotel;

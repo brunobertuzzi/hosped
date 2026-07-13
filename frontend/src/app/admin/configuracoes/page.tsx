@@ -35,6 +35,7 @@ export default function ConfiguracoesPage() {
   const [slogan, setSlogan] = useState(hotel.slogan || '');
   const [descricaoPublica, setDescricaoPublica] = useState(hotel.descricaoPublica || '');
   const [diferenciais, setDiferenciais] = useState(hotel.diferenciais || []);
+  const [slug, setSlug] = useState(hotel.slug || '');
   const [webhooks, setWebhooks] = useState(hotel.webhooks || { onReservationComplete: '', onCheckIn: '' });
   const [localInfos, setLocalInfos] = useState(hotel.localInfos || { checkInTime: '14:00', checkOutTime: '12:00', timezone: 'America/Sao_Paulo' });
   const [isSaving, setIsSaving] = useState(false);
@@ -68,6 +69,7 @@ export default function ConfiguracoesPage() {
         slogan,
         descricaoPublica,
         diferenciais,
+        slug,
         webhooks,
         localInfos
       });
@@ -135,6 +137,21 @@ export default function ConfiguracoesPage() {
                   onChange={e => setHotelName(e.target.value)}
                   className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
                 />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL Personalizada do Portal (Slug/Domínio)</label>
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
+                  <span className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 hidden md:inline-block">https://frontend-production-2b45.up.railway.app/</span>
+                  <input 
+                    type="text" 
+                    value={slug} 
+                    onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
+                    placeholder="hotel-galvan.com.br"
+                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  />
+                </div>
+                <p className="text-[10px] text-white/30 mt-2">Os hóspedes acessarão sua página através deste link.</p>
               </div>
               
               <div>

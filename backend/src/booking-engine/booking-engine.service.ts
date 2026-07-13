@@ -19,8 +19,10 @@ export class BookingEngineService {
   ) {}
 
   async getPublicHotelData(hotelId: string) {
-    const hotel = await this.prisma.client.hotel.findUnique({
-      where: { id: hotelId },
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(hotelId);
+    
+    const hotel = await this.prisma.client.hotel.findFirst({
+      where: isUuid ? { id: hotelId } : { slug: hotelId },
       include: {
         branches: true,
         roomCategories: true,

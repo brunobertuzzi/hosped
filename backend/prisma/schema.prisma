@@ -110,6 +110,8 @@ model Hotel {
   slogan               String?
   descricaoPublica     String?
   diferenciais         String[]
+  slug                 String?   @unique
+
   plan                 String    @default("STARTUP")
   status               String    @default("ACTIVE")
   mrr                  Float     @default(150.0)
