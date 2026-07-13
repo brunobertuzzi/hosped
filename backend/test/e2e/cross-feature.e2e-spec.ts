@@ -30,30 +30,6 @@ describe('Cross-Feature E2E Tests', () => {
   let token: string;
 
   beforeAll(async () => {
-    await prisma.tariff.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.season.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.payment.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.reservation.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.room.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.roomCategory.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.user.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
-    await prisma.branch.deleteMany({
-      where: { hotel: { nome: 'E2E Cross Hotel' } },
-    });
     await prisma.hotel.deleteMany({ where: { nome: 'E2E Cross Hotel' } });
 
     const h = await prisma.hotel.create({
@@ -116,13 +92,7 @@ describe('Cross-Feature E2E Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.payment.deleteMany({ where: { hotelId } });
-    await prisma.reservation.deleteMany({ where: { hotelId } });
-    await prisma.room.deleteMany({ where: { hotelId } });
-    await prisma.roomCategory.deleteMany({ where: { hotelId } });
-    await prisma.user.deleteMany({ where: { hotelId } });
-    await prisma.branch.deleteMany({ where: { hotelId } });
-    await prisma.hotel.delete({ where: { id: hotelId } });
+    await prisma.hotel.deleteMany({ where: { id: hotelId } });
   });
 
   const book = (data: any, tk?: string) =>
@@ -238,12 +208,6 @@ describe('Cross-Feature E2E Tests', () => {
     });
     expect(aRes.status).toBe(201);
 
-    await prisma.payment.deleteMany({ where: { hotelId: hBId } });
-    await prisma.reservation.deleteMany({ where: { hotelId: hBId } });
-    await prisma.room.deleteMany({ where: { hotelId: hBId } });
-    await prisma.roomCategory.deleteMany({ where: { hotelId: hBId } });
-    await prisma.user.deleteMany({ where: { hotelId: hBId } });
-    await prisma.branch.deleteMany({ where: { hotelId: hBId } });
     await prisma.hotel.delete({ where: { id: hBId } });
   });
 

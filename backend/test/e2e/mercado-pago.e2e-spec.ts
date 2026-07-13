@@ -6,15 +6,23 @@ const API_URL = 'http://localhost:3001';
 const hashedPassword = bcrypt.hashSync('password123', 10);
 
 async function cleanup(name: string) {
-  await prisma.payment.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.reservation.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.room.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.roomCategory.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.user.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.branch.deleteMany({ where: { hotel: { nome: name } } });
-  await prisma.hotel.deleteMany({ where: { nome: name } });
+  const allHotels = await prisma.hotel.findMany();
+  const hotels = allHotels.filter(h => h.nome.startsWith(name));
+  for (const hotel of hotels) {
+    const hotelId = hotel.id;
+    await prisma.payment.deleteMany({ where: { hotelId } });
+    await prisma.consumption.deleteMany({ where: { hotelId } });
+    await prisma.reservation.deleteMany({ where: { hotelId } });
+    await prisma.guest.deleteMany({ where: { hotelId } });
+    await prisma.tariff.deleteMany({ where: { hotelId } });
+    await prisma.season.deleteMany({ where: { hotelId } });
+    await prisma.room.deleteMany({ where: { hotelId } });
+    await prisma.roomCategory.deleteMany({ where: { hotelId } });
+    await prisma.user.deleteMany({ where: { hotelId } });
+    await prisma.branch.deleteMany({ where: { hotelId } });
+    await prisma.hotel.delete({ where: { id: hotelId } });
+  }
 }
-
 async function loginWithRetry(email: string, password: string, retries = 5) {
   for (let i = 0; i < retries; i++) {
     try {
