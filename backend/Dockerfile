@@ -25,7 +25,7 @@ ENV NODE_ENV=production
 ENV PRISMA_CLI_BINARY_TARGETS="linux-musl"
 
 # Install runtime dependencies
-RUN apk add --no-cache libc6-compat openssl wget
+RUN apk add --no-cache libc6-compat openssl wget postgresql-client
 
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts

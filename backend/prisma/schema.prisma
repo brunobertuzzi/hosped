@@ -617,3 +617,13 @@ model SystemAnnouncement {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 }
+
+model GlobalSettings {
+  id              String @id @default("1")
+  asaasApiKey     String @default("")
+  stripeSecretKey String @default("")
+  platformName    String @default("Hosped")
+  supportEmail    String @default("suporte@hosped.com")
+  helpCenterUrl   String @default("")
+}
+

@@ -1,11 +1,10 @@
 import { Controller, Post, Get, Body, Req, Headers, UseGuards, Request, UnauthorizedException, HttpCode, Param } from '@nestjs/common';
-import { PrismaService } from '../core/prisma.service';
+import { WebhooksService } from './webhooks.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { WebhookStatus } from '@prisma/client';
 
 @Controller('webhooks')
 export class WebhooksController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly webhooksService: WebhooksService) {}
 
   @Post('mercadopago/:hotelId')
   @HttpCode(200)
@@ -14,18 +13,7 @@ export class WebhooksController {
     @Body() payload: any,
   ) {
     if (!payload) return { received: true };
-
-    let eventType = payload.type || payload.action || 'unknown';
-    
-    await this.prisma.client.webhookEvent.create({
-      data: {
-        hotelId,
-        event: eventType,
-        payload: payload,
-        status: WebhookStatus.RECEBIDO
-      }
-    });
-
+    await this.webhooksService.processMercadoPago(hotelId, payload);
     return { received: true };
   }
 
@@ -36,23 +24,17 @@ export class WebhooksController {
       throw new UnauthorizedException('Somente Super Admin pode ver webhooks.');
     }
 
-    const logs = await this.prisma.client.webhookEvent.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-      include: {
-        hotel: { select: { nome: true } }
-      }
-    });
+    const logs = await this.webhooksService.findAllLogs();
 
     return logs.map((l: any) => ({
       id: l.id,
       tenantId: l.hotelId,
-      tenantName: l.hotel.nome,
-      event: l.event,
-      provider: 'MERCADO_PAGO',
+      tenantName: l.hotel?.nome || 'N/A',
+      event: l.eventType,
+      provider: l.provider || 'MERCADO_PAGO',
       status: l.status === 'RECEBIDO' ? 200 : 500,
       timestamp: l.createdAt,
-      payload: JSON.stringify(l.payload)
+      payload: JSON.stringify(l.payload),
     }));
   }
 }

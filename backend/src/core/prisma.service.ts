@@ -39,7 +39,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
             // Ignorar isolamento se for o modelo Hotel, pois ele não possui hotelId (a chave primária é id)
             // e o controle de acesso é feito nos controllers.
-            if (model === 'Hotel' || model === 'SystemPlan') {
+            if (model === 'Hotel' || model === 'SystemPlan' || model === 'GlobalSettings' || model === 'SystemAnnouncement' || model === 'FeatureFlag') {
               return query(args);
             }
 

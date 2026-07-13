@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useActiveBranchData, useTenantStore } from '../../../store/useTenantStore';
+import { api } from '../../../lib/api';
 import { motion } from 'framer-motion';
 import { Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
 
@@ -16,19 +17,29 @@ export default function GovernancaPage() {
   const { cleaningTasks, rooms } = useActiveBranchData();
   const { updateCleaningTaskStatus } = useTenantStore();
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    api.getCleaningTasks().catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
-    // Update status in zustand
+    // Update local state immediately for responsiveness
     updateCleaningTaskStatus(draggableId, destination.droppableId);
+
+    // Sync with backend
+    try {
+      await api.updateCleaningTaskStatus(draggableId, destination.droppableId);
+    } catch {
+      // Revert on failure - refetch from server
+      await api.getCleaningTasks();
+    }
   };
 
   if (!mounted) return null;
@@ -48,7 +59,7 @@ export default function GovernancaPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {COLUMNS.map(col => {
             const columnTasks = cleaningTasks.filter(t => t.status === col.id);
-            
+
             return (
               <div key={col.id} className="glass-panel p-4 rounded-2xl flex flex-col min-h-[500px]">
                 <div className="flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
@@ -59,14 +70,14 @@ export default function GovernancaPage() {
 
                 <Droppable droppableId={col.id}>
                   {(provided, snapshot) => (
-                    <div 
-                      {...provided.droppableProps} 
+                    <div
+                      {...provided.droppableProps}
                       ref={provided.innerRef}
                       className={`flex-1 transition-colors rounded-xl p-2 -mx-2 ${snapshot.isDraggingOver ? 'bg-white/[0.02]' : ''}`}
                     >
                       {columnTasks.map((task, index) => {
                         const room = rooms.find(r => r.id === task.roomId);
-                        
+
                         return (
                           <Draggable key={task.id} draggableId={task.id} index={index}>
                             {(provided, snapshot) => (

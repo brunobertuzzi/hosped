@@ -8,14 +8,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
  */
 export async function request(path: string, options: RequestInit = {}) {
   const store = useTenantStore.getState();
-  
+
   // Obter token do localStorage ou cookies
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
+
   // Injetar headers padrão
   const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
-  
+
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
@@ -233,7 +233,7 @@ export const api = {
     await this.getRoomCategories();
     return res;
   },
-  
+
   async updateRoomCategory(id: string, data: any) {
     const res = await request(`/rooms/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) });
     await this.getRoomCategories();
@@ -590,5 +590,110 @@ export const api = {
 
   async getSystemLogs() {
     return await request('/core/tenants/system-logs');
-  }
+  },
+
+  // ================= HOUSEKEEPING (Tarefas de Limpeza) =================
+
+  async getCleaningTasks() {
+    const res = await request('/housekeeping');
+    // Mapeia campos do backend para o formato do frontend
+    const mapped = (res || []).map((t: any) => ({
+      id: t.id,
+      roomId: t.roomId,
+      status: t.status,
+      tipoLimpeza: t.tipoLimpeza,
+      observacoes: t.observacoes,
+      responsavelId: t.responsavelId,
+      iniciadaEm: t.iniciadaEm,
+      finalizadaEm: t.finalizadaEm,
+      branchId: t.room?.branchId,
+      room: t.room,
+      responsavel: t.responsavel,
+    }));
+    useTenantStore.setState({ cleaningTasks: mapped });
+    return mapped;
+  },
+
+  async createCleaningTask(data: { roomId: string; tipoLimpeza: string; observacoes?: string; responsavelId?: string }) {
+    const res = await request('/housekeeping', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    await this.getCleaningTasks();
+    return res;
+  },
+
+  async updateCleaningTaskStatus(id: string, status: string) {
+    const res = await request(`/housekeeping/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+    await this.getCleaningTasks();
+    return res;
+  },
+
+  async deleteCleaningTask(id: string) {
+    const res = await request(`/housekeeping/${id}`, {
+      method: 'DELETE',
+    });
+    await this.getCleaningTasks();
+    return res;
+  },
+
+  // ================= EXPENSES (Despesas) =================
+
+  async getExpenses() {
+    const res = await request('/expenses');
+    // Mapeia campos do backend (português) para o formato do frontend
+    const mapped = (res || []).map((e: any) => ({
+      id: e.id,
+      description: e.descricao,
+      amount: Number(e.valor),
+      dueDate: e.dataVencimento ? new Date(e.dataVencimento).toISOString().split('T')[0] : '',
+      status: e.status === 'PAGO' ? 'PAID' : e.status === 'PENDENTE' ? 'PENDING' : e.status,
+      category: e.categoria,
+      provider: e.fornecedor,
+      paymentDate: e.dataPagamento,
+      branchId: e.branchId,
+    }));
+    useTenantStore.setState({ expenses: mapped });
+    return mapped;
+  },
+
+  async createExpense(data: { descricao: string; valor: number; dataVencimento: string; categoria: string; fornecedor?: string }) {
+    const res = await request('/expenses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    await this.getExpenses();
+    return res;
+  },
+
+  async updateExpense(id: string, data: any) {
+    const res = await request(`/expenses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    await this.getExpenses();
+    return res;
+  },
+
+  async updateExpenseStatus(id: string, status: string) {
+    // Mapeia status do frontend para o backend
+    const backendStatus = status === 'PAID' ? 'PAGO' : status === 'PENDING' ? 'PENDENTE' : status;
+    const res = await request(`/expenses/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: backendStatus }),
+    });
+    await this.getExpenses();
+    return res;
+  },
+
+  async deleteExpense(id: string) {
+    const res = await request(`/expenses/${id}`, {
+      method: 'DELETE',
+    });
+    await this.getExpenses();
+    return res;
+  },
 };

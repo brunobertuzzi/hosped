@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { 
-  TrendingUp, TrendingDown, DollarSign, 
-  CreditCard, ArrowUpRight, ArrowDownRight, 
+import React, { useMemo, useEffect } from 'react';
+import {
+  TrendingUp, TrendingDown, DollarSign,
+  CreditCard, ArrowUpRight, ArrowDownRight,
   Calendar, Building2, Receipt
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
+import { api } from '../../../lib/api';
 
 export default function FinanceiroPage() {
   const { reservations, hotel, expenses } = useActiveBranchData();
@@ -19,6 +20,10 @@ export default function FinanceiroPage() {
   const [activeTab, setActiveTab] = React.useState('GERAL'); // GERAL, RECEBER, PAGAR
 
   const primaryColor = hotel.cores?.primary || '#3b82f6';
+
+  useEffect(() => {
+    api.getExpenses().catch(() => {});
+  }, []);
 
   // Processamento de Dados Financeiros
   const financialData = useMemo(() => {
@@ -31,7 +36,7 @@ export default function FinanceiroPage() {
       // Receita capturada
       const paid = (res.payments || []).reduce((sum: number, p: any) => sum + p.valor, 0);
       totalReceita += paid;
-      
+
       // Receita Pendente
       if (res.valorTotal > paid) {
         totalPendente += (res.valorTotal - paid);
@@ -67,7 +72,7 @@ export default function FinanceiroPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
@@ -83,20 +88,20 @@ export default function FinanceiroPage() {
 
       {/* Tabs */}
       <div className="flex items-center gap-4 border-b border-white/5 pb-6">
-        <button 
-          onClick={() => setActiveTab('GERAL')} 
+        <button
+          onClick={() => setActiveTab('GERAL')}
           className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'GERAL' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}
         >
           Visão Geral
         </button>
-        <button 
-          onClick={() => setActiveTab('RECEBER')} 
+        <button
+          onClick={() => setActiveTab('RECEBER')}
           className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'RECEBER' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}
         >
           A Receber
         </button>
-        <button 
-          onClick={() => setActiveTab('PAGAR')} 
+        <button
+          onClick={() => setActiveTab('PAGAR')}
           className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'PAGAR' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}
         >
           Contas a Pagar
@@ -144,13 +149,13 @@ export default function FinanceiroPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Gráfico de Faturamento */}
         <div className="lg:col-span-2 glass-panel p-6 rounded-[24px] border border-white/5">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 mb-6">
             <TrendingUp className="w-4 h-4 text-brand" /> Curva de Faturamento Diário
           </h3>
-          
+
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={financialData.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -163,7 +168,7 @@ export default function FinanceiroPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="date" stroke="rgba(255,255,255,0.2)" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke="rgba(255,255,255,0.2)" fontSize={11} tickFormatter={(val) => `R$ ${val}`} tickLine={false} axisLine={false} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ backgroundColor: '#000', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}
                   itemStyle={{ color: primaryColor }}
                 />
@@ -178,7 +183,7 @@ export default function FinanceiroPage() {
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
             <CreditCard className="w-4 h-4 text-brand" /> Extrato Recente
           </h3>
-          
+
           <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[300px]">
             {financialData.paymentsList.map(pay => (
               <div key={pay.id} className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl flex items-center justify-between hover:bg-white/[0.04] transition-colors">
@@ -240,8 +245,11 @@ export default function FinanceiroPage() {
                     </span>
                   </div>
                   {exp.status !== 'PAID' && (
-                    <button 
-                      onClick={() => updateExpenseStatus(exp.id, 'PAID')}
+                    <button
+                      onClick={async () => {
+                        updateExpenseStatus(exp.id, 'PAID');
+                        try { await api.updateExpenseStatus(exp.id, 'PAGO'); } catch { await api.getExpenses(); }
+                      }}
                       className="ml-4 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
                     >
                       Pagar

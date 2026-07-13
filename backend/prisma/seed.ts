@@ -92,6 +92,25 @@ async function main() {
     console.warn('O servidor iniciará normalmente. Os planos serão criados no próximo restart.');
   }
 
+  // Seeding GlobalSettings (Singleton)
+  try {
+    await prisma.globalSettings.upsert({
+      where: { id: '1' },
+      update: {},
+      create: {
+        id: '1',
+        asaasApiKey: '',
+        stripeSecretKey: '',
+        platformName: 'Hosped',
+        supportEmail: 'suporte@hosped.com',
+        helpCenterUrl: '',
+      },
+    });
+    console.log('Configurações globais (GlobalSettings) inicializadas.');
+  } catch (error: any) {
+    console.warn(`Aviso: GlobalSettings não foi inicializado - ${error?.message || error}`);
+  }
+
   // 2. Criar Super Admin apenas se não existir
   const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
   const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
