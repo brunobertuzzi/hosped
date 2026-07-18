@@ -279,6 +279,7 @@ export default function GlobalSettingsPage() {
                 </button>
               </div>
             </div>
+          </div>
         </div>
 
         {/* Controle do Sistema */}
