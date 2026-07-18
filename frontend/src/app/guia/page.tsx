@@ -422,8 +422,10 @@ export default function GuiaPage() {
             <span className="text-lg font-bold tracking-tight">HOSPED</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-[13px] font-semibold text-white/60 uppercase tracking-widest">
-            <Link href="/" className="hover:text-white transition-colors">Início</Link>
+            <Link href="/#features" className="hover:text-white transition-colors">Funcionalidades</Link>
+            <Link href="/#pricing" className="hover:text-white transition-colors">Planos</Link>
             <Link href="/guia" className="text-indigo-400 border-b-2 border-indigo-400 pb-1">Guia de Uso</Link>
+            <a href="/11111111-1111-1111-1111-111111111111" target="_blank" className="hover:text-white transition-colors text-purple-400">Ver Demo do Portal</a>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-[12px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors">
