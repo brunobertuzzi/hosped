@@ -477,6 +477,6 @@ export default function PlansPage() {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
