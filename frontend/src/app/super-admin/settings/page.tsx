@@ -596,7 +596,7 @@ export default function GlobalSettingsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Tipo de Anúncio</label>
-                  <select required value={newType} onChange={e => setNewType(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                  <select required value={newType} onChange={e => setNewType(e.target.value as AnnouncementType)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
                     <option value="INFO">Informativo</option>
                     <option value="RELEASE_NOTES">Novidades / Release Notes</option>
                     <option value="WARNING">Aviso / Manutenção</option>
