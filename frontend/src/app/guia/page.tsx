@@ -387,6 +387,16 @@ export default function GuiaPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [activeTopic, setActiveTopic] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [supportEmail, setSupportEmail] = useState('suporte@hosped.com');
+
+  React.useEffect(() => {
+    import('../../../lib/api').then(({ api }) => {
+      api.getGlobalSettings().then((global: any) => {
+        if (global?.supportEmail) setSupportEmail(global.supportEmail);
+      }).catch(console.error);
+    });
+  }, []);
+
 
   const filteredSections = searchQuery
     ? guideSections.map(section => ({
@@ -414,7 +424,6 @@ export default function GuiaPage() {
           <div className="hidden md:flex items-center gap-8 text-[13px] font-semibold text-white/60 uppercase tracking-widest">
             <Link href="/" className="hover:text-white transition-colors">Início</Link>
             <Link href="/guia" className="text-indigo-400 border-b-2 border-indigo-400 pb-1">Guia de Uso</Link>
-            <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-[12px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors">
@@ -598,10 +607,7 @@ export default function GuiaPage() {
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ainda tem dúvidas?</h2>
           <p className="text-xl text-white/50 mb-10">Nossa equipe de suporte está pronta para ajudar você e sua equipe.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/faq" className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-[13px] uppercase tracking-widest rounded-full transition-all">
-              Ver FAQ <HelpCircle className="w-4 h-4" />
-            </Link>
-            <a href="https://wa.me/5511999999999" target="_blank" className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[13px] uppercase tracking-widest rounded-full transition-all shadow-[0_0_30px_-5px_#6366f1] hover:scale-105">
+            <a href={`mailto:${supportEmail}`} className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[13px] uppercase tracking-widest rounded-full transition-all shadow-[0_0_30px_-5px_#6366f1] hover:scale-105">
               Falar com Suporte <MessageSquare className="w-4 h-4" />
             </a>
           </div>
@@ -618,7 +624,6 @@ export default function GuiaPage() {
           <div className="flex items-center gap-6 text-[11px] text-white/30 uppercase tracking-widest font-bold">
             <Link href="/" className="hover:text-white/60 transition-colors">Início</Link>
             <Link href="/guia" className="hover:text-white/60 transition-colors">Guia de Uso</Link>
-            <Link href="/faq" className="hover:text-white/60 transition-colors">FAQ</Link>
           </div>
           <p className="text-[11px] text-white/30 uppercase tracking-widest font-bold text-center md:absolute md:right-0">
             © 2026 HOSPED

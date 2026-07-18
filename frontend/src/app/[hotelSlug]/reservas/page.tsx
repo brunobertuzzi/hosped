@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { formatDocument } from '../../../lib/masks';
 import { useTenantStore } from '../../../store/useTenantStore';
+import { toast } from 'sonner';
 
 function BookingEngineContent() {
   const params = useParams();
@@ -25,7 +26,7 @@ function BookingEngineContent() {
     return branches.find(b => b.id === selectedBranchId) || branches[0] || {
       id: '',
       nome: 'Carregando...',
-      fotoCapa: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600',
+      fotoCapa: '',
       cidade: '',
       estado: '',
       descricao: '',
@@ -224,8 +225,8 @@ function BookingEngineContent() {
   };
 
   const handleConfirmReservation = async () => {
-    if (!guestName || !guestDoc || !guestEmail) return alert('Por favor, preencha todos os campos obrigatórios (Nome, Doc, E-mail).');
-    if (!activeBranch?.id || !selectedCatId) return alert('Selecione uma filial e categoria válidas.');
+    if (!guestName || !guestDoc || !guestEmail) return toast.error('Preencha todos os campos obrigatórios (Nome, Doc, E-mail).');
+    if (!activeBranch?.id || !selectedCatId) return toast.error('Selecione uma filial e categoria válidas.');
 
     if (paymentMethod === 'pix') {
       try {
@@ -265,7 +266,7 @@ function BookingEngineContent() {
 
         setPaymentPollingId(interval);
       } catch (err: any) {
-        alert('Falha: ' + (err.message || 'Verifique se o backend está rodando e se hotelId é válido (use o UUID do seed).'));
+        toast.error('Falha: ' + (err.message || 'Verifique se o backend está rodando.'));
         setIsWaitingPayment(false);
       }
     } else {
@@ -275,7 +276,7 @@ function BookingEngineContent() {
         const createdRes = await createRealReservation();
         finishReservation(null, createdRes);
       } catch (e: any) {
-        alert('Falha ao criar reserva: ' + e.message);
+        toast.error('Falha ao criar reserva: ' + e.message);
         setIsWaitingPayment(false);
       }
     }
@@ -315,7 +316,7 @@ function BookingEngineContent() {
         <header className="relative h-[50vh] w-full flex flex-col md:flex-row border-b border-white/[0.03] overflow-hidden">
           <div className="w-full md:w-1/2 h-full flex flex-col items-center md:items-start justify-center px-12 md:px-24 z-20 bg-black/40 backdrop-blur-md">
             <div className="w-16 h-16 rounded-2xl overflow-hidden mb-6 border border-white/10 shadow-2xl bg-white/[0.02]">
-              <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover" />
+              <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4">{hotel.nome}</h1>
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-2">
@@ -324,17 +325,17 @@ function BookingEngineContent() {
           </div>
           <div className="w-full md:w-1/2 h-full relative">
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent md:from-black/60 md:to-transparent z-10" />
-            <img src={activeBranch.fotoCapa || hotel.banner || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600'} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={activeBranch.fotoCapa || hotel.banner || '/placeholder-hotel.svg'} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </header>
       ) : (
         <header className="relative h-[40vh] w-full overflow-hidden flex flex-col items-center justify-center border-b border-white/[0.03]">
           <div className="absolute inset-0 bg-black/60 z-10 mix-blend-multiply" />
-          <img src={activeBranch.fotoCapa || hotel.banner || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600'} alt="banner" className="absolute inset-0 w-full h-full object-cover transform scale-[1.03]" />
+          <img src={activeBranch.fotoCapa || hotel.banner || '/placeholder-hotel.svg'} alt="banner" className="absolute inset-0 w-full h-full object-cover transform scale-[1.03]" />
 
           <div className="relative z-20 text-center space-y-4 px-4 mt-8">
             <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto border border-white/10 shadow-2xl backdrop-blur-xl bg-white/[0.02]">
-              <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover" />
+              <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white drop-shadow-2xl">{hotel.nome}</h1>
             <p className="text-[11px] font-bold uppercase tracking-widest text-white/70 flex items-center justify-center gap-2 drop-shadow-xl">
@@ -388,7 +389,7 @@ function BookingEngineContent() {
                   activeRoomCategories.map(cat => {
                     const isCapacityFit = cat.capacidade >= hospedesCount;
                     const fotos = cat.fotos || [];
-                    const mainImage = fotos.length > 0 ? fotos[0] : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';
+                    const mainImage = fotos.length > 0 ? fotos[0] : '/placeholder-hotel.svg';
 
                     return (
                       <div key={cat.id} className={`bg-black/60 backdrop-blur-md rounded-[24px] overflow-hidden flex flex-col lg:flex-row border transition-all duration-500 ${isCapacityFit ? 'border-white/10 hover:border-brand/40 hover:shadow-[0_0_40px_-15px_rgba(255,255,255,0.1)]' : 'opacity-40 border-white/[0.02] pointer-events-none'}`}>
@@ -399,12 +400,12 @@ function BookingEngineContent() {
                             {fotos.length > 0 ? (
                               fotos.map((fotoUrl: string, idx: number) => (
                                 <div key={idx} className="w-full h-full shrink-0 snap-center">
-                                  <img src={fotoUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600'} alt={`${cat.nome} foto ${idx}`} className="w-full h-full object-cover" />
+                                  <img src={fotoUrl || '/placeholder-hotel.svg'} alt={`${cat.nome} foto ${idx}`} className="w-full h-full object-cover" />
                                 </div>
                               ))
                             ) : (
                               <div className="w-full h-full shrink-0 snap-center">
-                                <img src={mainImage || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600'} alt={cat.nome} className="w-full h-full object-cover opacity-50 grayscale" />
+                                <img src={mainImage || '/placeholder-hotel.svg'} alt={cat.nome} className="w-full h-full object-cover opacity-50 grayscale" />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white/30 gap-2">
                                   <ImageIcon className="w-8 h-8" />
                                   <span className="text-[10px] uppercase tracking-widest font-bold">Sem Foto</span>

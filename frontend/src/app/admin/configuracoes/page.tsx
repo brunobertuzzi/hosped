@@ -8,6 +8,7 @@ import {
 import { motion } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
+import { toast } from 'sonner';
 
 const COLOR_PRESETS = [
   { name: 'Azul Premium', hex: '#3b82f6' },
@@ -89,9 +90,9 @@ export default function ConfiguracoesPage() {
         detalhes: `Configurações da filial atualizadas no backend. Nova cor primária: ${primaryColor}, fundo: ${backgroundColor}`
       });
 
-      alert('Configurações salvas e aplicadas em tempo real!');
+      toast.success('Configurações salvas e aplicadas em tempo real!');
     } catch (err: any) {
-      alert(err.message || 'Erro ao salvar configurações no backend.');
+      toast.error(err.message || 'Erro ao salvar configurações no backend.');
     } finally {
       setIsSaving(false);
     }
@@ -455,7 +456,7 @@ export default function ConfiguracoesPage() {
                   {heroVariant === 'standard' ? (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-transparent z-10" style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), ${backgroundColor})` }} />
-                      <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400')" }} />
+                      <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: "url('/placeholder-hotel.svg')" }} />
 
                       <div className="relative z-20 p-6 flex flex-col items-center">
                         <h4 className="text-white font-bold text-2xl mb-2 tracking-tight drop-shadow-xl">{hotelName || 'Nome do Hotel'}</h4>
@@ -485,7 +486,7 @@ export default function ConfiguracoesPage() {
                         </button>
                       </div>
                       <div className="w-1/2 relative">
-                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400')" }} />
+                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/placeholder-hotel.svg')" }} />
                         {/* Gradient fade para o background selecionado */}
                         <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${backgroundColor} 0%, transparent 100%)` }} />
                       </div>

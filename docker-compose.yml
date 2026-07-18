@@ -6,7 +6,7 @@ services:
     container_name: hotel_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hotel_password_123}  # OVERRIDE via .env or env vars - do not use default in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # OBRIGATÓRIO: definir via .env ou variável de ambiente
       POSTGRES_DB: ${POSTGRES_DB:-hotel_sistema}
     ports:
       - "5433:5432"

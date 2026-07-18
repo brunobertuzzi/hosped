@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Search, Megaphone, Info, AlertTriangle, CheckCircle2, Calendar, Trash2, Loader2, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 type AnnouncementType = 'INFO' | 'WARNING' | 'SUCCESS' | 'RELEASE_NOTES';
 
@@ -66,7 +67,7 @@ export default function BroadcastPage() {
       const { api } = await import('../../../lib/api');
       await api.updateAnnouncement(id, { ...announcement, isActive: !currentStatus });
     } catch (err) {
-      alert('Erro ao atualizar status');
+      toast.error('Erro ao atualizar status');
       fetchData(); // revert on fail
     }
   };
@@ -78,7 +79,7 @@ export default function BroadcastPage() {
       await api.deleteAnnouncement(id);
       setAnnouncements(announcements.filter(a => a.id !== id));
     } catch (err) {
-      alert('Erro ao excluir anúncio');
+      toast.error('Erro ao excluir anúncio');
     }
   };
 
@@ -99,7 +100,7 @@ export default function BroadcastPage() {
       setNewType('INFO');
       fetchData();
     } catch (err: any) {
-      alert('Erro ao criar anúncio: ' + (err.message || 'Erro desconhecido'));
+      toast.error('Erro ao criar anúncio: ' + (err.message || 'Erro desconhecido'));
     }
   };
 
@@ -144,11 +145,11 @@ export default function BroadcastPage() {
             <p className="text-white/50 text-sm mt-1">Ao ativar, todos os tenants serão desconectados e verão uma tela de "Sistema em Manutenção". Apenas o Super Admin poderá logar.</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={toggleMaintenance}
           className={`relative w-16 h-8 rounded-full transition-colors flex items-center shrink-0 ${maintenanceMode ? 'bg-red-500' : 'bg-white/10'}`}
         >
-          <motion.div 
+          <motion.div
             className="w-6 h-6 bg-white rounded-full shadow-md"
             animate={{ x: maintenanceMode ? 36 : 4 }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -167,9 +168,9 @@ export default function BroadcastPage() {
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Buscar comunicados..." 
+            <input
+              type="text"
+              placeholder="Buscar comunicados..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 transition-colors"
@@ -186,18 +187,18 @@ export default function BroadcastPage() {
           ) : (
             <AnimatePresence>
               {filteredAnnouncements.map((announcement) => (
-                <motion.div 
+                <motion.div
                   layout
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
-                  key={announcement.id} 
+                  key={announcement.id}
                   className={`border rounded-2xl p-5 flex flex-col relative overflow-hidden transition-all ${announcement.isActive ? 'bg-white/[0.03] border-white/10 hover:border-indigo-500/30' : 'bg-black/40 border-white/5 opacity-60'}`}
                 >
                   {!announcement.isActive && (
                     <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
                   )}
-                  
+
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${getTypeStyle(announcement.type)}`}>
@@ -205,27 +206,27 @@ export default function BroadcastPage() {
                         {announcement.type}
                       </span>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <div 
+                        <div
                           onClick={() => toggleActive(announcement.id, announcement.isActive, announcement)}
                           className={`w-8 h-4 rounded-full relative transition-colors ${announcement.isActive ? 'bg-indigo-500' : 'bg-white/20'}`}
                         >
-                          <motion.div 
+                          <motion.div
                             layout
                             className={`w-2.5 h-2.5 bg-white rounded-full absolute top-[3px] ${announcement.isActive ? 'left-[18px]' : 'left-[3px]'}`}
                           />
                         </div>
                       </label>
                     </div>
-                    
+
                     <h3 className="text-[15px] font-bold text-white mb-2 leading-tight">{announcement.title}</h3>
                     <p className="text-[12px] text-white/50 mb-6 line-clamp-3 leading-relaxed">{announcement.content}</p>
-                    
+
                     <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
                       <div className="flex items-center gap-1.5 text-[10px] text-white/30 font-mono">
                         <Calendar className="w-3 h-3" />
                         {new Date(announcement.createdAt).toLocaleDateString('pt-BR')}
                       </div>
-                      
+
                       <button onClick={() => handleDelete(announcement.id)} className="text-white/20 hover:text-red-400 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

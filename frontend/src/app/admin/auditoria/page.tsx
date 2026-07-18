@@ -53,12 +53,12 @@ export default function AuditoriaPage() {
     }
   };
 
-  const handleSimulateExport = () => {
+  const handleExport = () => {
     const fileContent = JSON.stringify(filteredAudits, null, 2);
     const blob = new Blob([fileContent], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url; link.download = `auditoria_tenant_${Date.now()}.json`; link.click();
+    link.href = url; link.download = `auditoria_${Date.now()}.json`; link.click();
     URL.revokeObjectURL(url);
   };
 
@@ -72,7 +72,7 @@ export default function AuditoriaPage() {
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Registro seguro de todas as operações do hotel, com dados protegidos entre unidades.</p>
         </div>
-        <button onClick={handleSimulateExport} className="px-4 py-2 bg-transparent hover:bg-white/[0.03] border border-white/10 rounded-xl text-[11px] font-bold text-white uppercase tracking-widest transition-colors flex items-center gap-2">
+        <button onClick={handleExport} className="px-4 py-2 bg-transparent hover:bg-white/[0.03] border border-white/10 rounded-xl text-[11px] font-bold text-white uppercase tracking-widest transition-colors flex items-center gap-2">
           <Download className="w-3.5 h-3.5 text-brand" /> Export JSON
         </button>
       </div>

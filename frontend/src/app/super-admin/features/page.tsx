@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ToggleLeft, Plus, Search, CheckCircle2, ShieldAlert, Users, Trash2, X, Loader2 } from 'lucide-react';
 import { api } from '../../../lib/api';
+import { toast } from 'sonner';
 
 interface FeatureFlag {
   id: string;
@@ -18,7 +19,7 @@ export default function FeatureFlagsPage() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  
+
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newName, setNewName] = useState('');
@@ -45,7 +46,7 @@ export default function FeatureFlagsPage() {
       setFlags(flags.map(f => f.id === id ? { ...f, isEnabled: !currentStatus } : f));
       await api.updateFeatureFlag(id, { ...flag, isEnabled: !currentStatus });
     } catch (err) {
-      alert('Erro ao atualizar flag.');
+      toast.error('Erro ao atualizar flag.');
       fetchFlags(); // revert
     }
   };
@@ -56,7 +57,7 @@ export default function FeatureFlagsPage() {
       await api.deleteFeatureFlag(id);
       setFlags(flags.filter(f => f.id !== id));
     } catch (err) {
-      alert('Erro ao excluir flag.');
+      toast.error('Erro ao excluir flag.');
     }
   };
 
@@ -74,7 +75,7 @@ export default function FeatureFlagsPage() {
       setNewDesc('');
       fetchFlags();
     } catch (err: any) {
-      alert('Erro ao criar flag: ' + (err.message || 'Desconhecido'));
+      toast.error('Erro ao criar flag: ' + (err.message || 'Desconhecido'));
     }
   };
 
@@ -98,9 +99,9 @@ export default function FeatureFlagsPage() {
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Buscar pelo nome da flag..." 
+            <input
+              type="text"
+              placeholder="Buscar pelo nome da flag..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 transition-colors"
@@ -117,12 +118,12 @@ export default function FeatureFlagsPage() {
           ) : (
             <AnimatePresence>
               {filteredFlags.map((flag) => (
-                <motion.div 
+                <motion.div
                   layout
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
-                  key={flag.id} 
+                  key={flag.id}
                   className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/[0.04] transition-colors"
                 >
                   <div className="flex-1">
@@ -154,11 +155,11 @@ export default function FeatureFlagsPage() {
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <span className="text-[11px] uppercase tracking-widest font-bold text-white/40">Global</span>
-                        <div 
+                        <div
                           onClick={() => toggleGlobal(flag.id, flag.isEnabled, flag)}
                           className={`w-10 h-5 rounded-full relative transition-colors ${flag.isEnabled ? 'bg-indigo-500' : 'bg-white/10'}`}
                         >
-                          <motion.div 
+                          <motion.div
                             layout
                             className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] ${flag.isEnabled ? 'left-[22px]' : 'left-[3px]'}`}
                           />

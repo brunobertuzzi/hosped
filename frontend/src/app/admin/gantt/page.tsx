@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
+import { toast } from 'sonner';
 
 export default function AdminGanttPage() {
   const store = useTenantStore();
@@ -57,7 +58,7 @@ export default function AdminGanttPage() {
     try {
       await api.checkIn(selectedResForDetail.id, checkInDoc, checkInRoomId);
       setIsCheckInModalOpen(false); setSelectedResForDetail(null); setCheckInDoc(''); setCheckInRoomId('');
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err.message); }
   };
 
   const triggerAddConsumption = async () => {
@@ -65,7 +66,7 @@ export default function AdminGanttPage() {
     try {
       await api.addConsumption(selectedResForDetail.id, consumptionItemId, consumptionQty);
       setIsConsumptionModalOpen(false); setSelectedResForDetail(null); setConsumptionItemId(''); setConsumptionQty(1);
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err.message); }
   };
 
   const handlePixPayment = async () => {
@@ -77,7 +78,7 @@ export default function AdminGanttPage() {
     try {
       await api.recordManualPayment(selectedResForDetail.id, balance, 'PIX');
       setSelectedResForDetail(null);
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err.message); }
   };
 
   const triggerCheckOut = async () => {
@@ -85,7 +86,7 @@ export default function AdminGanttPage() {
     try {
       await api.checkOut(selectedResForDetail.id);
       setSelectedResForDetail(null);
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err.message); }
   };
 
   const handleDragStart = (e: React.DragEvent, resId: string) => {

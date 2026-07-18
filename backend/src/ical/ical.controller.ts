@@ -33,6 +33,7 @@ export class IcalController {
   }
 
   // Trigger manual import sync for a specific IcalSync
+  @UseGuards(AuthGuard)
   @Post('sync/:id')
   async syncManual(@Param('id') id: string) {
     return this.icalService.syncIcalUrls(id);

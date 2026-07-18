@@ -447,7 +447,7 @@ export default function QuartosPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
                     {editingCatFotos.map((url, idx) => (
                       <div key={idx} className="relative group aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
-                        <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image')} />
+                        <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = '/placeholder-hotel.svg')} />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button type="button" onClick={() => handleRemoveFoto(idx)} className="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500/40 transition-colors"><Trash2 className="w-4 h-4" /></button>
                         </div>

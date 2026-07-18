@@ -517,40 +517,6 @@ export default function SaasLandingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-6 bg-[#050505] border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
-            <p className="text-white/40">Tudo o que você precisa saber sobre o HOSPED.</p>
-          </div>
-
-          <div className="space-y-4">
-            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
-              <summary className="font-bold text-lg list-none flex justify-between items-center">
-                Posso migrar meus dados de outro sistema?
-                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
-              </summary>
-              <p className="mt-4 text-white/50 leading-relaxed">Sim! Nossa equipe auxilia em toda a migração dos dados do seu sistema antigo, incluindo reservas futuras, cadastro de hóspedes e configurações dos quartos.</p>
-            </details>
-            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
-              <summary className="font-bold text-lg list-none flex justify-between items-center">
-                Existe contrato de fidelidade?
-                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
-              </summary>
-              <p className="mt-4 text-white/50 leading-relaxed">Não. Você pode cancelar sua assinatura a qualquer momento. Não cobramos multas de cancelamento.</p>
-            </details>
-            <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
-              <summary className="font-bold text-lg list-none flex justify-between items-center">
-                Como funciona o suporte técnico?
-                <span className="group-open:rotate-45 transition-transform text-white/50">+</span>
-              </summary>
-              <p className="mt-4 text-white/50 leading-relaxed">Oferecemos suporte via WhatsApp e e-mail em horário comercial. Em planos corporativos, você conta com um gerente de contas dedicado e suporte 24/7 para emergências.</p>
-            </details>
-          </div>
-        </div>
-      </section>
-
       {/* CTA End */}
       <section className="py-24 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-900/20 pointer-events-none" />

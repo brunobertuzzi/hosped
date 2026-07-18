@@ -103,7 +103,7 @@ async function main() {
         stripeSecretKey: '',
         platformName: 'Hosped',
         supportEmail: 'suporte@hosped.com',
-        helpCenterUrl: '',
+        helpCenterUrl: '/guia',
       },
     });
     console.log('Configurações globais (GlobalSettings) inicializadas.');

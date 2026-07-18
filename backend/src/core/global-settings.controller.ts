@@ -4,8 +4,8 @@ import { PrismaService } from './prisma.service';
 
 const DEFAULT_SETTINGS = {
   platformName: 'Hosped',
-  supportEmail: 'suporte@hosped.com',
-  helpCenterUrl: '',
+  supportEmail: process.env.SUPPORT_EMAIL || 'suporte@hosped.com',
+  helpCenterUrl: '/guia',
   paymentGateways: [],
 };
 
@@ -39,7 +39,7 @@ export class GlobalSettingsController {
 
     const settings = await this.prisma.client.globalSettings.upsert({
       where: { id: '1' },
-      create: { id: '1', platformName: 'Hosped', supportEmail: 'suporte@hosped.com', helpCenterUrl: '', paymentGateways: [], ...data },
+      create: { id: '1', platformName: 'Hosped', supportEmail: process.env.SUPPORT_EMAIL || 'suporte@hosped.com', helpCenterUrl: '/guia', paymentGateways: [], ...data },
       update: data,
     });
     return { success: true, settings };

@@ -10,6 +10,15 @@ import { toast } from 'sonner';
 export default function SuspendedPage() {
   const router = useRouter();
   const { user } = useTenantStore();
+  const [supportEmail, setSupportEmail] = React.useState('suporte@hosped.com');
+
+  React.useEffect(() => {
+    import('../../../lib/api').then(({ api }) => {
+      api.getGlobalSettings().then((global: any) => {
+        if (global?.supportEmail) setSupportEmail(global.supportEmail);
+      }).catch(console.error);
+    });
+  }, []);
 
   const handleLogout = () => {
     useTenantStore.getState().setUser(null);
@@ -50,9 +59,9 @@ export default function SuspendedPage() {
         </button>
 
         <div className="flex flex-col gap-3">
-          <button className="w-full py-3 px-6 bg-white/5 hover:bg-white/10 text-white/60 font-bold text-[12px] rounded-xl transition-all flex items-center justify-center gap-2">
+          <a href={`mailto:${supportEmail}`} className="w-full py-3 px-6 bg-white/5 hover:bg-white/10 text-white/60 font-bold text-[12px] rounded-xl transition-all flex items-center justify-center gap-2">
             <Phone className="w-4 h-4" /> Falar com o Suporte
-          </button>
+          </a>
 
           <button onClick={handleLogout} className="text-[11px] text-white/30 hover:text-white transition-colors underline underline-offset-4">
             Voltar para o Login

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { QrCode, DoorOpen, Coffee, CreditCard, CheckCircle2, ChevronRight, Bed, Receipt } from 'lucide-react';
 import { useTenantStore } from '../../../../store/useTenantStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function GuestPanelPage() {
   const params = useParams();
@@ -88,7 +89,7 @@ export default function GuestPanelPage() {
       }
       setIsCheckInComplete(true);
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -112,7 +113,7 @@ export default function GuestPanelPage() {
       <div className="fixed top-0 inset-x-0 p-6 flex justify-center z-40 pointer-events-none">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/10 p-1 bg-white/5 backdrop-blur-md">
-            <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover rounded" />
+            <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover rounded" />
           </div>
           <span className="font-bold text-sm tracking-tight drop-shadow-md">{hotel.nome}</span>
         </div>

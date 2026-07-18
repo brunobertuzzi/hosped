@@ -392,20 +392,26 @@ export class AuthService {
         message: 'Se o e-mail existir, um link será enviado.',
       };
 
-    const secret =
-      (process.env.JWT_SECRET || 'fallback-secret') + user.password;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new BadRequestException('JWT_SECRET não configurado no servidor.');
+    }
+    const resetSecret = secret + user.password;
     const token = this.jwtService.sign(
       { sub: user.id, email: user.email },
-      { secret, expiresIn: '15m' },
+      { secret: resetSecret, expiresIn: '15m' },
     );
 
     // TODO: Enviar e-mail real com link de redefinição de senha
     // Em desenvolvimento, o link é logado no console para facilitar testes
     if (process.env.NODE_ENV !== 'production') {
-      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-      console.log(
-        `\n\n[DEV] Password reset link for ${user.email}: \n${resetLink}\n\n`,
-      );
+      const frontendUrl = process.env.FRONTEND_URL;
+      if (frontendUrl) {
+        const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+        console.log(
+          `\n\n[DEV] Password reset link for ${user.email}: \n${resetLink}\n\n`,
+        );
+      }
     }
 
     return {
@@ -420,10 +426,13 @@ export class AuthService {
     });
     if (!user) throw new BadRequestException('Token inválido ou expirado.');
 
-    const secret =
-      (process.env.JWT_SECRET || 'fallback-secret') + user.password;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new BadRequestException('JWT_SECRET não configurado no servidor.');
+    }
+    const resetSecret = secret + user.password;
     try {
-      this.jwtService.verify(token, { secret });
+      this.jwtService.verify(token, { secret: resetSecret });
     } catch (e) {
       throw new BadRequestException('Token inválido ou expirado.');
     }

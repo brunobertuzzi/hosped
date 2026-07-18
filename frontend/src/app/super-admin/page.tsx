@@ -87,7 +87,7 @@ export default function SuperAdminDashboard() {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
             Financials
             <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
               <Zap className="w-3 h-3" /> Live

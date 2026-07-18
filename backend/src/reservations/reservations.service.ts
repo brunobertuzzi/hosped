@@ -16,6 +16,7 @@ import {
   Prisma,
 } from '@prisma/client';
 
+import { v4 as uuidv4 } from 'uuid';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -673,7 +674,7 @@ export class ReservationsService {
         valor,
         metodo: normalizedMethod as any,
         status: 'APROVADO',
-        transacaoId: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        transacaoId: `manual-${uuidv4()}`,
       },
     });
 

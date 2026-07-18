@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
+import { toast } from 'sonner';
 
 export default function EquipePage() {
   const { users, addAuditLog, user: currentUser } = useActiveBranchData();
@@ -65,12 +66,15 @@ export default function EquipePage() {
           detalhes: `Funcionário atualizado: ${newUserName} (${newUserRole})`
         });
       } else {
+        const tempPassword = Math.random().toString(36).slice(-8);
         await api.createTeamMember({
           nome: newUserName,
           email: newUserEmail,
           role: newUserRole,
-          password: 'mudar123' // Senha inicial padrão
+          password: tempPassword
         });
+
+        toast.success(`Funcionário criado! Senha temporária: ${tempPassword}`, { duration: 8000 });
 
         addAuditLog({
           id: 'a_' + Date.now(),
@@ -85,13 +89,13 @@ export default function EquipePage() {
       await api.getTeam();
       setIsModalOpen(false);
     } catch (err: any) {
-      alert(err.message || 'Erro ao salvar funcionário.');
+      toast.error(err.message || 'Erro ao salvar funcionário.');
     }
   };
 
   const toggleStatus = async (id: string, currentStatus: string, name: string) => {
     if (id === currentUser?.id) {
-      alert('Você não pode desativar sua própria conta.');
+      toast.error('Você não pode desativar sua própria conta.');
       return;
     }
     const newStatus = currentStatus === 'ATIVO' ? 'INATIVO' : 'ATIVO';
@@ -109,7 +113,7 @@ export default function EquipePage() {
           detalhes: `Acesso do funcionário ${name} alterado para ${newStatus}`
         });
       } catch (err: any) {
-        alert(err.message || 'Erro ao alterar status do funcionário.');
+        toast.error(err.message || 'Erro ao alterar status do funcionário.');
       }
     }
   };

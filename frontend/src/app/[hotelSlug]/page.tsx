@@ -126,7 +126,7 @@ export default function TenantLandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 p-1 bg-white/5">
-              <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover rounded-lg" />
+              <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover rounded-lg" />
             </div>
             <div>
               <span className="font-bold text-base tracking-tight block">{hotel.nome}</span>
@@ -151,7 +151,7 @@ export default function TenantLandingPage() {
       {/* Hero Section */}
       <header className="relative h-[95vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-brand-bg z-10" />
-        <img src={hotel.banner || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600'} alt="Hotel Cover" className="absolute inset-0 w-full h-full object-cover transform scale-105" />
+        <img src={hotel.banner || '/placeholder-hotel.svg'} alt="Hotel Cover" className="absolute inset-0 w-full h-full object-cover transform scale-105" />
 
         <div className="relative z-20 text-center space-y-6 px-6 max-w-4xl mx-auto flex flex-col items-center mt-20">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand/10 border border-brand/20 rounded-full text-brand text-[10px] font-bold uppercase tracking-widest animate-pulse">

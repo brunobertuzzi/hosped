@@ -151,11 +151,11 @@ export default function PlansPage() {
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-inner">
               <CreditCard className="w-5 h-5 text-purple-400" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent">
+            <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
               Planos e Preços
             </h1>
           </div>
-          <p className="text-white/40 text-sm max-w-xl">
+          <p className="text-[13px] text-white/40 mt-1 font-medium">
             Gerencie as assinaturas, limites e os valores cobrados dos seus clientes (Hotéis).
           </p>
         </div>

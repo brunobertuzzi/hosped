@@ -22,7 +22,9 @@ export default function GlobalSettingsPage() {
   const [platformName, setPlatformName] = useState('Hosped');
   const [supportEmail, setSupportEmail] = useState('suporte@hosped.com');
   const [helpCenterUrl, setHelpCenterUrl] = useState('');
-  const [gateways, setGateways] = useState<PaymentGateway[]>([]);
+  const [gatewayName, setGatewayName] = useState('');
+  const [gatewayApiKey, setGatewayApiKey] = useState('');
+  const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -46,34 +48,16 @@ export default function GlobalSettingsPage() {
         setPlatformName(global.platformName || 'Hosped');
         setSupportEmail(global.supportEmail || 'suporte@hosped.com');
         setHelpCenterUrl(global.helpCenterUrl || '');
-        setGateways((global.paymentGateways || []).map((g: any) => ({ ...g, showKey: false })));
+        if (global.paymentGateways && global.paymentGateways.length > 0) {
+          setGatewayName(global.paymentGateways[0].name || '');
+          setGatewayApiKey(global.paymentGateways[0].apiKey || '');
+        }
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const addGateway = () => {
-    const newGw: PaymentGateway = {
-      id: 'gw_' + Date.now(),
-      name: '',
-      apiKey: '',
-      showKey: false,
-    };
-    setGateways([...gateways, newGw]);
-  };
-
-  const removeGateway = (id: string) => {
-    setGateways(gateways.filter(g => g.id !== id));
-  };
-
-  const updateGateway = (id: string, field: 'name' | 'apiKey', value: string) => {
-    setGateways(gateways.map(g => g.id === id ? { ...g, [field]: value } : g));
-  };
-
-  const toggleShowKey = (id: string) => {
-    setGateways(gateways.map(g => g.id === id ? { ...g, showKey: !g.showKey } : g));
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -96,7 +80,7 @@ export default function GlobalSettingsPage() {
         platformName,
         supportEmail,
         helpCenterUrl,
-        paymentGateways: gateways.map(({ showKey, ...rest }) => rest),
+        paymentGateways: [{ id: 'primary', name: gatewayName, apiKey: gatewayApiKey }],
       });
 
       toast.success('Configurações globais salvas com sucesso!');
@@ -115,7 +99,7 @@ export default function GlobalSettingsPage() {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
             Configurações Globais
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Gateway de pagamento, white label, manutenção e parâmetros da plataforma.</p>
@@ -140,62 +124,45 @@ export default function GlobalSettingsPage() {
                 <CreditCard className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Gateways de Pagamento</h2>
-                <p className="text-[11px] text-white/40 font-medium">Configure quantos gateways quiser — Mercado Pago, Asaas, Stripe, Cielo, etc.</p>
+                <h2 className="text-lg font-bold text-white">Gateway de Recebimento da Plataforma</h2>
+                <p className="text-[11px] text-white/40 font-medium">Configure o gateway por onde você receberá o pagamento das assinaturas.</p>
               </div>
             </div>
-            <button onClick={addGateway} className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Adicionar Gateway
-            </button>
           </div>
 
           <div className="space-y-4">
-            {gateways.length === 0 ? (
-              <div className="p-8 text-center border-2 border-dashed border-white/10 rounded-2xl">
-                <CreditCard className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                <p className="text-[13px] text-white/30 font-medium">Nenhum gateway configurado.</p>
-                <p className="text-[11px] text-white/20 mt-1">Clique em "Adicionar Gateway" para começar.</p>
-              </div>
-            ) : (
-              gateways.map((gw, idx) => (
-                <div key={gw.id} className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <GripVertical className="w-4 h-4 text-white/20 shrink-0" />
-                      <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest shrink-0">Gateway #{idx + 1}</span>
-                      <input
-                        type="text"
-                        value={gw.name}
-                        onChange={e => updateGateway(gw.id, 'name', e.target.value)}
-                        placeholder="Ex: Mercado Pago, Asaas, Stripe..."
-                        className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 placeholder:text-white/20"
-                      />
-                    </div>
-                    <button onClick={() => removeGateway(gw.id)} className="ml-3 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
-                    <input
-                      type={gw.showKey ? 'text' : 'password'}
-                      value={gw.apiKey}
-                      onChange={e => updateGateway(gw.id, 'apiKey', e.target.value)}
-                      placeholder="Chave secreta da API..."
-                      className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 font-mono placeholder:text-white/20"
-                    />
-                    <button onClick={() => toggleShowKey(gw.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors">
-                      {gw.showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
+            <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 flex-1">
+                  <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest shrink-0">Provedor</span>
+                  <input
+                    type="text"
+                    value={gatewayName}
+                    onChange={e => setGatewayName(e.target.value)}
+                    placeholder="Ex: Stripe, Asaas, Mercado Pago..."
+                    className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 placeholder:text-white/20"
+                  />
                 </div>
-              ))
-            )}
+              </div>
+              <div className="relative">
+                <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                <input
+                  type={showKey ? 'text' : 'password'}
+                  value={gatewayApiKey}
+                  onChange={e => setGatewayApiKey(e.target.value)}
+                  placeholder="Chave secreta da API..."
+                  className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 font-mono placeholder:text-white/20"
+                />
+                <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors">
+                  {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
             <AlertTriangle className="w-4 h-4 text-emerald-400 shrink-0" />
-            <p className="text-[10px] text-white/50">As chaves cadastradas aqui serão usadas como padrão para todos os hotéis. Cada hotel pode sobrescrever nas suas próprias configurações de integração.</p>
+            <p className="text-[10px] text-white/50">Esta configuração é exclusiva do seu gateway de recebimento (onde você recebe das assinaturas). Os hotéis clientes poderão escolher qualquer outro gateway nas configurações deles para receber dos hóspedes.</p>
           </div>
         </div>
 

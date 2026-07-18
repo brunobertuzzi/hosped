@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function AdminDashboardPage() {
   const {
@@ -84,7 +85,7 @@ export default function AdminDashboardPage() {
     try {
       await api.completeCleaning(roomId);
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -92,7 +93,7 @@ export default function AdminDashboardPage() {
     try {
       await api.completeMaintenance(maintId, 'Serviço concluído localmente.');
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -104,7 +105,7 @@ export default function AdminDashboardPage() {
       setMaintRoomId('');
       setMaintDesc('');
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 

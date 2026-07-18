@@ -624,6 +624,6 @@ model GlobalSettings {
   paymentGateways Json   @default("[]")
   platformName    String @default("Hosped")
   supportEmail    String @default("suporte@hosped.com")
-  helpCenterUrl   String @default("")
+  helpCenterUrl   String @default("/guia")
 }
 

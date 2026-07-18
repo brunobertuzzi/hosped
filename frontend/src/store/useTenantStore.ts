@@ -84,8 +84,8 @@ interface TenantState {
 
 export const useTenantStore = create<TenantState>((set) => ({
   user: null,
-  isOffline: true, // Default offline para fallback imediato
-  selectedBranchId: 'b1',
+  isOffline: false, // Será setado como true se houver falha de conexão
+  selectedBranchId: '',
   hotel: INITIAL_HOTEL,
   branches: INITIAL_BRANCHES,
   users: INITIAL_USERS,

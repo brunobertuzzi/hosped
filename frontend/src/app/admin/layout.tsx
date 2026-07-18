@@ -107,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Logo e Info Hotel */}
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-lg">
-                <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover" />
+                <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h2 className="text-sm font-semibold tracking-tight text-white/90">{hotel.nome}</h2>

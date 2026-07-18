@@ -79,7 +79,7 @@ export default function SystemErrorsPage() {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
             System Error Logs
             <span className="px-2.5 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
               <Bug className="w-3 h-3" /> Monitoramento

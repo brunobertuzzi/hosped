@@ -9,6 +9,7 @@ import { Building2, CheckCircle2, ChevronRight, Mail, User, Briefcase, KeyRound,
 import Link from 'next/link';
 import { initMercadoPago, Payment as MPPayment } from '@mercadopago/sdk-react';
 import { formatCNPJ } from '../../lib/masks';
+import { toast } from 'sonner';
 
 const MP_PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
 if (MP_PUBLIC_KEY) {
@@ -19,7 +20,7 @@ function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan') as TenantPlan | null;
-  
+
   // Removed unused useSuperAdminStore call
   const { setSelectedBranchId, setUser } = useTenantStore();
 
@@ -47,7 +48,7 @@ function OnboardingContent() {
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
-  
+
   const [companyName, setCompanyName] = useState('');
   const [companyDoc, setCompanyDoc] = useState('');
   const [hotelName, setHotelName] = useState('');
@@ -79,7 +80,7 @@ function OnboardingContent() {
       await finishTenantCreation(getSelectedPlanPrice(), 'REAL_CARD', paymentData);
     } catch (error) {
       console.error(error);
-      alert('Erro ao se comunicar com o Mercado Pago.');
+      toast.error('Erro ao se comunicar com o Mercado Pago.');
       setLoading(false);
     }
   };
@@ -87,6 +88,8 @@ function OnboardingContent() {
   const handleMockPayment = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    // TODO: Implementar integração real com gateway de pagamento
+    // Atualmente simula o pagamento para permitir fluxo de teste
     setTimeout(() => {
       finishTenantCreation(getSelectedPlanPrice(), cardNumber.slice(-4) || '1234');
     }, 2500);
@@ -112,7 +115,7 @@ function OnboardingContent() {
 
       const data = await response.json();
       if (!data.success) {
-        alert('Erro ao criar conta no banco de dados: ' + data.error);
+        toast.error('Erro ao criar conta no banco de dados: ' + data.error);
         setLoading(false);
         return;
       }
@@ -141,18 +144,18 @@ function OnboardingContent() {
       router.push('/admin/dashboard');
     } catch (err) {
       console.error(err);
-      alert('Falha ao registrar no servidor.');
+      toast.error('Falha ao registrar no servidor.');
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#030014] text-white font-sans flex flex-col md:flex-row overflow-hidden">
-      
+
       {/* Left Panel - Visual */}
       <div className="hidden md:flex flex-col justify-between w-[40%] bg-[#050505] border-r border-white/5 p-12 relative overflow-hidden">
         <div className="absolute top-1/4 left-0 w-full h-1/2 bg-indigo-500/10 blur-[100px] pointer-events-none" />
-        
+
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-3 mb-16">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
@@ -193,9 +196,9 @@ function OnboardingContent() {
       {/* Right Panel - Wizard */}
       <div className="flex-1 flex flex-col justify-center items-center p-6 relative">
         <div className="w-full max-w-md relative">
-          
+
           <AnimatePresence mode="wait">
-            
+
             {/* STEP 1: ADMIN ACCOUNT */}
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
@@ -203,7 +206,7 @@ function OnboardingContent() {
                   <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Crie sua conta de acesso</h3>
                   <p className="text-sm text-white/40">Estes serão seus dados para entrar no sistema todos os dias.</p>
                 </div>
-                
+
                 <form onSubmit={handleNextStep} className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Seu Nome Completo</label>
@@ -240,7 +243,7 @@ function OnboardingContent() {
                   <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Dados do seu Negócio</h3>
                   <p className="text-sm text-white/40">Falta pouco! Qual o nome do seu hotel ou pousada?</p>
                 </div>
-                
+
                 <form onSubmit={handleNextStep} className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Razão Social</label>
@@ -257,7 +260,7 @@ function OnboardingContent() {
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Fantasia da Primeira Filial</label>
                     <input required type="text" value={hotelName} onChange={e => setHotelName(e.target.value)} maxLength={100} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" placeholder="Ex: Unidade Centro" />
                   </div>
-                  
+
                   <div className="flex gap-3 pt-4">
                     <button type="button" onClick={() => setStep(1)} className="py-4 px-6 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-colors">Voltar</button>
                     <button type="submit" className="flex-1 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_-5px_#6366f1] flex items-center justify-center gap-2">
@@ -275,11 +278,11 @@ function OnboardingContent() {
                   <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Escolha seu Plano</h3>
                   <p className="text-sm text-white/40">Tudo pronto. Qual plano atende melhor a sua recepção?</p>
                 </div>
-                
+
                 <div className="space-y-4 mb-8">
                   {plans.length > 0 ? plans.map((p) => (
-                    <div 
-                      key={p.id} 
+                    <div
+                      key={p.id}
                       onClick={() => setPlan(p.name)}
                       className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${plan.toUpperCase() === p.name.toUpperCase() ? 'bg-indigo-500/10 border-indigo-500 shadow-[0_0_20px_-5px_rgba(99,102,241,0.2)]' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
                     >
@@ -317,7 +320,7 @@ function OnboardingContent() {
                   <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Finalizar Assinatura</h3>
                   <p className="text-sm text-white/40">Insira os dados do cartão de crédito para ativar o plano {plan}.</p>
                 </div>
-                
+
                 {MP_PUBLIC_KEY ? (
                   <div className="bg-white rounded-xl p-4 mt-6">
                     <MPPayment
@@ -355,7 +358,7 @@ function OnboardingContent() {
                         <input required type="text" value={cardNumber} onChange={e => setCardNumber(e.target.value)} maxLength={19} className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 font-mono tracking-widest" placeholder="0000 0000 0000 0000" />
                       </div>
                     </div>
-                    
+
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Impresso no Cartão</label>
                       <input required type="text" value={cardName} onChange={e => setCardName(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 uppercase" placeholder="EX: JOAO DA SILVA" />
@@ -371,14 +374,14 @@ function OnboardingContent() {
                         <input required type="text" value={cardCVC} onChange={e => setCardCVC(e.target.value)} maxLength={4} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 font-mono text-center" placeholder="123" />
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-3 pt-4">
                       <button type="button" onClick={() => setStep(3)} disabled={loading} className="py-4 px-6 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-colors disabled:opacity-50">Voltar</button>
                       <button type="submit" disabled={loading} className="flex-1 py-4 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_0_rgba(255,255,255,0.3)] flex items-center justify-center gap-2 disabled:opacity-50">
                         {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Processando Pagamento...</> : 'Pagar e Criar Conta'}
                       </button>
                     </div>
-                    
+
                     <p className="text-center text-[10px] text-white/30 mt-4 flex items-center justify-center gap-1.5">
                       <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Pagamento seguro e criptografado
                     </p>

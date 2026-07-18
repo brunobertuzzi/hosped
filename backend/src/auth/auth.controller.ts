@@ -54,8 +54,7 @@ export class AuthController {
 
   // --- SUPER ADMIN IMPERSONATION ---
   @Post('impersonate/:hotelId')
-  @UseGuards(AuthGuard) // Supondo que será substituído ou checado. Usaremos o token do Super Admin.
-  // Idealmente: @Roles(Role.PLATFORM_OWNER) + RolesGuard, mas faremos a checagem no Service para garantir.
+  @UseGuards(AuthGuard) // A checagem de role é feita no Service
   async impersonate(
     @Param('hotelId') hotelId: string,
     @Request() req: any,
