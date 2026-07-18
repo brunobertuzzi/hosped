@@ -18,10 +18,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const {
     user, hotel, branches, selectedBranchId, isOffline,
-    setSelectedBranchId, setUser, setHotelColors
+    setSelectedBranchId, setUser
   } = useTenantStore();
 
-  const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -58,9 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/login');
   };
 
-  const changeThemeColor = (colorHex: string) => {
-    setHotelColors({ primary: colorHex, secondary: '#000000' });
-  };
+  const currentBranch = branches.find(b => b.id === selectedBranchId) || branches[0];
 
   if (loading || !user) {
     return (
@@ -105,13 +102,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="space-y-10 relative z-10">
             {/* Logo e Info Hotel */}
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-lg">
                 <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover" />
               </div>
               <div>
-                <h2 className="text-sm font-semibold tracking-tight text-white/90">{hotel.nome}</h2>
+                <h2 className="text-[15px] font-bold tracking-tight text-white/90 leading-tight">{hotel.nome}</h2>
+                <span className="text-[9px] uppercase font-bold tracking-widest text-white/40">Painel Admin</span>
               </div>
+            </div>
+
+            {/* Branch Selector (Matriz/Filial) */}
+            <div className="mb-6 p-3 rounded-xl bg-brand/5 border border-brand/20 relative group">
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin className="w-3.5 h-3.5 text-brand" />
+                <span className="text-[9px] uppercase font-bold tracking-widest text-brand/70">Operação Local</span>
+              </div>
+              <select
+                value={selectedBranchId}
+                onChange={e => setSelectedBranchId(e.target.value)}
+                className="w-full bg-transparent text-[13px] font-bold text-white outline-none cursor-pointer border-none appearance-none hover:text-brand transition-colors truncate pr-4"
+              >
+                {branches.map(b => (
+                  <option key={b.id} value={b.id} className="bg-[#111] text-white py-2">{b.nome}</option>
+                ))}
+              </select>
             </div>
 
             {/* Navegação Admin */}
@@ -216,49 +231,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="w-6 h-6" />
             </button>
-            <div className="flex items-center gap-2 md:gap-3 bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 py-1.5 px-2 md:px-3 rounded-xl transition-colors">
-              <MapPin className="w-4 h-4 text-white/40" />
-              <div className="flex flex-col">
-                <span className="text-[8px] uppercase font-bold tracking-widest text-white/30">Operação Local</span>
-                <select
-                  value={selectedBranchId}
-                  onChange={e => setSelectedBranchId(e.target.value)}
-                  className="bg-transparent text-[11px] md:text-[13px] font-bold text-white/80 outline-none cursor-pointer border-none appearance-none hover:text-white transition-colors w-24 md:w-48 truncate"
-                >
-                  {branches.map(b => (
-                    <option key={b.id} value={b.id} className="bg-black text-white">{b.nome}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
           </div>
 
           <div className="flex items-center gap-6">
-
-            {/* Color Theme Selector */}
-            <div className="relative">
-              <button
-                onClick={() => setIsThemePanelOpen(!isThemePanelOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-[11px] font-bold tracking-widest uppercase rounded-full text-white/70 transition-colors"
-              >
-                <Palette className="w-3 h-3 text-brand" /> Tema
-              </button>
-
-              {isThemePanelOpen && (
-                <div className="absolute right-0 mt-3 w-48 glass-panel p-3 z-30">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                    {['#ffffff', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#06b6d4'].map(color => (
-                      <button
-                        key={color}
-                        onClick={() => { changeThemeColor(color); setIsThemePanelOpen(false); }}
-                        style={{ backgroundColor: color }}
-                        className="w-8 h-8 rounded-full border border-white/10 hover:scale-110 active:scale-95 transition-transform"
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* Status indicators */}
 
