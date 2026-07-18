@@ -102,9 +102,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               <Settings className="w-4 h-4" /> Configurações Globais
             </Link>
 
-            <Link href="/super-admin/features" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/features' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <ToggleLeft className="w-4 h-4" /> Feature Flags
-            </Link>
 
 
             
