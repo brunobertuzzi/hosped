@@ -63,6 +63,7 @@ export class TenantsController {
       storageLimitMB: hotel.storageLimitMB,
       apiRequestsCount: hotel.apiRequestsCount,
       apiRequestsLimit: hotel.apiRequestsLimit,
+      enabledModules: hotel.enabledModules,
     }));
   }
 
@@ -155,6 +156,7 @@ export class TenantsController {
           mrr: body.mrr,
           status: 'ACTIVE',
           nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          enabledModules: body.enabledModules || body.features || [],
         },
       });
     }
@@ -197,7 +199,10 @@ export class TenantsController {
       where: { id },
       data: {
         plan: body.plan,
-        mrr: body.mrr,
+        mrr: body.mrr !== undefined ? body.mrr : undefined,
+        nome: body.name !== undefined ? body.name : undefined,
+        email: body.email !== undefined ? body.email : undefined,
+        enabledModules: body.enabledModules ?? body.features ?? undefined,
       },
     });
     return hotel;
@@ -215,6 +220,22 @@ export class TenantsController {
       data: {
         status: body.status,
         mrr: body.status === 'CHURNED' ? 0 : undefined,
+      },
+    });
+    return hotel;
+  }
+
+  @Put(':id/modules')
+  async updateTenantModules(
+    @Param('id') id: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
+    this.checkSuperAdmin(req);
+    const hotel = await this.prisma.client.hotel.update({
+      where: { id },
+      data: {
+        enabledModules: body.enabledModules,
       },
     });
     return hotel;

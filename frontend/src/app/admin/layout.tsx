@@ -6,11 +6,12 @@ import Link from 'next/link';
 import {
   Building2, Activity, Calendar, Package, ShieldCheck, LogOut, MapPin,
   ChevronRight, AlertTriangle, Moon, Palette, CheckCircle2, CloudLightning,
-  Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X
+  Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X, Lock
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
 import { api } from '../../lib/api';
 import { CommandPalette } from '../../components/CommandPalette';
+import { useModule } from '../../hooks/useModule';
 
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     user, hotel, branches, selectedBranchId, isOffline,
     setSelectedBranchId, setUser
   } = useTenantStore();
+
+  // Module guards — controlados por enabledModules do hotel
+  const canUseGantt = useModule('GANTT_CHART');
+  const canUseWebhooks = useModule('WEBHOOKS');
+  const canUseMultipleBranches = useModule('MULTIPLE_BRANCHES');
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -112,21 +118,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
-            {/* Branch Selector (Matriz/Filial) */}
+            {/* Branch Selector — só exibe dropdown se MULTIPLE_BRANCHES habilitado */}
             <div className="mb-4 p-3 rounded-xl bg-brand/5 border border-brand/20 relative group">
               <div className="flex items-center gap-2 mb-1">
                 <MapPin className="w-3.5 h-3.5 text-brand" />
                 <span className="text-[9px] uppercase font-bold tracking-widest text-brand/70">Operação Local</span>
               </div>
-              <select
-                value={selectedBranchId}
-                onChange={e => setSelectedBranchId(e.target.value)}
-                className="w-full bg-transparent text-[13px] font-bold text-white outline-none cursor-pointer border-none appearance-none hover:text-brand transition-colors truncate pr-4"
-              >
-                {branches.map(b => (
-                  <option key={b.id} value={b.id} className="bg-[#111] text-white py-2">{b.nome}</option>
-                ))}
-              </select>
+              {canUseMultipleBranches && branches.length > 1 ? (
+                <select
+                  value={selectedBranchId}
+                  onChange={e => setSelectedBranchId(e.target.value)}
+                  className="w-full bg-transparent text-[13px] font-bold text-white outline-none cursor-pointer border-none appearance-none hover:text-brand transition-colors truncate pr-4"
+                >
+                  {branches.map(b => (
+                    <option key={b.id} value={b.id} className="bg-[#111] text-white py-2">{b.nome}</option>
+                  ))}
+                </select>
+              ) : (
+                <span className="text-[13px] font-bold text-white truncate block">
+                  {branches.find(b => b.id === selectedBranchId)?.nome || branches[0]?.nome || 'Unidade Principal'}
+                </span>
+              )}
             </div>
 
             {/* Navegação Admin */}
@@ -140,9 +152,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <Users className="w-4 h-4" /> Cadastro de Hóspedes
               </Link>
-              <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <Calendar className="w-4 h-4" /> Mapa de Ocupação
-              </Link>
+              {canUseGantt ? (
+                <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Calendar className="w-4 h-4" /> Mapa de Ocupação
+                </Link>
+              ) : (
+                <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-white/20 cursor-not-allowed select-none" title="Módulo não disponível no seu plano">
+                  <Calendar className="w-4 h-4" />
+                  <span>Mapa de Ocupação</span>
+                  <Lock className="w-3 h-3 ml-auto" />
+                </div>
+              )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'MAINTENANCE'].includes(user.role) && (
                 <Link href="/admin/manutencao" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/manutencao' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Wrench className="w-4 h-4" /> Manutenção
@@ -175,9 +195,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <DollarSign className="w-4 h-4" /> Financeiro
                   </Link>
-                  <Link href="/admin/integracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/integracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                    <CloudLightning className="w-4 h-4" /> Integrações
-                  </Link>
+                  {canUseWebhooks ? (
+                    <Link href="/admin/integracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/integracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <CloudLightning className="w-4 h-4" /> Integrações
+                    </Link>
+                  ) : (
+                    <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-white/20 cursor-not-allowed select-none" title="Módulo Webhooks & API não disponível no seu plano">
+                      <CloudLightning className="w-4 h-4" />
+                      <span>Integrações</span>
+                      <Lock className="w-3 h-3 ml-auto" />
+                    </div>
+                  )}
                   <Link href="/admin/configuracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/configuracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <Settings className="w-4 h-4" /> Configurações
                   </Link>

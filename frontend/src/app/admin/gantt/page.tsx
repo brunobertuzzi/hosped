@@ -3,17 +3,34 @@
 import React, { useState } from 'react';
 import {
   Calendar, ClipboardList, Bed, CheckCircle2, CreditCard, ChevronRight,
-  ShoppingBag, Trash2, KeyRound, User, AlertTriangle
+  ShoppingBag, Trash2, KeyRound, User, AlertTriangle, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
 import { toast } from 'sonner';
+import { useModule } from '../../../hooks/useModule';
 
 export default function AdminGanttPage() {
   const store = useTenantStore();
   const { rooms, reservations, inventory, guests, user } = useActiveBranchData();
+  const canUseGantt = useModule('GANTT_CHART');
   const [selectedResForDetail, setSelectedResForDetail] = useState<any>(null);
+
+  // Guard: módulo não habilitado para este hotel
+  if (!canUseGantt) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+          <Lock className="w-8 h-8 text-white/20" />
+        </div>
+        <h2 className="text-xl font-bold text-white/60 mb-2">Módulo não disponível</h2>
+        <p className="text-sm text-white/30 max-w-sm">
+          O Mapa de Ocupação (Gantt) não está habilitado no plano atual. Entre em contato com o suporte para ativar este módulo.
+        </p>
+      </div>
+    );
+  }
 
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();

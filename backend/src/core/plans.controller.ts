@@ -44,6 +44,7 @@ export class PlansController {
         maxRooms: data.maxRooms,
         maxUsers: data.maxUsers,
         features: data.features || [],
+        modules: data.modules || data.systemFeatures || [],
         isActive: data.isActive ?? true,
       },
     });
@@ -67,6 +68,7 @@ export class PlansController {
         maxRooms: data.maxRooms,
         maxUsers: data.maxUsers,
         features: data.features,
+        modules: data.modules || data.systemFeatures || undefined,
         isActive: data.isActive,
       },
     });

@@ -10,20 +10,23 @@ export class GuestsService {
     private readonly audit: AuditService,
   ) {}
 
-  async findAll(page?: number, limit?: number) {
+  async findAll(page?: number, limit?: number, hotelId?: string) {
+    const where = hotelId ? { hotelId } : {};
     if (page && limit) {
       const skip = (page - 1) * limit;
       const [data, total] = await Promise.all([
         this.prisma.client.guest.findMany({
+          where,
           skip,
           take: limit,
           orderBy: { nome: 'asc' },
         }),
-        this.prisma.client.guest.count(),
+        this.prisma.client.guest.count({ where }),
       ]);
       return { data, total, page, totalPages: Math.ceil(total / limit) };
     }
     return this.prisma.client.guest.findMany({
+      where,
       orderBy: { nome: 'asc' },
     });
   }
@@ -34,14 +37,23 @@ export class GuestsService {
     return guest;
   }
 
-  async create(data: any, userId?: string) {
-    const created = await this.prisma.client.guest.create({ data });
+  async create(data: any, userId?: string, hotelId?: string) {
+    const created = await this.prisma.client.guest.create({
+      data: {
+        ...data,
+        hotelId,
+      },
+    });
     await this.audit.log(userId, AuditAction.CRIAR, 'GUEST', null, created);
     return created;
   }
 
-  async update(id: string, data: any, userId?: string) {
+  async update(id: string, data: any, userId?: string, hotelId?: string) {
     const previous = await this.findOne(id);
+    // Ensure we only update guests belonging to this hotel
+    if (hotelId && previous.hotelId !== hotelId) {
+      throw new NotFoundException('Hóspede não encontrado');
+    }
     const updated = await this.prisma.client.guest.update({
       where: { id },
       data,

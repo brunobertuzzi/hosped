@@ -515,6 +515,13 @@ export const api = {
     });
   },
 
+  async updateTenantModules(id: string, enabledModules: string[]) {
+    return await request(`/core/tenants/${id}/modules`, {
+      method: 'PUT',
+      body: JSON.stringify({ enabledModules }),
+    });
+  },
+
   // ================= SYSTEM PLANS =================
   async getSystemPlans() {
     return await request('/core/plans');

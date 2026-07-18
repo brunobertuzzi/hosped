@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CloudLightning, Check, Settings2, Globe, Star, MessageCircle, MapPin, CreditCard } from 'lucide-react';
+import { CloudLightning, Check, Settings2, Globe, Star, MessageCircle, MapPin, CreditCard, Lock } from 'lucide-react';
 import { api } from '../../../lib/api';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { useModule } from '../../../hooks/useModule';
 
 const MySwal = withReactContent(Swal);
 
 export default function IntegracoesPage() {
+  const canUseWebhooks = useModule('WEBHOOKS');
   const [loading, setLoading] = useState(true);
   const [googlePlaceId, setGooglePlaceId] = useState('');
   const [googleApiKey, setGoogleApiKey] = useState('');
@@ -28,6 +30,21 @@ export default function IntegracoesPage() {
   useEffect(() => {
     fetchIntegrations();
   }, []);
+
+  // Guard: módulo não habilitado para este hotel
+  if (!canUseWebhooks) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+          <Lock className="w-8 h-8 text-white/20" />
+        </div>
+        <h2 className="text-xl font-bold text-white/60 mb-2">Módulo não disponível</h2>
+        <p className="text-sm text-white/30 max-w-sm">
+          O módulo de Integrações e Webhooks não está habilitado no plano atual. Entre em contato com o suporte para ativar este módulo.
+        </p>
+      </div>
+    );
+  }
 
   const fetchIntegrations = async () => {
     try {

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../../lib/api';
+import { PREMIUM_MODULES } from '../../../lib/modules';
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -36,12 +37,8 @@ export default function PlansPage() {
   const [systemFeatures, setSystemFeatures] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
 
-  const AVAILABLE_FEATURES = [
-    { id: 'WHITE_LABEL', label: 'White-Label (Hosped Injector)' },
-    { id: 'WEBHOOKS', label: 'Webhooks & API' },
-    { id: 'GANTT_CHART', label: 'Mapa de Ocupação (Gantt)' },
-    { id: 'MULTIPLE_BRANCHES', label: 'Múltiplas Filiais' }
-  ];
+  // Usa o registry centralizado — adicionar módulos aqui automaticamente os expõe
+  const AVAILABLE_FEATURES = PREMIUM_MODULES;
 
   const toggleSystemFeature = (featureId: string) => {
     setSystemFeatures(prev =>
@@ -77,7 +74,7 @@ export default function PlansPage() {
       setMaxRooms(plan.maxRooms?.toString() || '-1');
       setMaxUsers(plan.maxUsers.toString());
       setFeaturesText(plan.features ? plan.features.join('\n') : '');
-      setSystemFeatures(plan.systemFeatures || []);
+      setSystemFeatures(plan.modules || plan.systemFeatures || []);
       setIsActive(plan.isActive);
     } else {
       setEditingPlan(null);
@@ -111,7 +108,7 @@ export default function PlansPage() {
         maxRooms: parseInt(maxRooms, 10),
         maxUsers: parseInt(maxUsers, 10),
         features: featuresText.split('\n').filter(f => f.trim() !== ''),
-        systemFeatures,
+        modules: systemFeatures,
         isActive,
       };
 

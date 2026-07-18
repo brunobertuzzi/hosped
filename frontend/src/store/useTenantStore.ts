@@ -14,7 +14,8 @@ const INITIAL_HOTEL = {
   cores: { primary: '#3b82f6', secondary: '#1e293b' },
   layout: { font: 'sans', heroVariant: 'standard' },
   webhooks: { onReservationComplete: '', onCheckIn: '' },
-  localInfos: { checkInTime: '14:00', checkOutTime: '12:00', timezone: 'America/Sao_Paulo' }
+  localInfos: { checkInTime: '14:00', checkOutTime: '12:00', timezone: 'America/Sao_Paulo' },
+  enabledModules: []
 };
 
 const INITIAL_ROOM_CATEGORIES: any[] = [];

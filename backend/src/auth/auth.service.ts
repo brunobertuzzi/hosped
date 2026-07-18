@@ -60,7 +60,7 @@ export class AuthService {
         branchId: user.branchId,
         status: user.status,
         permissions: user.permissions,
-        hotel: user.hotel || null,
+        hotel: user.hotel ? { ...user.hotel, enabledModules: user.hotel.enabledModules || [] } : null,
         branch: user.branch || null,
       },
     };
@@ -276,7 +276,7 @@ export class AuthService {
         branchId: owner.branchId,
         status: owner.status,
         permissions: owner.permissions,
-        hotel: owner.hotel || null,
+        hotel: owner.hotel ? { ...owner.hotel, enabledModules: owner.hotel.enabledModules || [] } : null,
         branch: owner.branch || null,
       },
     };

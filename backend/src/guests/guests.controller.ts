@@ -20,15 +20,23 @@ export class GuestsController {
 
   @Post()
   async create(@Body() data: any, @Request() req: any) {
-    return this.guestsService.create(data, req.user?.sub);
+    return this.guestsService.create(data, req.user?.sub, req.user?.hotelId);
   }
 
   @Get()
-  findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Request() req?: any,
+  ) {
     if (page && limit) {
-      return this.guestsService.findAll(Number(page), Number(limit));
+      return this.guestsService.findAll(
+        Number(page),
+        Number(limit),
+        req?.user?.hotelId,
+      );
     }
-    return this.guestsService.findAll();
+    return this.guestsService.findAll(undefined, undefined, req?.user?.hotelId);
   }
 
   @Get(':id')
@@ -38,7 +46,7 @@ export class GuestsController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
-    return this.guestsService.update(id, data, req.user?.sub);
+    return this.guestsService.update(id, data, req.user?.sub, req.user?.hotelId);
   }
 
   @Delete(':id')

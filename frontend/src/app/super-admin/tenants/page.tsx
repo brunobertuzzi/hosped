@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../lib/api';
 import { formatCNPJ } from '../../../lib/masks';
 import { toast } from 'sonner';
+import { PREMIUM_MODULES } from '../../../lib/modules';
 
 export default function SuperAdminTenants() {
   const router = useRouter();
@@ -49,12 +50,8 @@ export default function SuperAdminTenants() {
   const [editStatus, setEditStatus] = useState<TenantStatus>('ACTIVE');
   const [editFeatures, setEditFeatures] = useState<string[]>([]);
 
-  const AVAILABLE_FEATURES = [
-    { id: 'WHITE_LABEL', label: 'White-Label (Hosped Injector)' },
-    { id: 'WEBHOOKS', label: 'Webhooks & API' },
-    { id: 'GANTT_CHART', label: 'Mapa de Ocupação (Gantt)' },
-    { id: 'MULTIPLE_BRANCHES', label: 'Múltiplas Filiais' }
-  ];
+  // Usa o registry centralizado — adicionar módulos em modules.ts os expõe aqui automaticamente
+  const AVAILABLE_FEATURES = PREMIUM_MODULES;
 
   const handleAddPlanChange = (newPlan: TenantPlan) => {
     setPlan(newPlan);
@@ -99,7 +96,7 @@ export default function SuperAdminTenants() {
         email,
         plan,
         mrr,
-        features: addFeatures
+        enabledModules: addFeatures
       });
       await fetchClients();
       setIsAddModalOpen(false);
@@ -126,7 +123,7 @@ export default function SuperAdminTenants() {
     setEditEmail(client.email);
     setEditMrr(client.mrr);
     setEditStatus(client.status);
-    setEditFeatures(client.features || []);
+    setEditFeatures(client.enabledModules || []);
     setIsEditModalOpen(true);
   };
 
@@ -140,7 +137,7 @@ export default function SuperAdminTenants() {
         mrr: Number(editMrr),
         name: editName,
         email: editEmail,
-        features: editFeatures
+        enabledModules: editFeatures
       });
       if (editStatus !== editingClient.status) {
         await api.updateTenantStatus(editingClient.id, editStatus);

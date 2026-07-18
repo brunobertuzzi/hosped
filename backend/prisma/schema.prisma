@@ -122,6 +122,7 @@ model Hotel {
   storageLimitMB       Float     @default(1024)
   apiRequestsCount     Int       @default(0)
   apiRequestsLimit     Int       @default(10000)
+  enabledModules       String[]  @default([])
 
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
@@ -575,6 +576,7 @@ model SystemPlan {
   maxRooms    Int      @default(20) // -1 for unlimited
   maxUsers    Int      @default(5)
   features    String[]
+  modules     String[] @default([])
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings, PaintBucket, Palette, Store,
-  Save, LayoutTemplate, Shield, Webhook, Clock
+  Save, LayoutTemplate, Shield, Webhook, Clock, Lock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
 import { toast } from 'sonner';
+import { useModule } from '../../../hooks/useModule';
 
 const COLOR_PRESETS = [
   { name: 'Azul Premium', hex: '#3b82f6' },
@@ -26,6 +27,7 @@ const COLOR_PRESETS = [
 
 export default function ConfiguracoesPage() {
   const { hotel, setHotelColors, setHotelLayout, addAuditLog, user } = useActiveBranchData();
+  const canUseWhiteLabel = useModule('WHITE_LABEL');
 
   const [primaryColor, setPrimaryColor] = useState(hotel.cores?.primary || '#3b82f6');
   const [backgroundColor, setBackgroundColor] = useState(hotel.cores?.secondary || '#000000');
@@ -141,33 +143,47 @@ export default function ConfiguracoesPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL Personalizada do Portal (Slug/Domínio)</label>
-                <div className="flex flex-col md:flex-row md:items-center gap-2">
-                  <span className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 hidden md:inline-block">https://frontend-production-2b45.up.railway.app/</span>
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
-                    placeholder="hotel-galvan.com.br"
-                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
-                  />
-                </div>
-                <p className="text-[10px] text-white/30 mt-2">Os hóspedes acessarão sua página através deste link.</p>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 flex items-center gap-2">URL Personalizada do Portal (Slug/Domínio) {!canUseWhiteLabel && <Lock className="w-3 h-3 text-brand" />}</label>
+                {canUseWhiteLabel ? (
+                  <>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                      <span className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 hidden md:inline-block">https://frontend-production-2b45.up.railway.app/</span>
+                      <input
+                        type="text"
+                        value={slug}
+                        onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
+                        placeholder="hotel-galvan.com.br"
+                        className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
+                      />
+                    </div>
+                    <p className="text-[10px] text-white/30 mt-2">Os hóspedes acessarão sua página através deste link.</p>
+                  </>
+                ) : (
+                  <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 italic flex items-center gap-2">
+                    Funcionalidade exclusiva do plano Enterprise (Módulo White-Label)
+                  </div>
+                )}
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL da Logomarca (SVG/PNG)</label>
-                <div className="flex gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden p-2 shrink-0">
-                    <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 flex items-center gap-2">URL da Logomarca (SVG/PNG) {!canUseWhiteLabel && <Lock className="w-3 h-3 text-brand" />}</label>
+                {canUseWhiteLabel ? (
+                  <div className="flex gap-4">
+                    <div className="w-16 h-16 rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden p-2 shrink-0">
+                      <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                    </div>
+                    <input
+                      type="text"
+                      value={logoUrl}
+                      onChange={e => setLogoUrl(e.target.value)}
+                      className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-12 self-center"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={logoUrl}
-                    onChange={e => setLogoUrl(e.target.value)}
-                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-12 self-center"
-                  />
-                </div>
+                ) : (
+                  <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 italic">
+                    Logotipo customizado disponível no plano Enterprise.
+                  </div>
+                )}
               </div>
 
               <div>
@@ -297,7 +313,14 @@ export default function ConfiguracoesPage() {
             </div>
           </div>
 
-          <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
+          <div className={`glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 ${!canUseWhiteLabel ? 'opacity-50 pointer-events-none relative' : ''}`}>
+            {!canUseWhiteLabel && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 rounded-[24px] backdrop-blur-[2px]">
+                <Lock className="w-8 h-8 text-white/40 mb-3" />
+                <h4 className="text-white font-bold tracking-widest uppercase text-[11px]">Módulo White-Label</h4>
+                <p className="text-white/40 text-[11px] mt-1 text-center px-6">Disponível no plano Enterprise para customização do Design System.</p>
+              </div>
+            )}
             <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 border-b border-white/5 pb-4">
               <Palette className="w-4 h-4 text-brand" /> Tema Visual (Hosped Injector)
             </h3>
