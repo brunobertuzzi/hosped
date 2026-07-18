@@ -106,9 +106,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               <ToggleLeft className="w-4 h-4" /> Feature Flags
             </Link>
 
-            <Link href="/super-admin/broadcast" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/broadcast' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Radio className="w-4 h-4" /> Central de Anúncios
-            </Link>
+
             
             <div className="pt-6 mt-6 border-t border-white/5 space-y-1">
               <Link href="/super-admin/logs" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/logs' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>

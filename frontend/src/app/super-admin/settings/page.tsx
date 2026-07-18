@@ -1,21 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Settings, Server, Megaphone, CreditCard, CheckCircle2, AlertTriangle, RefreshCcw, Key, Eye, EyeOff, Plus, Trash2, GripVertical } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, Server, Megaphone, CreditCard, CheckCircle2, AlertTriangle, RefreshCcw, Key, Eye, EyeOff, Plus, Trash2, GripVertical, Search, Info, Calendar, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface PaymentGateway {
+type AnnouncementType = 'INFO' | 'WARNING' | 'SUCCESS' | 'RELEASE_NOTES';
+
+interface Announcement {
   id: string;
-  name: string;
-  apiKey: string;
-  showKey: boolean;
+  title: string;
+  content: string;
+  type: AnnouncementType;
+  isActive: boolean;
+  targetPlans: string[];
+  createdAt: string;
 }
 
 export default function GlobalSettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [broadcastMessage, setBroadcastMessage] = useState('');
-  const [activeAnnouncementId, setActiveAnnouncementId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Global Settings from DB
@@ -26,24 +29,34 @@ export default function GlobalSettingsPage() {
   const [gatewayApiKey, setGatewayApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
 
+  // Announcements State
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [newType, setNewType] = useState<AnnouncementType>('INFO');
+
   useEffect(() => {
     fetchSettings();
   }, []);
 
   const fetchSettings = async () => {
     try {
+      setLoadingAnnouncements(true);
       const { api } = await import('../../../lib/api');
-      const maintenanceRes = await api.getGlobalMaintenance();
+      
+      const [maintenanceRes, announcementsRes, global] = await Promise.all([
+        api.getGlobalMaintenance(),
+        api.getAnnouncements(),
+        api.getGlobalSettings()
+      ]);
+      
       setMaintenanceMode(maintenanceRes.maintenanceMode);
+      setAnnouncements(announcementsRes || []);
 
-      const announcements = await api.getAnnouncements();
-      const activeAnn = announcements.find((a: any) => a.isActive);
-      if (activeAnn) {
-        setBroadcastMessage(activeAnn.content);
-        setActiveAnnouncementId(activeAnn.id);
-      }
-
-      const global = await api.getGlobalSettings();
       if (global) {
         setPlatformName(global.platformName || 'Hosped');
         setSupportEmail(global.supportEmail || 'suporte@hosped.com');
@@ -55,26 +68,16 @@ export default function GlobalSettingsPage() {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingAnnouncements(false);
     }
   };
-
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
       const { api } = await import('../../../lib/api');
       await api.setGlobalMaintenance(maintenanceMode);
-
-      if (broadcastMessage) {
-        if (activeAnnouncementId) {
-          await api.updateAnnouncement(activeAnnouncementId, { content: broadcastMessage, title: 'Aviso Global', isActive: true, type: 'WARNING' });
-        } else {
-          const ann = await api.createAnnouncement({ content: broadcastMessage, title: 'Aviso Global', isActive: true, type: 'WARNING' });
-          setActiveAnnouncementId(ann.id);
-        }
-      } else if (activeAnnouncementId) {
-        await api.updateAnnouncement(activeAnnouncementId, { content: '', isActive: false });
-      }
 
       await api.updateGlobalSettings({
         platformName,
@@ -95,6 +98,70 @@ export default function GlobalSettingsPage() {
     toast.success('Cache global invalidado com sucesso.');
   };
 
+  const toggleAnnouncementActive = async (id: string, currentStatus: boolean, announcement: Announcement) => {
+    try {
+      setAnnouncements(announcements.map(a => a.id === id ? { ...a, isActive: !currentStatus } : a));
+      const { api } = await import('../../../lib/api');
+      await api.updateAnnouncement(id, { ...announcement, isActive: !currentStatus });
+    } catch (err) {
+      toast.error('Erro ao atualizar status do anúncio');
+      fetchSettings();
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!confirm('Deseja realmente excluir este anúncio?')) return;
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.deleteAnnouncement(id);
+      setAnnouncements(announcements.filter(a => a.id !== id));
+    } catch (err) {
+      toast.error('Erro ao excluir anúncio');
+    }
+  };
+
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.createAnnouncement({
+        title: newTitle,
+        content: newContent,
+        type: newType,
+        isActive: true,
+        targetPlans: []
+      });
+      setIsAddModalOpen(false);
+      setNewTitle('');
+      setNewContent('');
+      setNewType('INFO');
+      fetchSettings();
+      toast.success('Anúncio criado com sucesso!');
+    } catch (err: any) {
+      toast.error('Erro ao criar anúncio: ' + (err.message || 'Erro desconhecido'));
+    }
+  };
+
+  const filteredAnnouncements = announcements.filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const getTypeStyle = (type: AnnouncementType) => {
+    switch (type) {
+      case 'WARNING': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'SUCCESS': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'RELEASE_NOTES': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+      default: return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+    }
+  };
+
+  const getTypeIcon = (type: AnnouncementType) => {
+    switch (type) {
+      case 'WARNING': return <AlertTriangle className="w-3 h-3" />;
+      case 'SUCCESS': return <CheckCircle2 className="w-3 h-3" />;
+      case 'RELEASE_NOTES': return <Megaphone className="w-3 h-3" />;
+      default: return <Info className="w-3 h-3" />;
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
@@ -102,7 +169,7 @@ export default function GlobalSettingsPage() {
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
             Configurações Globais
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Gateway de pagamento, white label, manutenção e parâmetros da plataforma.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Gateway de pagamento, white label, manutenção e anúncios.</p>
         </div>
         <button
           onClick={handleSave}
@@ -139,6 +206,7 @@ export default function GlobalSettingsPage() {
                     type="text"
                     value={gatewayName}
                     onChange={e => setGatewayName(e.target.value)}
+                    autoComplete="off"
                     placeholder="Ex: Stripe, Asaas, Mercado Pago..."
                     className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 placeholder:text-white/20"
                   />
@@ -150,6 +218,7 @@ export default function GlobalSettingsPage() {
                   type={showKey ? 'text' : 'password'}
                   value={gatewayApiKey}
                   onChange={e => setGatewayApiKey(e.target.value)}
+                  autoComplete="new-password"
                   placeholder="Chave secreta da API..."
                   className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 font-mono placeholder:text-white/20"
                 />
@@ -167,7 +236,7 @@ export default function GlobalSettingsPage() {
         </div>
 
         {/* Controle do Sistema */}
-        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
               <Server className="w-5 h-5" />
@@ -182,7 +251,7 @@ export default function GlobalSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-[13px] font-bold text-white mb-1">Modo Manutenção</h4>
-                <p className="text-[11px] text-white/40 max-w-xs">Desconecta todos os hotéis e exibe tela de manutenção. Apenas Super Admin acessa.</p>
+                <p className="text-[11px] text-white/40 max-w-xs">Desconecta todos os hotéis e exibe tela de manutenção.</p>
               </div>
               <button
                 onClick={() => setMaintenanceMode(!maintenanceMode)}
@@ -195,7 +264,7 @@ export default function GlobalSettingsPage() {
             <div className="pt-4 border-t border-white/5 flex items-center justify-between">
               <div>
                 <h4 className="text-[13px] font-bold text-white mb-1">Limpeza de Cache (Redis)</h4>
-                <p className="text-[11px] text-white/40">Força a atualização de queries de relatórios para todos os hotéis.</p>
+                <p className="text-[11px] text-white/40">Força a atualização de queries.</p>
               </div>
               <button onClick={handleClearCache} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-[10px] uppercase tracking-widest rounded-lg transition-colors">
                 Limpar Cache
@@ -204,38 +273,8 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* Broadcast */}
-        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-              <Megaphone className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Aviso Global (Broadcast)</h2>
-              <p className="text-[11px] text-white/40 font-medium">Mensagem fixada no topo do painel de todos os clientes</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Conteúdo da Mensagem</label>
-            <textarea
-              rows={4}
-              value={broadcastMessage}
-              onChange={e => setBroadcastMessage(e.target.value)}
-              placeholder="Ex: Sistema passará por manutenção programada no Sábado às 02h00..."
-              className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 resize-none placeholder:text-white/20"
-            />
-            {broadcastMessage && (
-              <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center gap-3">
-                <AlertTriangle className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span className="text-[11px] text-indigo-200">A mensagem será exibida imediatamente ao salvar.</span>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* White Label e E-mail */}
-        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <Settings className="w-5 h-5" />
@@ -262,7 +301,144 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
+        {/* Central de Anúncios */}
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <Megaphone className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Central de Anúncios</h2>
+                <p className="text-[11px] text-white/40 font-medium">Gerencie comunicados enviados para todos os hotéis</p>
+              </div>
+            </div>
+            <button onClick={() => setIsAddModalOpen(true)} className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-[12px] font-bold tracking-wide transition-colors flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Novo Anúncio
+            </button>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 relative">
+                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                <input
+                  type="text"
+                  placeholder="Buscar comunicados..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+              {loadingAnnouncements && announcements.length === 0 ? (
+                <div className="col-span-full py-12 flex flex-col items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-indigo-500 animate-spin mb-4" />
+                  <span className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Carregando anúncios...</span>
+                </div>
+              ) : (
+                <AnimatePresence>
+                  {filteredAnnouncements.map((announcement) => (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      key={announcement.id}
+                      className={`border rounded-2xl p-5 flex flex-col relative overflow-hidden transition-all ${announcement.isActive ? 'bg-white/[0.03] border-white/10 hover:border-indigo-500/30' : 'bg-black/40 border-white/5 opacity-60'}`}
+                    >
+                      {!announcement.isActive && (
+                        <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
+                      )}
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${getTypeStyle(announcement.type)}`}>
+                            {getTypeIcon(announcement.type)}
+                            {announcement.type}
+                          </span>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <div
+                              onClick={() => toggleAnnouncementActive(announcement.id, announcement.isActive, announcement)}
+                              className={`w-8 h-4 rounded-full relative transition-colors ${announcement.isActive ? 'bg-indigo-500' : 'bg-white/20'}`}
+                            >
+                              <motion.div
+                                layout
+                                className={`w-2.5 h-2.5 bg-white rounded-full absolute top-[3px] ${announcement.isActive ? 'left-[18px]' : 'left-[3px]'}`}
+                              />
+                            </div>
+                          </label>
+                        </div>
+
+                        <h3 className="text-[15px] font-bold text-white mb-2 leading-tight">{announcement.title}</h3>
+                        <p className="text-[12px] text-white/50 mb-6 line-clamp-3 leading-relaxed">{announcement.content}</p>
+
+                        <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-4">
+                          <div className="flex items-center gap-1.5 text-[10px] text-white/30 font-mono">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(announcement.createdAt).toLocaleDateString('pt-BR')}
+                          </div>
+
+                          <button onClick={() => handleDeleteAnnouncement(announcement.id)} className="text-white/20 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              )}
+            </div>
+            {!loadingAnnouncements && filteredAnnouncements.length === 0 && (
+              <div className="py-12 text-center text-white/30 text-xs font-medium uppercase tracking-widest border border-dashed border-white/5 rounded-2xl">
+                Nenhum anúncio encontrado
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
+
+      {/* Modal Add Announcement */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+              <button onClick={() => setIsAddModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500" />
+              <h2 className="text-xl font-bold text-white mb-6">Criar Novo Anúncio</h2>
+              <form onSubmit={handleCreateAnnouncement} className="space-y-5">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Título do Anúncio</label>
+                  <input required type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Tipo de Anúncio</label>
+                  <select required value={newType} onChange={e => setNewType(e.target.value as AnnouncementType)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                    <option value="INFO">Informativo</option>
+                    <option value="RELEASE_NOTES">Novidades / Release Notes</option>
+                    <option value="WARNING">Aviso / Manutenção</option>
+                    <option value="SUCCESS">Sucesso</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Mensagem (Conteúdo)</label>
+                  <textarea required value={newContent} onChange={e => setNewContent(e.target.value)} rows={4} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
+                </div>
+                <div className="pt-6 flex gap-3">
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Publicar</button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
   );
 }
