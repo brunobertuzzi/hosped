@@ -104,15 +104,12 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
 
 
-            
-            <div className="pt-6 mt-6 border-t border-white/5 space-y-1">
-              <Link href="/super-admin/logs" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/logs' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-                <Terminal className="w-4 h-4" /> Logs de Auditoria
-              </Link>
-              <Link href="/super-admin/system-errors" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/system-errors' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-                <Server className="w-4 h-4" /> Erros de Sistema
-              </Link>
-            </div>
+            <Link href="/super-admin/logs" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/logs' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
+              <Terminal className="w-4 h-4" /> Logs de Auditoria
+            </Link>
+            <Link href="/super-admin/system-errors" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/system-errors' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
+              <Server className="w-4 h-4" /> Erros de Sistema
+            </Link>
           </nav>
         </div>
 
