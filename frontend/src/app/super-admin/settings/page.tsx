@@ -83,7 +83,7 @@ export default function GlobalSettingsPage() {
         platformName,
         supportEmail,
         helpCenterUrl,
-        paymentGateways: [{ id: 'primary', name: gatewayName, apiKey: gatewayApiKey }],
+        paymentGateways: [{ id: 'primary', name: gatewayName || 'Mercado Pago', apiKey: gatewayApiKey }],
       });
 
       toast.success('Configurações globais salvas com sucesso!');
@@ -199,19 +199,6 @@ export default function GlobalSettingsPage() {
 
           <div className="space-y-4">
             <div className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest shrink-0">Provedor</span>
-                  <input
-                    type="text"
-                    value={gatewayName}
-                    onChange={e => setGatewayName(e.target.value)}
-                    autoComplete="off"
-                    placeholder="Ex: Stripe, Asaas, Mercado Pago..."
-                    className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 placeholder:text-white/20"
-                  />
-                </div>
-              </div>
               <div className="relative">
                 <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
                 <input
