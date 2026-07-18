@@ -279,12 +279,6 @@ export default function GlobalSettingsPage() {
                 </button>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-            <AlertTriangle className="w-4 h-4 text-emerald-400 shrink-0" />
-            <p className="text-[10px] text-white/50">Esta configuração é exclusiva do seu gateway de recebimento (onde você recebe das assinaturas). Os hotéis clientes poderão escolher qualquer outro gateway nas configurações deles para receber dos hóspedes.</p>
-          </div>
         </div>
 
         {/* Controle do Sistema */}
@@ -325,14 +319,14 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* White Label e E-mail */}
+        {/* Identidade Visual e E-mail */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <Settings className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">White Label & Suporte</h2>
+              <h2 className="text-lg font-bold text-white">Identidade Visual & Suporte</h2>
               <p className="text-[11px] text-white/40 font-medium">Configurações visuais e de contato do SaaS</p>
             </div>
           </div>
