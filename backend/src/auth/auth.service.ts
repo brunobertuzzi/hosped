@@ -141,6 +141,13 @@ export class AuthService {
           telefone: '00000000000',
           endereco: 'Endereço não informado',
           diferenciais: [],
+          plan: plan || 'STARTUP',
+          status: 'ACTIVE',
+          mrr: mrr ? Number(mrr) : 150.0,
+          storageUsedMB: 0,
+          storageLimitMB: 1024,
+          apiRequestsCount: 0,
+          apiRequestsLimit: 10000,
         },
       });
 
@@ -154,6 +161,7 @@ export class AuthService {
           estado: 'EX',
           telefone: '00000000000',
           email: email,
+          status: 'ACTIVE',
         },
       });
 
