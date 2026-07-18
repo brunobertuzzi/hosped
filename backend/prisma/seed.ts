@@ -99,8 +99,7 @@ async function main() {
       update: {},
       create: {
         id: '1',
-        asaasApiKey: '',
-        stripeSecretKey: '',
+        paymentGateways: [],
         platformName: 'Hosped',
         supportEmail: 'suporte@hosped.com',
         helpCenterUrl: '/guia',

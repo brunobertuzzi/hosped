@@ -390,7 +390,7 @@ export default function GuiaPage() {
   const [supportEmail, setSupportEmail] = useState('suporte@hosped.com');
 
   React.useEffect(() => {
-    import('../../../lib/api').then(({ api }) => {
+    import('../../lib/api').then(({ api }) => {
       api.getGlobalSettings().then((global: any) => {
         if (global?.supportEmail) setSupportEmail(global.supportEmail);
       }).catch(console.error);
