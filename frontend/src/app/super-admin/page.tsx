@@ -51,31 +51,36 @@ export default function SuperAdminDashboard() {
     const validClients = sistemaClients.filter(
       c => c.id !== '11111111-1111-1111-1111-111111111111' && c.status !== 'CHURNED'
     );
-    
+
     const months = [];
     const revenues = [];
     const today = new Date();
-    
+
     // Generate last 7 months data (cumulative MRR)
     for (let i = 6; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthStr = d.toLocaleString('pt-BR', { month: 'short' });
       months.push(monthStr.charAt(0).toUpperCase() + monthStr.slice(1, 3));
-      
+
       // Clients created before the end of this month
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59);
-      
+
       const mrr = validClients
         .filter(c => new Date(c.createdAt) <= endOfMonth)
         .reduce((acc, c) => acc + c.mrr, 0);
-        
+
       revenues.push(mrr);
     }
-    
-    const maxRev = Math.max(...revenues, 1); 
+
+    const maxRev = Math.max(...revenues, 1);
     const heights = revenues.map(r => (r / maxRev) * 100);
-    
-    return { months, revenues, heights };
+
+    // Calcula crescimento percentual do último mês completo vs anterior
+    const lastMonth = revenues[revenues.length - 1];
+    const prevMonth = revenues[revenues.length - 2];
+    const growth = prevMonth > 0 ? ((lastMonth - prevMonth) / prevMonth) * 100 : 0;
+
+    return { months, revenues, heights, growth };
   }, [sistemaClients]);
 
   return (
@@ -106,7 +111,11 @@ export default function SuperAdminDashboard() {
               {kpis.totalMRR.toFixed(2)}
             </span>
             <div className="text-[11px] text-white/30 mt-2 font-medium flex items-center gap-1.5">
-              <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> 8.4%</span> 
+              {chartData.growth >= 0 ? (
+                <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> {chartData.growth.toFixed(1)}%</span>
+              ) : (
+                <span className="text-red-400/90 flex items-center bg-red-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5 rotate-90" /> {Math.abs(chartData.growth).toFixed(1)}%</span>
+              )}
               este mês
             </div>
           </div>
@@ -200,14 +209,14 @@ export default function SuperAdminDashboard() {
               <div className="w-full border-t border-white/[0.03]" />
               <div className="w-full border-t border-white/[0.03]" />
             </div>
-            
+
             <div className="w-full h-full flex items-end justify-between px-2 gap-2 z-10">
               {chartData.heights.map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col justify-end items-center group relative h-full">
                   <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                     R$ {chartData.revenues[i].toFixed(2)}
                   </div>
-                  <motion.div 
+                  <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${h}%` }}
                     transition={{ duration: 1, delay: i * 0.1 }}
@@ -265,7 +274,7 @@ export default function SuperAdminDashboard() {
               </div>
             </div>
           </div>
-          
+
           <button className="w-full mt-6 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-white/10">
             <Download className="w-3.5 h-3.5" /> Forçar Backup SQL
           </button>

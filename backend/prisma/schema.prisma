@@ -61,6 +61,7 @@ enum AuditAction {
   CANCELAR
   ESTORNO
   MUDANCA_STATUS
+  PAGAMENTO_REGISTRADO
 }
 
 enum ExpenseStatus {
@@ -116,7 +117,7 @@ model Hotel {
   status               String    @default("ACTIVE")
   mrr                  Float     @default(150.0)
   nextBillingDate      DateTime?
-  
+
   storageUsedMB        Float     @default(0)
   storageLimitMB       Float     @default(1024)
   apiRequestsCount     Int       @default(0)
@@ -620,8 +621,7 @@ model SystemAnnouncement {
 
 model GlobalSettings {
   id              String @id @default("1")
-  asaasApiKey     String @default("")
-  stripeSecretKey String @default("")
+  paymentGateways Json   @default("[]")
   platformName    String @default("Hosped")
   supportEmail    String @default("suporte@hosped.com")
   helpCenterUrl   String @default("")

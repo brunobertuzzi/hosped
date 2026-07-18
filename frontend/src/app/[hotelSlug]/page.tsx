@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTenantStore } from '../../store/useTenantStore';
 import { api } from '../../lib/api';
-import { 
-  MapPin, Calendar, ArrowRight, Coffee, Wifi, Tv, 
-  Waves, Star, ChevronRight, Sparkles, Shield, Award, MessageSquare 
+import {
+  MapPin, Calendar, ArrowRight, Coffee, Wifi, Tv,
+  Waves, Star, ChevronRight, Sparkles, Shield, Award, MessageSquare
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -20,8 +20,12 @@ export default function TenantLandingPage() {
   const [loading, setLoading] = useState(true);
 
   // Form states for quick booking search bar
-  const [checkInDate, setCheckInDate] = useState('2026-06-21');
-  const [checkOutDate, setCheckOutDate] = useState('2026-06-25');
+  const todayStr = new Date().toISOString().split('T')[0];
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + 4);
+  const futureStr = futureDate.toISOString().split('T')[0];
+  const [checkInDate, setCheckInDate] = useState(todayStr);
+  const [checkOutDate, setCheckOutDate] = useState(futureStr);
   const [guestsCount, setGuestsCount] = useState(2);
 
   // Google Reviews state
@@ -89,17 +93,13 @@ export default function TenantLandingPage() {
   }
 
   // Fallback de depoimentos se não houver reviews do Google
-  const displayReviews = reviews.length > 0 ? reviews : [
-    { author_name: 'Alessandro Vieira', text: 'Espetacular! A suíte master vista mar tem um conforto extraordinário. O check-in com o código localizador do portal foi super rápido. Recomendo muito!', rating: 5, isGoogle: false },
-    { author_name: 'Camila Santos', text: 'O café da manhã é um espetáculo à parte. Tudo muito limpo, equipe prestativa e a piscina de borda infinita da unidade praia é indescritível. Voltarei com certeza.', rating: 5, isGoogle: false },
-    { author_name: 'Roberto Mendes', text: 'Ótima infraestrutura para quem viaja a trabalho. Wi-Fi rápido e estável no quarto e áreas comuns, além de um atendimento de concierge impecável.', rating: 5, isGoogle: false }
-  ];
+  const displayReviews = reviews.length > 0 ? reviews : [];
 
   return (
     <div className={`min-h-screen text-white transition-colors duration-500 overflow-x-hidden ${fontClass}`} style={{ backgroundColor: bgColor }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;700&display=swap');
-        
+
         :root {
           --brand-primary: ${primaryColor};
           --brand-primary-glow: ${primaryColor}66;
@@ -109,11 +109,11 @@ export default function TenantLandingPage() {
         .bg-brand { background-color: var(--brand-primary); }
         .border-brand { border-color: var(--brand-primary); }
         .glow-brand { box-shadow: 0 0 40px -10px var(--brand-primary-glow); }
-        
+
         .font-sans { font-family: 'Inter', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
         .font-mono { font-family: 'Fira Code', monospace !important; }
-        
+
         .glass-nav {
           background: rgba(0, 0, 0, 0.4);
           backdrop-filter: blur(16px);
@@ -152,7 +152,7 @@ export default function TenantLandingPage() {
       <header className="relative h-[95vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-brand-bg z-10" />
         <img src={hotel.banner || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600'} alt="Hotel Cover" className="absolute inset-0 w-full h-full object-cover transform scale-105" />
-        
+
         <div className="relative z-20 text-center space-y-6 px-6 max-w-4xl mx-auto flex flex-col items-center mt-20">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand/10 border border-brand/20 rounded-full text-brand text-[10px] font-bold uppercase tracking-widest animate-pulse">
             <Sparkles className="w-3.5 h-3.5" /> Experiência Hoteleira de Luxo
@@ -162,7 +162,7 @@ export default function TenantLandingPage() {
           <p className="text-lg md:text-xl text-white/80 font-medium max-w-2xl mx-auto drop-shadow-lg leading-relaxed font-sans">
             {hotel.descricaoPublica || 'Viva estadias memoráveis nas localizações mais cobiçadas, com conforto inigualável e atendimento exclusivo para você e sua família.'}
           </p>
-          
+
           <div className="pt-4">
             <Link href={`/${tenantSlug}/reservas`} className="px-10 py-5 bg-brand hover:brightness-110 text-black font-bold text-[13px] uppercase tracking-widest rounded-full transition-all shadow-[0_0_30px_-5px_var(--brand-primary)] hover:scale-105 inline-flex items-center gap-3">
               Fazer uma Reserva <ArrowRight className="w-5 h-5" />
@@ -207,7 +207,7 @@ export default function TenantLandingPage() {
               <motion.div key={b.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="group relative rounded-[32px] overflow-hidden border border-white/10 h-[450px] cursor-pointer shadow-lg hover:shadow-brand/10 transition-all duration-500">
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-10" />
                 <img src={b.fotoCapa || hotel.banner} alt={b.nome} className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-[1.03] transition-transform duration-700" />
-                
+
                 <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
                   <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md self-start mb-4">
                     <MapPin className="w-4 h-4 text-brand" />
@@ -215,7 +215,7 @@ export default function TenantLandingPage() {
                   </div>
                   <h3 className="text-3xl font-bold mb-2 text-white group-hover:text-brand transition-colors">{b.nome}</h3>
                   <p className="text-white/60 text-sm line-clamp-2 mb-6 font-sans leading-relaxed">{b.endereco}</p>
-                  
+
                   <Link href={`/${tenantSlug}/reservas?branch=${b.id}`} className="inline-flex items-center gap-2 text-brand font-bold text-[11px] uppercase tracking-widest group-hover:translate-x-2 transition-transform">
                     Ver Quartos & Tarifas <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -233,7 +233,7 @@ export default function TenantLandingPage() {
             <h2 className="text-4xl md:text-6xl font-bold tracking-tight">{hotel.slogan || `O Padrão de Excelência ${hotel.nome}`}</h2>
             <p className="text-white/50 text-lg max-w-xl mx-auto font-sans">Nossos diferenciais são pilares de uma estadia inesquecível em qualquer unidade.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {hotel.diferenciais && hotel.diferenciais.length > 0 ? (
               hotel.diferenciais.map((A: any, idx: number) => (
@@ -268,11 +268,12 @@ export default function TenantLandingPage() {
       </section>
 
       {/* Testimonials Section (Now Dynamic with Google Reviews) */}
+      {(loadingReviews || displayReviews.length > 0) && (
       <section id="depoimentos" className="py-32 px-6">
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight flex items-center justify-center gap-4">
-              <Star className="w-10 h-10 text-brand fill-brand" /> 
+              <Star className="w-10 h-10 text-brand fill-brand" />
               O Que Dizem Nossos Hóspedes
             </h2>
             <p className="text-white/50 text-lg max-w-xl mx-auto font-sans">
@@ -314,6 +315,7 @@ export default function TenantLandingPage() {
           )}
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/5 text-center space-y-4">

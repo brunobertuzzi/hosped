@@ -81,6 +81,14 @@ export class RoomsService {
     return created;
   }
 
+  async updateCategory(id: string, data: any, userId?: string) {
+    const previous = await this.prisma.client.roomCategory.findUnique({ where: { id } });
+    if (!previous) throw new NotFoundException('Categoria não encontrada');
+    const updated = await this.prisma.client.roomCategory.update({ where: { id }, data });
+    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'ROOM_CATEGORY', previous, updated);
+    return updated;
+  }
+
   /**
    * Cria uma nova ordem de manutenção para um quarto físico
    */

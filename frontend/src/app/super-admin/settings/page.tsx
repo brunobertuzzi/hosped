@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, ShieldAlert, Key, Server, Megaphone, CheckCircle2, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Settings, Server, Megaphone, CreditCard, CheckCircle2, AlertTriangle, RefreshCcw, Key, Eye, EyeOff, Plus, Trash2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+
+interface PaymentGateway {
+  id: string;
+  name: string;
+  apiKey: string;
+  showKey: boolean;
+}
 
 export default function GlobalSettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -11,11 +18,13 @@ export default function GlobalSettingsPage() {
   const [activeAnnouncementId, setActiveAnnouncementId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Mock API keys states
-  const [asaasKey, setAsaasKey] = useState('***************************');
-  const [stripeKey, setStripeKey] = useState('sk_test_*******************');
+  // Global Settings from DB
+  const [platformName, setPlatformName] = useState('Hosped');
+  const [supportEmail, setSupportEmail] = useState('suporte@hosped.com');
+  const [helpCenterUrl, setHelpCenterUrl] = useState('');
+  const [gateways, setGateways] = useState<PaymentGateway[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchSettings();
   }, []);
 
@@ -31,9 +40,39 @@ export default function GlobalSettingsPage() {
         setBroadcastMessage(activeAnn.content);
         setActiveAnnouncementId(activeAnn.id);
       }
+
+      const global = await api.getGlobalSettings();
+      if (global) {
+        setPlatformName(global.platformName || 'Hosped');
+        setSupportEmail(global.supportEmail || 'suporte@hosped.com');
+        setHelpCenterUrl(global.helpCenterUrl || '');
+        setGateways((global.paymentGateways || []).map((g: any) => ({ ...g, showKey: false })));
+      }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const addGateway = () => {
+    const newGw: PaymentGateway = {
+      id: 'gw_' + Date.now(),
+      name: '',
+      apiKey: '',
+      showKey: false,
+    };
+    setGateways([...gateways, newGw]);
+  };
+
+  const removeGateway = (id: string) => {
+    setGateways(gateways.filter(g => g.id !== id));
+  };
+
+  const updateGateway = (id: string, field: 'name' | 'apiKey', value: string) => {
+    setGateways(gateways.map(g => g.id === id ? { ...g, [field]: value } : g));
+  };
+
+  const toggleShowKey = (id: string) => {
+    setGateways(gateways.map(g => g.id === id ? { ...g, showKey: !g.showKey } : g));
   };
 
   const handleSave = async () => {
@@ -41,7 +80,7 @@ export default function GlobalSettingsPage() {
     try {
       const { api } = await import('../../../lib/api');
       await api.setGlobalMaintenance(maintenanceMode);
-      
+
       if (broadcastMessage) {
         if (activeAnnouncementId) {
           await api.updateAnnouncement(activeAnnouncementId, { content: broadcastMessage, title: 'Aviso Global', isActive: true, type: 'WARNING' });
@@ -53,6 +92,13 @@ export default function GlobalSettingsPage() {
         await api.updateAnnouncement(activeAnnouncementId, { content: '', isActive: false });
       }
 
+      await api.updateGlobalSettings({
+        platformName,
+        supportEmail,
+        helpCenterUrl,
+        paymentGateways: gateways.map(({ showKey, ...rest }) => rest),
+      });
+
       toast.success('Configurações globais salvas com sucesso!');
     } catch (err) {
       toast.error('Erro ao salvar as configurações.');
@@ -62,7 +108,7 @@ export default function GlobalSettingsPage() {
   };
 
   const handleClearCache = async () => {
-    toast.success('Cache global invalidado com sucesso. Todos os tenants receberão a nova versão no próximo refresh.');
+    toast.success('Cache global invalidado com sucesso.');
   };
 
   return (
@@ -72,9 +118,9 @@ export default function GlobalSettingsPage() {
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             Configurações Globais
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de chaves-mestras, manutenção e parâmetros globais da plataforma.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Gateway de pagamento, white label, manutenção e parâmetros da plataforma.</p>
         </div>
-        <button 
+        <button
           onClick={handleSave}
           disabled={isSaving}
           className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_-5px_#6366f1] disabled:opacity-50 flex items-center gap-2"
@@ -85,7 +131,74 @@ export default function GlobalSettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
+
+        {/* Gateway de Pagamento */}
+        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Gateways de Pagamento</h2>
+                <p className="text-[11px] text-white/40 font-medium">Configure quantos gateways quiser — Mercado Pago, Asaas, Stripe, Cielo, etc.</p>
+              </div>
+            </div>
+            <button onClick={addGateway} className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Adicionar Gateway
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {gateways.length === 0 ? (
+              <div className="p-8 text-center border-2 border-dashed border-white/10 rounded-2xl">
+                <CreditCard className="w-10 h-10 text-white/20 mx-auto mb-3" />
+                <p className="text-[13px] text-white/30 font-medium">Nenhum gateway configurado.</p>
+                <p className="text-[11px] text-white/20 mt-1">Clique em "Adicionar Gateway" para começar.</p>
+              </div>
+            ) : (
+              gateways.map((gw, idx) => (
+                <div key={gw.id} className="bg-white/[0.02] p-5 rounded-2xl border border-white/5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <GripVertical className="w-4 h-4 text-white/20 shrink-0" />
+                      <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest shrink-0">Gateway #{idx + 1}</span>
+                      <input
+                        type="text"
+                        value={gw.name}
+                        onChange={e => updateGateway(gw.id, 'name', e.target.value)}
+                        placeholder="Ex: Mercado Pago, Asaas, Stripe..."
+                        className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 placeholder:text-white/20"
+                      />
+                    </div>
+                    <button onClick={() => removeGateway(gw.id)} className="ml-3 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                    <input
+                      type={gw.showKey ? 'text' : 'password'}
+                      value={gw.apiKey}
+                      onChange={e => updateGateway(gw.id, 'apiKey', e.target.value)}
+                      placeholder="Chave secreta da API..."
+                      className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-[13px] text-white outline-none focus:border-emerald-500 font-mono placeholder:text-white/20"
+                    />
+                    <button onClick={() => toggleShowKey(gw.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors">
+                      {gw.showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+            <AlertTriangle className="w-4 h-4 text-emerald-400 shrink-0" />
+            <p className="text-[10px] text-white/50">As chaves cadastradas aqui serão usadas como padrão para todos os hotéis. Cada hotel pode sobrescrever nas suas próprias configurações de integração.</p>
+          </div>
+        </div>
+
         {/* Controle do Sistema */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
           <div className="flex items-center gap-3 mb-4">
@@ -102,9 +215,9 @@ export default function GlobalSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-[13px] font-bold text-white mb-1">Modo Manutenção</h4>
-                <p className="text-[11px] text-white/40 max-w-xs">Ao ativar, todos os tenants (exceto Super Admins) serão deslogados e verão uma tela de manutenção.</p>
+                <p className="text-[11px] text-white/40 max-w-xs">Desconecta todos os hotéis e exibe tela de manutenção. Apenas Super Admin acessa.</p>
               </div>
-              <button 
+              <button
                 onClick={() => setMaintenanceMode(!maintenanceMode)}
                 className={`w-14 h-7 rounded-full transition-colors relative flex items-center shrink-0 ${maintenanceMode ? 'bg-amber-500' : 'bg-white/10'}`}
               >
@@ -138,7 +251,7 @@ export default function GlobalSettingsPage() {
 
           <div className="space-y-4">
             <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Conteúdo da Mensagem</label>
-            <textarea 
+            <textarea
               rows={4}
               value={broadcastMessage}
               onChange={e => setBroadcastMessage(e.target.value)}
@@ -151,53 +264,6 @@ export default function GlobalSettingsPage() {
                 <span className="text-[11px] text-indigo-200">A mensagem será exibida imediatamente ao salvar.</span>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Chaves de Integração (API Keys) */}
-        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Key className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Integrações de Faturamento (Master)</h2>
-              <p className="text-[11px] text-white/40 font-medium">Credenciais para emissão de faturas e pagamentos da assinatura (SaaS)</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
-            <div>
-              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Asaas API Key (PIX / Boleto)</label>
-              <div className="relative">
-                <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
-                <input 
-                  type="password"
-                  value={asaasKey}
-                  onChange={e => setAsaasKey(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-4 py-3 text-[13px] text-white outline-none focus:border-emerald-500 font-mono"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Stripe Secret Key (Cartões Globais)</label>
-              <div className="relative">
-                <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
-                <input 
-                  type="password"
-                  value={stripeKey}
-                  onChange={e => setStripeKey(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl pl-10 pr-4 py-3 text-[13px] text-white outline-none focus:border-emerald-500 font-mono"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 p-4 bg-red-500/5 border border-red-500/10 rounded-xl">
-            <ShieldAlert className="w-5 h-5 text-red-400 shrink-0" />
-            <p className="text-[11px] text-white/60">
-              Alterar as chaves-mestras pode interromper a cobrança recorrente de todos os {">"} 120 tenants ativos. Cuidado ao manipular essas configurações em produção.
-            </p>
           </div>
         </div>
 
@@ -216,45 +282,15 @@ export default function GlobalSettingsPage() {
           <div className="space-y-4 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
             <div>
               <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Nome da Plataforma</label>
-              <input type="text" defaultValue="Hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
+              <input type="text" value={platformName} onChange={e => setPlatformName(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">E-mail de Suporte Global</label>
-              <input type="email" defaultValue="ajuda@hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
+              <input type="email" value={supportEmail} onChange={e => setSupportEmail(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500" />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">URL da Central de Ajuda</label>
-              <input type="url" defaultValue="https://help.hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500 text-purple-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* Segurança */}
-        <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Segurança Global</h2>
-              <p className="text-[11px] text-white/40 font-medium">Políticas de senha e autenticação</p>
-            </div>
-          </div>
-
-          <div className="space-y-6 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-[13px] font-bold text-white mb-1">Forçar 2FA (MFA)</h4>
-                <p className="text-[11px] text-white/40 max-w-xs">Obriga todos os administradores de hotéis a usarem autenticação em duas etapas.</p>
-              </div>
-              <button className={`w-14 h-7 rounded-full transition-colors relative flex items-center shrink-0 bg-white/10`}>
-                <motion.div className="w-5 h-5 rounded-full bg-white absolute left-[4px]" />
-              </button>
-            </div>
-
-            <div className="pt-4 border-t border-white/5">
-              <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Timeout de Sessão (minutos)</label>
-              <input type="number" defaultValue={120} className="w-32 bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-blue-500 font-mono" />
+              <input type="url" value={helpCenterUrl} onChange={e => setHelpCenterUrl(e.target.value)} placeholder="https://ajuda.hosped.io" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-purple-500 text-purple-400" />
             </div>
           </div>
         </div>

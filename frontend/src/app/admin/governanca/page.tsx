@@ -49,9 +49,9 @@ export default function GovernancaPage() {
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Governança <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Housekeeping</span>
+            Governança
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de limpeza e arrumação de quartos (Kanban).</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de limpeza e arrumação dos quartos pela equipe.</p>
         </div>
       </div>
 

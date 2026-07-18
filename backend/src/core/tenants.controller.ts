@@ -15,6 +15,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
 import { AuthService } from '../auth/auth.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Controller('core/tenants')
 @UseGuards(AuthGuard)
@@ -79,7 +80,8 @@ export class TenantsController {
   }
 
   @Post('seed-default')
-  async seedDefaultHotel() {
+  async seedDefaultHotel(@Request() req: any) {
+    this.checkSuperAdmin(req);
     const defaultHotelId = '11111111-1111-1111-1111-111111111111';
     const defaultBranchId = '22222222-2222-2222-2222-222222222222';
 
@@ -91,22 +93,22 @@ export class TenantsController {
         existingHotel = await this.prisma.client.hotel.create({
           data: {
             id: defaultHotelId,
-            nome: 'Hotel Exemplo (Padrão)',
-            razaoSocial: 'Hotel Exemplo LTDA',
+            nome: 'Hotel Seed',
+            razaoSocial: 'Hotel Seed LTDA',
             documentoFiscal: `00.000.000/${Date.now().toString().slice(-4)}-00`,
-            email: `contato-${Date.now()}@hotelexemplo.com`,
-            telefone: '11999999999',
-            endereco: 'Rua das Flores, 123',
+            email: `seed-${Date.now()}@hotelexemplo.com`,
+            telefone: '11000000000',
+            endereco: 'Seed',
             diferenciais: [],
             branches: {
               create: {
                 id: defaultBranchId,
                 nome: 'Matriz',
-                endereco: 'Rua das Flores, 123',
+                endereco: 'Seed',
                 cidade: 'São Paulo',
                 estado: 'SP',
-                telefone: '11999999999',
-                email: `contato-${Date.now()}@hotelexemplo.com`,
+                telefone: '11000000000',
+                email: `seed-${Date.now()}@hotelexemplo.com`,
               },
             },
           },
@@ -116,8 +118,10 @@ export class TenantsController {
       }
     }
 
-    const superAdminEmail =
-      process.env.SUPER_ADMIN_EMAIL || 'brunobertuzzib@gmail.com';
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
+    if (!superAdminEmail) {
+      return { success: false, error: 'SUPER_ADMIN_EMAIL não configurado nas variáveis de ambiente.' };
+    }
     await this.prisma.client.user.updateMany({
       where: { email: superAdminEmail },
       data: { hotelId: defaultHotelId, branchId: defaultBranchId },
@@ -129,13 +133,18 @@ export class TenantsController {
   @Post()
   async createTenant(@Body() body: any, @Request() req: any) {
     this.checkSuperAdmin(req);
+    // Gerar senha aleatória se não fornecida
+    const tempPassword = body.password || crypto.randomBytes(6).toString('hex');
+    if (!body.password && process.env.NODE_ENV !== 'production') {
+      console.log(`[DEV] Tenant "${body.email}" criado com senha temporária: ${tempPassword}`);
+    }
     // Reutilizar a logica de registro do AuthService, mas forçando plano e MRR
     const res = await this.authService.register({
       companyName: body.name,
       companyDoc: body.document,
       email: body.email,
-      userName: 'Administrador', // Nome padrao
-      password: 'mudar123', // Senha temporária
+      userName: 'Administrador',
+      password: tempPassword,
     });
 
     if (res.success && res.hotelId) {

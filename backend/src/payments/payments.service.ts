@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { MercadoPagoConfig, Payment as MercadoPagoPayment } from 'mercadopago';
 import { PrismaService } from '../core/prisma.service';
 import { PaymentMethod } from '@prisma/client';
@@ -32,6 +32,10 @@ export class PaymentsService {
   }
 
   async createPixPayment(dto: CreatePaymentDto, userId?: string) {
+    if (!dto.email) {
+      throw new BadRequestException('Email do pagador é obrigatório para gerar PIX.');
+    }
+
     return this.prisma.client.$transaction(async (tx: any) => {
       // Validar reserva e carregar a integração do hotel
       const reservation = await tx.reservation.findUnique({
@@ -57,7 +61,7 @@ export class PaymentsService {
           transaction_amount: Number(dto.amount),
           description: dto.description || 'Reserva Hotel',
           payment_method_id: 'pix',
-          payer: { email: dto.email || 'hospede@teste.com' },
+          payer: { email: dto.email },
         };
         const result = await payment.create({ body: request });
         resultId = result.id || '';

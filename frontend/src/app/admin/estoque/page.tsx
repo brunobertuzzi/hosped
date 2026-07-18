@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Package, Search, PlusCircle, AlertTriangle, TrendingUp, 
+import {
+  Package, Search, PlusCircle, AlertTriangle, TrendingUp,
   ShoppingCart, ShieldAlert, Check, Plus, Minus, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,11 +15,11 @@ export default function EstoquePage() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
-  
+
   const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
   const [restockItemId, setRestockItemId] = useState('');
   const [restockQty, setRestockQty] = useState(10);
-  
+
   const [isNewItemModalOpen, setIsNewItemModalOpen] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('BEBIDA');
@@ -65,12 +65,12 @@ export default function EstoquePage() {
       const store = useTenantStore.getState();
       const item = store.inventory.find(i => i.id === restockItemId);
       if (!item) throw new Error('Item não encontrado.');
-      
+
       await api.updateInventoryItem(restockItemId, {
         quantidade: item.quantidade + Number(restockQty)
       });
       await api.getInventory();
-      
+
       setIsRestockModalOpen(false); setRestockItemId(''); setRestockQty(10);
       alerts.success('Estoque reposto com sucesso!');
     } catch (err: any) { alerts.error('Atenção', err.message); }
@@ -107,14 +107,14 @@ export default function EstoquePage() {
   const handleEditItem = async (id: string, currentPrice: number, currentStock: number) => {
     const priceStr = await alerts.prompt('Novo valor de venda', currentPrice.toString());
     if (!priceStr) return;
-    
+
     const stockStr = await alerts.prompt('Nova quantidade', currentStock.toString());
     if (!stockStr) return;
-    
+
     try {
-      await api.updateInventoryItem(id, { 
-        valorVenda: Number(priceStr), 
-        quantidade: Number(stockStr) 
+      await api.updateInventoryItem(id, {
+        valorVenda: Number(priceStr),
+        quantidade: Number(stockStr)
       });
       await api.getInventory();
       alerts.success('Produto atualizado!');
@@ -138,13 +138,13 @@ export default function EstoquePage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
-      
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Almoxarifado
+            Estoque & Consumos
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de consumíveis, reabastecimento e PDV de hóspedes.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Gerencie itens do frigobar, reabastecimento e consumo dos hóspedes.</p>
         </div>
         <div className="flex gap-3">
           {user?.role !== 'HOUSEKEEPING' && (

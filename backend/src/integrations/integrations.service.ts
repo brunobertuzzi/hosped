@@ -66,7 +66,7 @@ export class IntegrationsService {
   async fetchGoogleReviews(hotelIdOrSlug: string) {
     const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(hotelIdOrSlug);
     let hotelId = hotelIdOrSlug;
-    
+
     if (!isUuid) {
       const hotel = await this.prisma.client.hotel.findUnique({
         where: { slug: hotelIdOrSlug },
@@ -87,15 +87,8 @@ export class IntegrationsService {
 
     const apiKey = integration.googleApiKey || process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
-      // Retornar fallback temporário se a chave não estiver configurada
-      return [
-        {
-          author_name: 'Cliente Satisfeito',
-          rating: 5,
-          text: 'Ótima estadia! (Para exibir avaliações reais, configure sua chave de API no painel).',
-          time: Math.floor(Date.now() / 1000) - 86400,
-        }
-      ];
+      // Sem chave de API, retornar array vazio
+      return [];
     }
 
     try {

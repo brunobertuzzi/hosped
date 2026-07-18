@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Calendar, ClipboardList, Bed, CheckCircle2, CreditCard, ChevronRight, 
+import {
+  Calendar, ClipboardList, Bed, CheckCircle2, CreditCard, ChevronRight,
   ShoppingBag, Trash2, KeyRound, User, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,17 +13,17 @@ export default function AdminGanttPage() {
   const store = useTenantStore();
   const { rooms, reservations, inventory, guests, user } = useActiveBranchData();
   const [selectedResForDetail, setSelectedResForDetail] = useState<any>(null);
-  
+
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     today.setDate(today.getDate() - 6); // Hoje fica como o 7º dia (no meio)
     return today;
   });
-  
+
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [checkInDoc, setCheckInDoc] = useState('');
   const [checkInRoomId, setCheckInRoomId] = useState('');
-  
+
   const [isConsumptionModalOpen, setIsConsumptionModalOpen] = useState(false);
   const [consumptionItemId, setConsumptionItemId] = useState('');
   const [consumptionQty, setConsumptionQty] = useState(1);
@@ -75,16 +75,7 @@ export default function AdminGanttPage() {
     if (balance <= 0) return;
 
     try {
-      const store = useTenantStore.getState();
-      const newPayment = {
-        id: 'p_' + Date.now(), valor: balance, metodo: 'PIX', status: 'APROVADO',
-        transacaoId: 'mp-pix-' + Math.floor(Math.random() * 100000), createdAt: new Date().toISOString()
-      };
-      store.addPaymentToRes(selectedResForDetail.id, newPayment);
-      store.addAuditLog({
-        id: 'a_' + Date.now(), usuario: store.user?.nome || 'Operador', data: new Date().toISOString(),
-        acao: 'ESTORNO', entidade: 'PAYMENT', detalhes: `Recebimento Pix de R$ ${balance.toFixed(2)} registrado.`
-      });
+      await api.recordManualPayment(selectedResForDetail.id, balance, 'PIX');
       setSelectedResForDetail(null);
     } catch (err: any) { alert(err.message); }
   };
@@ -109,7 +100,7 @@ export default function AdminGanttPage() {
   const handleDropOnTimeline = async (e: React.DragEvent, targetRoomId: string) => {
     e.preventDefault();
     e.currentTarget.classList.remove('bg-white/[0.08]');
-    
+
     const resId = e.dataTransfer.getData('resId');
     if (!resId) return;
 
@@ -120,9 +111,9 @@ export default function AdminGanttPage() {
     const dropX = e.clientX - rect.left;
     const width = rect.width;
     const percentX = Math.max(0, Math.min(1, dropX / width));
-    
+
     const daysOffset = Math.floor(percentX * 14);
-    
+
     const newStartDate = new Date(startDate);
     newStartDate.setDate(startDate.getDate() + daysOffset);
     newStartDate.setHours(12, 0, 0, 0);
@@ -136,10 +127,10 @@ export default function AdminGanttPage() {
     const newDataCheckIn = newStartDate.toISOString().split('T')[0];
     const newDataCheckOut = newEndDate.toISOString().split('T')[0];
 
-    store.updateReservation(resId, { 
-      roomId: targetRoomId, 
-      dataCheckIn: newDataCheckIn, 
-      dataCheckOut: newDataCheckOut 
+    store.updateReservation(resId, {
+      roomId: targetRoomId,
+      dataCheckIn: newDataCheckIn,
+      dataCheckOut: newDataCheckOut
     });
 
     try {
@@ -168,16 +159,16 @@ export default function AdminGanttPage() {
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Ocupação <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Gantt</span>
+            Mapa de Ocupação
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Timeline operacional interativa de reservas.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Visualize todas as reservas dos quartos em uma linha do tempo.</p>
         </div>
       </div>
 
       <div className="glass-panel p-6 rounded-[24px] overflow-x-auto relative">
         <div className="flex items-center justify-between gap-4 mb-6 min-w-[1300px]">
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => {
                 const d = new Date(startDate);
                 d.setDate(d.getDate() - 14);
@@ -187,7 +178,7 @@ export default function AdminGanttPage() {
             >
               &larr; 14 Dias
             </button>
-            <button 
+            <button
               onClick={() => {
                 const d = new Date(startDate);
                 d.setMonth(d.getMonth() - 1);
@@ -197,7 +188,7 @@ export default function AdminGanttPage() {
             >
               Mês Anterior
             </button>
-            <button 
+            <button
               onClick={() => {
                 const today = new Date();
                 today.setDate(today.getDate() - 6);
@@ -207,7 +198,7 @@ export default function AdminGanttPage() {
             >
               Hoje
             </button>
-            <button 
+            <button
               onClick={() => {
                 const d = new Date(startDate);
                 d.setMonth(d.getMonth() + 1);
@@ -217,7 +208,7 @@ export default function AdminGanttPage() {
             >
               Próximo Mês
             </button>
-            <button 
+            <button
               onClick={() => {
                 const d = new Date(startDate);
                 d.setDate(d.getDate() + 14);
@@ -238,8 +229,8 @@ export default function AdminGanttPage() {
           {dates.map((d, idx) => {
             const isToday = formatDateISO(d) === formatDateISO(new Date());
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={isToday ? "text-brand border border-brand/30 bg-brand/10 rounded-lg p-1 flex items-center justify-center" : "flex items-center justify-center p-1"}
               >
                 {getHeaderLabel(d)}
@@ -261,7 +252,7 @@ export default function AdminGanttPage() {
                   <span className={`w-2 h-2 rounded-full shrink-0 shadow-lg ${room.status === 'DISPONIVEL' ? 'bg-emerald-500 shadow-emerald-500/50' : room.status === 'OCUPADO' ? 'bg-brand shadow-brand/50' : 'bg-amber-500 shadow-amber-500/50'}`} />
                 </div>
 
-                <div 
+                <div
                   className="col-span-14 h-full relative flex items-center justify-start pointer-events-auto transition-colors duration-200"
                   onDrop={(e) => handleDropOnTimeline(e, room.id)}
                   onDragOver={handleDragOver}
@@ -274,10 +265,10 @@ export default function AdminGanttPage() {
 
                   {resList.map((res: any) => {
                     const guest = guests.find(g => g.id === res.guestId);
-                    
+
                     const checkInDate = new Date(typeof res.dataCheckIn === 'string' && !res.dataCheckIn.includes('T') ? res.dataCheckIn + 'T12:00:00' : res.dataCheckIn);
                     const checkOutDate = new Date(typeof res.dataCheckOut === 'string' && !res.dataCheckOut.includes('T') ? res.dataCheckOut + 'T12:00:00' : res.dataCheckOut);
-                    
+
                     const startWindow = new Date(startDate);
                     startWindow.setHours(0,0,0,0);
                     const endWindow = new Date(dates[13]);
@@ -286,7 +277,7 @@ export default function AdminGanttPage() {
                     if (checkOutDate < startWindow || checkInDate > endWindow) return null;
 
                     const oneDay = 24 * 60 * 60 * 1000;
-                    
+
                     const dIn = new Date(checkInDate);
                     dIn.setHours(12,0,0,0);
                     const dOut = new Date(checkOutDate);
@@ -308,7 +299,7 @@ export default function AdminGanttPage() {
 
                     let pillClass = 'bg-brand/20 border-brand text-brand hover:bg-brand/30';
                     if (res.status === 'CHECK_OUT_REALIZADO') pillClass = 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10';
-                    
+
                     return (
                       <button
                         key={res.id} onClick={() => setSelectedResForDetail(res)}
@@ -357,8 +348,8 @@ export default function AdminGanttPage() {
       <AnimatePresence>
         {selectedResForDetail && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }} className="w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-[24px] p-8 shadow-2xl">
-              
+            <motion.div initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }} className="w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl">
+
               <div className="flex items-center justify-between border-b border-white/5 pb-5">
                 <div>
                   <span className="text-[10px] uppercase font-bold tracking-widest text-brand">Detalhes da Reserva</span>

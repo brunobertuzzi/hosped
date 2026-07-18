@@ -177,7 +177,7 @@ export default function AdminReservasPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">Reservas</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">Controle de Reservas</h1>
           <p className="text-[13px] text-white/50">Gerencie e crie reservas do balcão e telefone.</p>
         </div>
 

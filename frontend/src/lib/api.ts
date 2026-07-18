@@ -176,7 +176,7 @@ export const api = {
   },
 
   /**
-   * Realizar Checkout
+   * Realizar Check-out
    */
   async checkOut(reservationId: string) {
     const res = await request(`/reservations/${reservationId}/check-out`, {
@@ -186,6 +186,29 @@ export const api = {
     await this.getRooms();
     await this.getReservations();
     return res;
+  },
+
+  /**
+   * Registrar pagamento manual (PIX, Cartão, Dinheiro) sem gateway
+   */
+  async recordManualPayment(reservationId: string, valor: number, metodo: string) {
+    const res = await request(`/reservations/${reservationId}/manual-payment`, {
+      method: 'POST',
+      body: JSON.stringify({ valor, metodo }),
+    });
+
+    await this.getReservations();
+    return res;
+  },
+
+  /**
+   * Completar pré-check-in do hóspede (envio de documento)
+   */
+  async completePreCheckIn(guestToken: string, documentoCheckIn: string) {
+    return await request(`/reservations/${guestToken}/pre-check-in`, {
+      method: 'POST',
+      body: JSON.stringify({ documentoCheckIn }),
+    });
   },
 
   /**
@@ -287,11 +310,12 @@ export const api = {
 
   async updateInventoryItem(id: string, data: any) {
     const res = await request(`/inventory/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-    // Assuming getInventory() exists or state is managed differently
+    await this.getInventory();
     return res;
   },
   async deleteInventoryItem(id: string) {
     const res = await request(`/inventory/${id}`, { method: 'DELETE' });
+    await this.getInventory();
     return res;
   },
 
@@ -590,6 +614,19 @@ export const api = {
 
   async getSystemLogs() {
     return await request('/core/tenants/system-logs');
+  },
+
+  // ================= GLOBAL SETTINGS (Super Admin) =================
+
+  async getGlobalSettings() {
+    return await request('/core/global-settings');
+  },
+
+  async updateGlobalSettings(data: any) {
+    return await request('/core/global-settings', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
   },
 
   // ================= HOUSEKEEPING (Tarefas de Limpeza) =================

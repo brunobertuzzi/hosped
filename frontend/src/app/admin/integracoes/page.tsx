@@ -137,21 +137,21 @@ export default function IntegracoesPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header>
         <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-          App Store e Integrações
+          Integrações
         </h1>
         <p className="text-white/60 text-sm max-w-2xl mt-2">
-          Conecte o seu hotel aos melhores serviços do mercado. Sincronize avaliações, canais de venda e otimize a comunicação com seus hóspedes.
+          Conecte seu hotel com Google, WhatsApp, pagamentos e sites de reserva.
         </p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
         {/* Google Reviews Card */}
         <div className="glass-card border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Star className="w-24 h-24 text-white" />
           </div>
-          
+
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
               <Globe className="w-6 h-6 text-emerald-400" />
@@ -222,7 +222,7 @@ export default function IntegracoesPage() {
               <p className="text-xs text-white/50">Auto-atendimento e notificações (Evolution API)</p>
             </div>
           </div>
-          
+
           <div className="space-y-4 relative z-10">
             <div className="space-y-2">
               <label className="text-xs font-medium text-white/70">URL da API</label>
@@ -284,7 +284,7 @@ export default function IntegracoesPage() {
               <p className="text-xs text-white/50">Receba reservas direto na sua conta do hotel</p>
             </div>
           </div>
-          
+
           <div className="space-y-4 relative z-10">
             <div className="space-y-2">
               <label className="text-xs font-medium text-white/70">Provedor</label>

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { 
+import {
   Users, CheckCircle, Calendar as CalendarIcon, Image as ImageIcon,
   MapPin, ShieldCheck, CreditCard, CheckCircle2, ChevronLeft, Building2, User, ChevronRight, Check, BedDouble, Calendar, Moon, Plus, Minus, KeyRound, Copy, Star, ArrowLeft, Loader2
 } from 'lucide-react';
@@ -38,8 +38,14 @@ function BookingEngineContent() {
     return roomCategories; // or filter rooms separately for stock per branch
   }, [roomCategories, activeBranch]);
 
-  const [checkInDate, setCheckInDate] = useState('2026-06-15');
-  const [checkOutDate, setCheckOutDate] = useState('2026-06-18');
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const futureDate = new Date(today);
+  futureDate.setDate(today.getDate() + 3);
+  const futureStr = futureDate.toISOString().split('T')[0];
+
+  const [checkInDate, setCheckInDate] = useState(todayStr);
+  const [checkOutDate, setCheckOutDate] = useState(futureStr);
   const [hospedesCount, setHospedesCount] = useState(2);
 
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
@@ -52,7 +58,7 @@ function BookingEngineContent() {
 
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix');
   const [isCopied, setIsCopied] = useState(false);
-  
+
   // Mercado Pago states
   const [isWaitingPayment, setIsWaitingPayment] = useState(false);
   const [qrCodeData, setQrCodeData] = useState<{ id: string, qr_code: string, qr_code_base64: string } | null>(null);
@@ -60,13 +66,15 @@ function BookingEngineContent() {
 
   const [createdReservationCode, setCreatedReservationCode] = useState('');
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGuestDoc(formatDocument(e.target.value));
   };
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // Load public data for the hotel (treat hotelSlug param as hotelId for demo; pass real UUID e.g. the seed hotel id)
+  // Load public data for the hotel (hotelSlug param is the hotel UUID)
   useEffect(() => {
     const loadPublicData = async () => {
       if (!tenantSlug) return;
@@ -101,21 +109,23 @@ function BookingEngineContent() {
           const initial = initialBranchId || hdata.branches[0]?.id;
           if (initial) setSelectedBranchId(initial);
         } else {
-          // Minimal fallback
+          // Se a API falhou, mostrar estado de erro
           useTenantStore.setState({
             hotel: {
               id: hid,
-              nome: 'Hotel Sol & Praia (Public)',
+              nome: 'Hotel não encontrado',
               razaoSocial: '',
               documentoFiscal: '',
-              logo: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200',
-              banner: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600',
+              logo: '',
+              banner: '',
               cores: { primary: '#f59e0b', secondary: '#0f172a' },
             } as any,
           });
+          setError('Não foi possível carregar dados do hotel.');
         }
       } catch (e) {
-        console.warn('[Public] Failed to load hotel data via API, using store fallback', e);
+        console.warn('[Public] Failed to load hotel data via API', e);
+        setError('Não foi possível carregar dados do hotel.');
       }
     };
     loadPublicData();
@@ -186,8 +196,13 @@ function BookingEngineContent() {
     return await res.json(); // returns the created reservation with real id
   };
 
-  const finishReservation = (transacaoId: string, realReservation?: any) => {
-    const code = realReservation?.id || ('RES-' + Math.floor(100000 + Math.random() * 900000));
+  const finishReservation = (transacaoId: string | null, realReservation?: any) => {
+    const code = realReservation?.id;
+    if (!code) {
+      setError('Erro ao criar reserva: ID não retornado pelo servidor.');
+      setIsWaitingPayment(false);
+      return;
+    }
     const newRes = {
       id: code,
       guestId: 'g_' + Date.now(),
@@ -254,11 +269,11 @@ function BookingEngineContent() {
         setIsWaitingPayment(false);
       }
     } else {
-      // Fake Card: still create real res for demo
+      // Pagamento por cartão: cria a reserva mas depende de confirmação manual
       setIsWaitingPayment(true);
       try {
         const createdRes = await createRealReservation();
-        setTimeout(() => finishReservation('card-mock-tx-' + Date.now(), createdRes), 1500);
+        finishReservation(null, createdRes);
       } catch (e: any) {
         alert('Falha ao criar reserva: ' + e.message);
         setIsWaitingPayment(false);
@@ -276,7 +291,7 @@ function BookingEngineContent() {
     <div className={`min-h-screen text-white transition-colors duration-500 ${fontClass}`} style={{ backgroundColor: bgColor }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;700&display=swap');
-        
+
         :root {
           --brand-primary: ${primaryColor};
           --brand-primary-glow: ${primaryColor}66;
@@ -285,7 +300,7 @@ function BookingEngineContent() {
         .bg-brand { background-color: var(--brand-primary); }
         .border-brand { border-color: var(--brand-primary); }
         .glow-brand { box-shadow: 0 0 40px -10px var(--brand-primary-glow); }
-        
+
         .font-sans { font-family: 'Inter', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
         .font-mono { font-family: 'Fira Code', monospace !important; }
@@ -316,7 +331,7 @@ function BookingEngineContent() {
         <header className="relative h-[40vh] w-full overflow-hidden flex flex-col items-center justify-center border-b border-white/[0.03]">
           <div className="absolute inset-0 bg-black/60 z-10 mix-blend-multiply" />
           <img src={activeBranch.fotoCapa || hotel.banner || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600'} alt="banner" className="absolute inset-0 w-full h-full object-cover transform scale-[1.03]" />
-          
+
           <div className="relative z-20 text-center space-y-4 px-4 mt-8">
             <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto border border-white/10 shadow-2xl backdrop-blur-xl bg-white/[0.02]">
               <img src={hotel.logo || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200'} alt="logo" className="w-full h-full object-cover" />
@@ -331,10 +346,10 @@ function BookingEngineContent() {
 
       <main className="max-w-5xl mx-auto px-6 -mt-12 md:-mt-16 relative z-30 space-y-12 pb-24">
         <AnimatePresence mode="wait">
-          
+
           {step === 'search' && (
             <motion.div key="search" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-12">
-              
+
               <div className="glass-panel p-6 rounded-[24px] grid grid-cols-1 md:grid-cols-5 gap-4 items-end shadow-2xl border border-white/10 backdrop-blur-2xl bg-[#111]/80">
                 <div className="md:col-span-2">
                   <label className="block text-[10px] text-white/40 font-bold uppercase tracking-widest mb-2 flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Unidade / Destino</label>
@@ -377,7 +392,7 @@ function BookingEngineContent() {
 
                     return (
                       <div key={cat.id} className={`bg-black/60 backdrop-blur-md rounded-[24px] overflow-hidden flex flex-col lg:flex-row border transition-all duration-500 ${isCapacityFit ? 'border-white/10 hover:border-brand/40 hover:shadow-[0_0_40px_-15px_rgba(255,255,255,0.1)]' : 'opacity-40 border-white/[0.02] pointer-events-none'}`}>
-                        
+
                         {/* Photo Carousel Area */}
                         <div className="relative w-full lg:w-[400px] h-64 lg:h-auto shrink-0 bg-black overflow-hidden group">
                           <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
@@ -415,7 +430,7 @@ function BookingEngineContent() {
                                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="w-3 h-3 text-brand fill-brand opacity-80" />)}
                               </div>
                             </div>
-                            
+
                             <div className="flex flex-wrap gap-2 pt-2">
                               {cat.comodidades.map((com: string) => (
                                 <span key={com} className="px-3 py-1 bg-white/[0.03] border border-white/5 rounded-md text-[10px] font-bold text-white/60 uppercase tracking-widest">
@@ -445,7 +460,7 @@ function BookingEngineContent() {
 
           {step === 'checkout' && (
             <motion.div key="checkout" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
+
               <button onClick={() => { setStep('search'); setIsWaitingPayment(false); setQrCodeData(null); }} className="col-span-1 lg:col-span-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors py-1 self-start">
                 <ArrowLeft className="w-4 h-4" /> Voltar para Quartos
               </button>
@@ -561,7 +576,7 @@ function BookingEngineContent() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {!isWaitingPayment ? (
                     <button onClick={handleConfirmReservation} className="w-full py-4 bg-brand hover:brightness-110 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_-5px_var(--brand-primary)]">
                       {paymentMethod === 'pix' ? 'Gerar PIX e Confirmar' : 'Pagar e Confirmar'}

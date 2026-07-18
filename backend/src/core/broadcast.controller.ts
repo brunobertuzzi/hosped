@@ -1,28 +1,32 @@
-import { Controller, Get, Post, Body, UseGuards, Request, UnauthorizedException, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, UnauthorizedException, Put, Param, Delete, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
-
-// In-memory state for simplicity, ideally should be in DB (e.g., Settings table)
-let globalMaintenanceMode = false;
 
 @Controller('core/broadcast')
 @UseGuards(AuthGuard)
 export class BroadcastController {
-  
+
   constructor(private readonly prisma: PrismaService) {}
 
   @Get('maintenance')
-  getMaintenanceMode() {
-    return { maintenanceMode: globalMaintenanceMode };
+  async getMaintenanceMode() {
+    const setting = await this.prisma.client.globalSettings.findUnique({
+      where: { key: 'maintenanceMode' },
+    });
+    return { maintenanceMode: setting?.value === 'true' };
   }
 
   @Put('maintenance')
-  setMaintenanceMode(@Body() body: { maintenanceMode: boolean }, @Request() req: any) {
+  async setMaintenanceMode(@Body() body: { maintenanceMode: boolean }, @Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
     }
-    globalMaintenanceMode = body.maintenanceMode;
-    return { success: true, maintenanceMode: globalMaintenanceMode };
+    await this.prisma.client.globalSettings.upsert({
+      where: { key: 'maintenanceMode' },
+      create: { key: 'maintenanceMode', value: String(body.maintenanceMode) },
+      update: { value: String(body.maintenanceMode) },
+    });
+    return { success: true, maintenanceMode: body.maintenanceMode };
   }
 
   // ================= ANNOUNCEMENTS =================

@@ -102,9 +102,9 @@ export default function HospedesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Hóspedes
+            Cadastro de Hóspedes
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Gestão de relacionamento corporativo e fidelidade.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Cadastro e histórico de hóspedes com check-ins anteriores.</p>
         </div>
         <div className="bg-white/5 border border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold text-white uppercase tracking-widest">
           Total Base: {guests.length} Clientes

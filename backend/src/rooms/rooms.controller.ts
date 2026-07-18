@@ -52,6 +52,17 @@ export class RoomsController {
 
   @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('rooms.manage')
+  @Put('categories/:id')
+  async updateCategory(
+    @Param('id') id: string,
+    @Body() data: any,
+    @Request() req: any,
+  ) {
+    return this.roomsService.updateCategory(id, data, req.user?.sub);
+  }
+
+  @UseGuards(AuthGuard, PermissionsGuard)
+  @Permissions('rooms.manage')
   @Post(':id/cleaning-complete')
   async completeCleaning(@Param('id') id: string, @Request() req: any) {
     const userId = req.user?.sub;

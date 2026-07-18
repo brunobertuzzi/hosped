@@ -34,6 +34,12 @@ export class GuestsService {
     return guest;
   }
 
+  async create(data: any, userId?: string) {
+    const created = await this.prisma.client.guest.create({ data });
+    await this.audit.log(userId, AuditAction.CRIAR, 'GUEST', null, created);
+    return created;
+  }
+
   async update(id: string, data: any, userId?: string) {
     const previous = await this.findOne(id);
     const updated = await this.prisma.client.guest.update({

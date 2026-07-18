@@ -16,6 +16,7 @@ import { PlansController } from './plans.controller';
 import { HealthController } from './health.controller';
 import { BroadcastController } from './broadcast.controller';
 import { FeatureFlagsController } from './feature-flags.controller';
+import { GlobalSettingsController } from './global-settings.controller';
 
 @Global()
 @Module({
@@ -29,6 +30,7 @@ import { FeatureFlagsController } from './feature-flags.controller';
     HealthController,
     BroadcastController,
     FeatureFlagsController,
+    GlobalSettingsController,
   ],
   providers: [
     PrismaService,

@@ -113,4 +113,29 @@ export class ReservationsController {
   async deleteReservation(@Param('id') id: string, @Request() req: any) {
     return this.reservationsService.deleteReservation(id, req.user?.sub);
   }
+
+  @UseGuards(AuthGuard, PermissionsGuard)
+  @Permissions('reservations.edit')
+  @Post(':id/manual-payment')
+  async recordManualPayment(
+    @Param('id') id: string,
+    @Body() body: { valor: number; metodo: string },
+    @Request() req: any,
+  ) {
+    return this.reservationsService.recordManualPayment(
+      id,
+      body.valor,
+      body.metodo,
+      req.user?.sub,
+    );
+  }
+
+  // Endpoint público (sem auth) para pré-check-in do hóspede
+  @Post(':guestToken/pre-check-in')
+  async preCheckIn(
+    @Param('guestToken') guestToken: string,
+    @Body() body: { documentoCheckIn: string },
+  ) {
+    return this.reservationsService.preCheckIn(guestToken, body.documentoCheckIn);
+  }
 }

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { 
-  ShieldCheck, Search, Filter, Calendar, User, Terminal, 
+import {
+  ShieldCheck, Search, Filter, Calendar, User, Terminal,
   Download, Eye, AlertCircle, RefreshCw, Layers, Lock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -64,13 +64,13 @@ export default function AuditoriaPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
-      
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Security & Audit <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">RLS Ativo</span>
+            Segurança e Auditoria <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Proteção Ativa</span>
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Log imutável de operações corporativas com isolamento por tenant.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Registro seguro de todas as operações do hotel, com dados protegidos entre unidades.</p>
         </div>
         <button onClick={handleSimulateExport} className="px-4 py-2 bg-transparent hover:bg-white/[0.03] border border-white/10 rounded-xl text-[11px] font-bold text-white uppercase tracking-widest transition-colors flex items-center gap-2">
           <Download className="w-3.5 h-3.5 text-brand" /> Export JSON
@@ -83,11 +83,11 @@ export default function AuditoriaPage() {
           <div className="text-3xl font-bold text-white tracking-tight">{metrics.totalLogs}</div>
         </div>
         <div className="glass-card p-6 border-t-2 border-purple-500/50">
-          <div className="text-[10px] uppercase font-bold tracking-widest text-purple-400/80 mb-3">Modificações (DML)</div>
+          <div className="text-[10px] uppercase font-bold tracking-widest text-purple-400/80 mb-3">Alterações em Dados</div>
           <div className="text-3xl font-bold text-purple-400 tracking-tight">{metrics.modificationsCount}</div>
         </div>
         <div className="glass-card p-6 border-t-2 border-emerald-500/50">
-          <div className="text-[10px] uppercase font-bold tracking-widest text-emerald-400/80 mb-3">Operadores Auditados</div>
+          <div className="text-[10px] uppercase font-bold tracking-widest text-emerald-400/80 mb-3">Funcionários com Acesso</div>
           <div className="text-3xl font-bold text-emerald-400 tracking-tight">{metrics.uniqueOperators}</div>
         </div>
         <div className="glass-card p-6 border-t-2 border-red-500/50">
@@ -136,7 +136,7 @@ export default function AuditoriaPage() {
                   </div>
                   <p className="text-white/70 leading-relaxed font-sans">{log.detalhes}</p>
                 </div>
-                
+
                 <div className="flex items-center gap-3 shrink-0 pt-2 md:pt-0 border-t border-white/[0.04] md:border-none">
                   <div className="text-right">
                     <span className="text-[11px] font-bold text-white/80 block font-sans">{log.usuario}</span>

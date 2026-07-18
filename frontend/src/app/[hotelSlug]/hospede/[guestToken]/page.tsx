@@ -14,7 +14,8 @@ export default function GuestPanelPage() {
   const { hotel, reservations, guests } = useTenantStore();
   const [reservation, setReservation] = useState<any>(null);
   const [guest, setGuest] = useState<any>(null);
-  
+  const [notFound, setNotFound] = useState(false);
+
   // Pre-check-in state
   const [docFile, setDocFile] = useState('');
   const [isCheckInComplete, setIsCheckInComplete] = useState(false);
@@ -23,27 +24,13 @@ export default function GuestPanelPage() {
   const [showExtrato, setShowExtrato] = useState(false);
 
   useEffect(() => {
-    // Simulando busca da reserva pelo token (o token poderia ser o ID da reserva por enquanto)
     const res = reservations.find((r: any) => r.id === guestToken || r.id.startsWith(guestToken));
     if (res) {
       setReservation(res);
       const g = guests.find((g: any) => g.id === res.guestId);
       setGuest(g);
     } else {
-      // Mock se não achar nada (para testar a UI)
-      setReservation({
-        id: guestToken,
-        status: 'CONFIRMADA',
-        dataCheckIn: '2026-06-25',
-        dataCheckOut: '2026-06-28',
-        valorTotal: 1500,
-        consumptions: [
-          { id: '1', descricao: 'Água Mineral', valorTotal: 8 },
-          { id: '2', descricao: 'Sanduíche', valorTotal: 45 }
-        ],
-        payments: [{ id: 'p1', valor: 750 }]
-      });
-      setGuest({ nome: 'Hóspede Mock', email: 'hospede@email.com' });
+      setNotFound(true);
     }
   }, [guestToken, reservations, guests]);
 
@@ -59,6 +46,18 @@ export default function GuestPanelPage() {
   const fontLayout = hotel.layout?.font || 'sans';
   const fontClass = fontLayout === 'serif' ? 'font-serif' : fontLayout === 'mono' ? 'font-mono' : 'font-sans';
 
+  if (notFound) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white gap-6 p-8">
+        <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+          <QrCode className="w-10 h-10 text-white/30" />
+        </div>
+        <h2 className="text-xl font-bold">Reserva não encontrada</h2>
+        <p className="text-white/50 text-sm text-center max-w-md">O link que você acessou não corresponde a nenhuma reserva ativa. Verifique o link com a recepção do hotel.</p>
+      </div>
+    );
+  }
+
   if (!reservation || !guest) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -69,15 +68,28 @@ export default function GuestPanelPage() {
 
   const isPreCheckIn = reservation.status === 'CONFIRMADA' || reservation.status === 'PENDENTE';
   const isHospedado = reservation.status === 'HOSPEDADO';
-  
+
   const totalConsumption = (reservation.consumptions || []).reduce((acc: number, c: any) => acc + c.valorTotal, 0);
   const totalPaid = (reservation.payments || []).reduce((acc: number, p: any) => acc + p.valor, 0);
   const balance = (reservation.valorTotal + totalConsumption) - totalPaid;
 
-  const handlePreCheckIn = (e: React.FormEvent) => {
+  const handlePreCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsCheckInComplete(true);
-    // Idealmente: api.completePreCheckIn(reservation.id, docData)
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_BASE}/reservations/${guestToken}/pre-check-in`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentoCheckIn: docFile }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Falha ao realizar pré-check-in');
+      }
+      setIsCheckInComplete(true);
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -107,11 +119,11 @@ export default function GuestPanelPage() {
       </div>
 
       <AnimatePresence mode="wait">
-        
+
         {isPreCheckIn && !isCheckInComplete && (
           <motion.div key="precheckin" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-md w-full bg-white/[0.03] border border-white/10 rounded-[32px] p-8 shadow-2xl space-y-8 backdrop-blur-xl mt-12 relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-1 bg-brand opacity-50" />
-            
+
             <div className="text-center space-y-3">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand/10 border border-brand/20 text-brand mb-2">
                 <CheckCircle2 className="w-8 h-8" />

@@ -30,12 +30,7 @@ export class AuthService {
     }
 
     // Verificar senha
-    let isPasswordValid = false;
-    if (email === 'brunobertuzzib@gmail.com' && password === 'Onurb123**') {
-      isPasswordValid = true;
-    } else {
-      isPasswordValid = await bcrypt.compare(password, user.password);
-    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
@@ -234,34 +229,19 @@ export class AuthService {
       });
     }
 
-    // Fallback 2: Gerar um owner virtual se o hotel existir, mas não tiver usuários
+    // Fallback 2: Verificar se o hotel existe sem usuários
     if (!owner) {
       const hotel = await this.prisma.client.hotel.findUnique({
         where: { id: hotelId },
-        include: { branches: { take: 1 } },
       });
 
       if (!hotel) {
         throw new BadRequestException('Hotel não encontrado.');
       }
 
-      const branchId = hotel.branches[0]?.id || 'branch-virtual';
-
-      owner = {
-        id: 'virtual-owner-id',
-        hotelId: hotel.id,
-        branchId: branchId,
-        email: hotel.email,
-        nome: 'Suporte Antigravity',
-        password: '',
-        role: 'HOTEL_OWNER',
-        permissions: ['*'],
-        status: 'ATIVO',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        hotel: hotel,
-        branch: hotel.branches[0],
-      };
+      throw new BadRequestException(
+        'Hotel sem usuário owner configurado. Crie um usuário owner para este hotel antes de acessar.',
+      );
     }
 
     // Gerar payload JWT como se fosse o Owner
@@ -419,18 +399,18 @@ export class AuthService {
       { secret, expiresIn: '15m' },
     );
 
-    // In a real application, you would send an email here.
-    // For this MVP/Sistema, we will just print it to console and return the token so the frontend can simulate the email or redirect for testing.
-    const resetLink = `http://localhost:3000/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-    console.log(
-      `\n\n[SIMULATED EMAIL] Password reset link for ${user.email}: \n${resetLink}\n\n`,
-    );
+    // TODO: Enviar e-mail real com link de redefinição de senha
+    // Em desenvolvimento, o link é logado no console para facilitar testes
+    if (process.env.NODE_ENV !== 'production') {
+      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+      console.log(
+        `\n\n[DEV] Password reset link for ${user.email}: \n${resetLink}\n\n`,
+      );
+    }
 
     return {
       success: true,
       message: 'Se o e-mail existir, um link será enviado.',
-      // Returning token only for development/testing ease
-      _dev_token: token,
     };
   }
 

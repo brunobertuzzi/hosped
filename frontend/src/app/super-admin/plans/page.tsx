@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  CreditCard, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  CheckCircle2, 
-  X, 
-  Layers, 
-  Users, 
+import {
+  CreditCard,
+  Plus,
+  Edit3,
+  Trash2,
+  CheckCircle2,
+  X,
+  Layers,
+  Users,
   Building2,
   Bed,
   RefreshCcw
@@ -44,8 +44,8 @@ export default function PlansPage() {
   ];
 
   const toggleSystemFeature = (featureId: string) => {
-    setSystemFeatures(prev => 
-      prev.includes(featureId) 
+    setSystemFeatures(prev =>
+      prev.includes(featureId)
         ? prev.filter(f => f !== featureId)
         : [...prev, featureId]
     );
@@ -160,7 +160,7 @@ export default function PlansPage() {
           </p>
         </div>
 
-        <button 
+        <button
           onClick={() => openModal()}
           className="bg-white text-black hover:bg-white/90 font-bold py-3 px-6 rounded-xl text-sm transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-white/10"
         >
@@ -191,7 +191,7 @@ export default function PlansPage() {
             // Theme colors based on plan name or index
             const isPro = plan.name.toLowerCase().includes('pro');
             const isEnterprise = plan.name.toLowerCase().includes('enterprise');
-            
+
             let theme = {
               color: 'emerald',
               hex: '#10b981',
@@ -291,7 +291,7 @@ export default function PlansPage() {
                     <p className="text-xs text-white/40 font-medium">Funcionários ativos</p>
                   </div>
                 </div>
-                
+
                 <div className="pt-6 mt-6 border-t border-white/5">
                   <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Recursos Inclusos</p>
                   <ul className="space-y-3">
@@ -309,13 +309,13 @@ export default function PlansPage() {
               </div>
 
               <div className="flex gap-2 relative z-10 mt-auto pt-6 border-t border-white/5">
-                <button 
+                <button
                   onClick={() => openModal(plan)}
                   className={`flex-1 px-3 py-3 bg-white/5 hover:${theme.bgClass} border border-white/10 hover:${theme.borderClass} rounded-xl text-[10px] uppercase font-bold tracking-widest text-white/60 hover:${theme.textClass} transition-colors flex items-center justify-center gap-2`}
                 >
                   <Edit3 className="w-3.5 h-3.5" /> Editar Plano
                 </button>
-                <button 
+                <button
                   onClick={() => handleDelete(plan.id)}
                   className="w-12 shrink-0 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/50 rounded-xl text-white/60 hover:text-red-400 flex items-center justify-center transition-colors"
                 >
@@ -332,15 +332,15 @@ export default function PlansPage() {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={closeModal}
             />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -351,7 +351,7 @@ export default function PlansPage() {
                   <Layers className="w-5 h-5 text-purple-400" />
                   {editingPlan ? 'Editar Plano' : 'Novo Plano'}
                 </h2>
-                <button onClick={closeModal} className="text-white/40 hover:text-white transition-colors">
+                <button onClick={closeModal} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -361,18 +361,18 @@ export default function PlansPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Nome do Plano</label>
-                      <input 
+                      <input
                         required
-                        type="text" 
+                        type="text"
                         value={name} onChange={e => setName(e.target.value)}
                         placeholder="Ex: PRO, PREMIUM"
                         className="w-full input-premium rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20"
                       />
                     </div>
-                    
+
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Preço Mensal (R$)</label>
-                      <input 
+                      <input
                         required
                         type="number" step="0.01" min="0"
                         value={price} onChange={e => setPrice(e.target.value)}
@@ -383,7 +383,7 @@ export default function PlansPage() {
 
                     <div>
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Lim. Filiais</label>
-                      <input 
+                      <input
                         required
                         type="number" min="1"
                         value={maxBranches} onChange={e => setMaxBranches(e.target.value)}
@@ -393,7 +393,7 @@ export default function PlansPage() {
 
                     <div>
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Lim. Quartos (-1 ilimitado)</label>
-                      <input 
+                      <input
                         required
                         type="number" min="-1"
                         value={maxRooms} onChange={e => setMaxRooms(e.target.value)}
@@ -403,7 +403,7 @@ export default function PlansPage() {
 
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Lim. Usuários</label>
-                      <input 
+                      <input
                         required
                         type="number" min="1"
                         value={maxUsers} onChange={e => setMaxUsers(e.target.value)}
@@ -413,8 +413,8 @@ export default function PlansPage() {
 
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Descrição Rápida</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={description} onChange={e => setDescription(e.target.value)}
                         placeholder="Para hotéis em crescimento..."
                         className="w-full input-premium rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20"
@@ -437,7 +437,7 @@ export default function PlansPage() {
 
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Recursos (Bulas Comerciais, um por linha)</label>
-                      <textarea 
+                      <textarea
                         rows={3}
                         value={featuresText} onChange={e => setFeaturesText(e.target.value)}
                         placeholder="Gestão de reservas&#10;Motor de reservas&#10;Nota Fiscal Eletrônica"
@@ -451,7 +451,7 @@ export default function PlansPage() {
                         onClick={() => setIsActive(!isActive)}
                         className={`w-12 h-6 rounded-full transition-colors relative ${isActive ? 'bg-purple-500' : 'bg-white/10'}`}
                       >
-                        <motion.div 
+                        <motion.div
                           className="w-4 h-4 rounded-full bg-white absolute top-1"
                           animate={{ left: isActive ? '26px' : '4px' }}
                         />
@@ -463,13 +463,13 @@ export default function PlansPage() {
               </div>
 
               <div className="p-5 border-t border-white/5 bg-black/20 flex gap-3">
-                <button 
+                <button
                   onClick={closeModal}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   form="plan-form"
                   type="submit"
                   disabled={saving}

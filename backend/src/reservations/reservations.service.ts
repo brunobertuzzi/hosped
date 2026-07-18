@@ -638,4 +638,97 @@ export class ReservationsService {
     );
     return deleted;
   }
+
+  /**
+   * Registra um pagamento manual (dinheiro, PIX recebido presencialmente, etc.)
+   * sem integração com gateway de pagamento.
+   */
+  async recordManualPayment(
+    reservationId: string,
+    valor: number,
+    metodo: string,
+    userId?: string,
+  ) {
+    const reservation = await this.prisma.client.reservation.findUnique({
+      where: { id: reservationId },
+    });
+    if (!reservation) {
+      throw new NotFoundException('Reserva não encontrada.');
+    }
+
+    if (valor <= 0) {
+      throw new BadRequestException('O valor do pagamento deve ser maior que zero.');
+    }
+
+    const validMethods = ['PIX', 'CARTAO', 'DINHEIRO'];
+    const normalizedMethod = (metodo || '').toUpperCase();
+    if (!validMethods.includes(normalizedMethod)) {
+      throw new BadRequestException(`Método de pagamento inválido. Valores aceitos: ${validMethods.join(', ')}`);
+    }
+
+    const payment = await this.prisma.client.payment.create({
+      data: {
+        hotelId: reservation.hotelId,
+        reservationId,
+        valor,
+        metodo: normalizedMethod as any,
+        status: 'APROVADO',
+        transacaoId: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      },
+    });
+
+    await this.audit.log(
+      userId,
+      AuditAction.PAGAMENTO_REGISTRADO,
+      'PAYMENT',
+      { reservationId, valor: 0 },
+      payment,
+    );
+
+    return payment;
+  }
+
+  /**
+   * Completa o pré-check-in do hóspede (envio de documento antes da chegada)
+   * Endpoint público, sem autenticação.
+   */
+  async preCheckIn(guestToken: string, documentoCheckIn: string) {
+    const reservation = await this.prisma.client.reservation.findUnique({
+      where: { id: guestToken },
+      include: { guest: true },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException('Reserva não encontrada.');
+    }
+
+    if (!['CONFIRMADA', 'PENDENTE'].includes(reservation.status)) {
+      throw new BadRequestException(
+        'Pré-check-in disponível apenas para reservas confirmadas ou pendentes.',
+      );
+    }
+
+    if (!documentoCheckIn || documentoCheckIn.trim().length < 4) {
+      throw new BadRequestException('Documento de identificação é obrigatório.');
+    }
+
+    // Atualizar documento no guest e na reserva
+    const [updatedGuest, updatedReservation] = await this.prisma.client.$transaction([
+      this.prisma.client.guest.update({
+        where: { id: reservation.guestId },
+        data: { documento: documentoCheckIn },
+      }),
+      this.prisma.client.reservation.update({
+        where: { id: guestToken },
+        data: { documentoCheckIn },
+      }),
+    ]);
+
+    return {
+      success: true,
+      message: 'Pré-check-in realizado com sucesso.',
+      guest: updatedGuest,
+      reservation: updatedReservation,
+    };
+  }
 }

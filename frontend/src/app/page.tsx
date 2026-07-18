@@ -7,39 +7,39 @@ import { Building2, ArrowRight, CheckCircle2, Globe, Shield, Smartphone, Zap, He
 import { AnimatePresence } from 'framer-motion';
 
 const featuresList = [
-  { 
-    icon: Building2, 
-    title: 'Multi-Tenant Nativo', 
+  {
+    icon: Building2,
+    title: 'Várias Unidades, Um só Painel',
     desc: 'Gerencie dezenas de filiais no mesmo painel. Controle de acesso por unidade e visão consolidada.',
     longDesc: 'Se você tem mais de uma pousada ou hotel, acesse todas as unidades usando apenas uma senha. Visualize facilmente quanto cada unidade faturou e controle o que seus gerentes podem ver.'
   },
-  { 
-    icon: Globe, 
-    title: 'Motor de Reservas', 
-    desc: 'Venda diretamente no seu site sem pagar comissões para OTAs. Totalmente customizável.',
+  {
+    icon: Globe,
+    title: 'Site de Reservas Próprio',
+    desc: 'Venda diretamente no seu site sem pagar comissões para sites como Booking e Airbnb. Totalmente customizável.',
     longDesc: 'Pare de pagar comissões altas. Tenha um site de reservas com a cara da sua marca. Integre avaliações reais de hóspedes do Google, mapa de localização e botão de WhatsApp para contato direto.'
   },
-  { 
-    icon: Calendar, 
-    title: 'Mapa Interativo (Gantt)', 
+  {
+    icon: Calendar,
+    title: 'Painel Visual de Reservas',
     desc: 'Gerencie as reservas em um mapa visual intuitivo com suporte a arrastar e soltar.',
     longDesc: 'Esqueça cadernos e tabelas complicadas. Veja todos os seus quartos em uma tela visual super simples. Troque um hóspede de quarto ou aumente os dias da estadia apenas clicando e arrastando o mouse.'
   },
-  { 
-    icon: Zap, 
-    title: 'Fim das Filas na Recepção', 
+  {
+    icon: Zap,
+    title: 'Fim das Filas na Recepção',
     desc: 'Envie um link para o celular do hóspede. Ele preenche os dados em casa e chega ao hotel apenas para pegar a chave.',
-    longDesc: 'Aumente o nível de serviço do seu hotel enviando um link de pré check-in pelo WhatsApp. O hóspede preenche a FNRH, assina digitalmente e tira foto do documento pelo celular. Quando ele chega, basta entregar a chave.'
+    longDesc: 'Aumente o nível de serviço do seu hotel enviando um link de pré check-in pelo WhatsApp. O hóspede preenche a ficha de cadastro, assina digitalmente e tira foto do documento pelo celular. Quando ele chega, basta entregar a chave.'
   },
-  { 
-    icon: CreditCard, 
-    title: 'Recebimentos Descomplicados', 
+  {
+    icon: CreditCard,
+    title: 'Recebimentos Descomplicados',
     desc: 'Receba via Pix e cartão de crédito direto no sistema. Pagamentos e parcelamentos processados de forma automática e segura.',
-    longDesc: 'Integração bancária e de cartão que dá baixa automática no sistema. Sem conciliação manual. Ao pagar pelo Pix, a reserva já muda de status instantaneamente. Parcele as vendas e emita notas fiscais (NFS-e) direto pela plataforma.'
+    longDesc: 'Integração bancária e de cartão que dá baixa automática no sistema. Sem conciliação manual. Ao pagar pelo Pix, a reserva já muda de status instantaneamente. Parcele as vendas e emita notas fiscais direto pela plataforma.'
   },
-  { 
-    icon: Shield, 
-    title: 'Controle de Acesso da Equipe', 
+  {
+    icon: Shield,
+    title: 'Controle de Acesso da Equipe',
     desc: 'Saiba exatamente o que cada funcionário fez. Você escolhe as telas que a recepção, a limpeza e o financeiro podem acessar.',
     longDesc: 'Evite fraudes e desorganização. Toda pequena alteração (excluir reserva, aplicar desconto, mudar quarto) gera um log detalhado apontando o e-mail, horário e o dado exato que foi modificado. Durma tranquilo sabendo que a operação está blindada.'
   },
@@ -47,13 +47,13 @@ const featuresList = [
     icon: RefreshCcw,
     title: 'Conexão com Sites de Reserva',
     desc: 'Atualize suas vagas no Booking, Airbnb e Expedia. Se um quarto é alugado em um site, bloqueia nos outros na mesma hora.',
-    longDesc: 'Evite overbookings de uma vez por todas. Toda vez que uma reserva entra pelo Booking ou pelo seu site, a disponibilidade é atualizada automaticamente em todos os outros canais em questão de segundos. Gestão de tarifas unificada.'
+    longDesc: 'Evite reservas duplicadas de uma vez por todas. Toda vez que uma reserva entra pelo Booking ou pelo seu site, a disponibilidade é atualizada automaticamente em todos os outros canais em questão de segundos. Gestão de tarifas unificada.'
   },
   {
     icon: Package,
     title: 'Consumo e Fechamento de Conta',
     desc: 'Lance o consumo do frigobar e restaurante direto na conta do quarto. Facilita o pagamento na hora em que o hóspede for embora.',
-    longDesc: 'Lance consumos diretamente na fatura do quarto. O sistema atualiza o estoque instantaneamente e avisa quando produtos estão acabando. Emita cupom fiscal de vendas avulsas para não-hóspedes diretamente do nosso PDV (Ponto de Venda).'
+    longDesc: 'Lance consumos diretamente na fatura do quarto. O sistema atualiza o estoque instantaneamente e avisa quando produtos estão acabando. Emita cupom fiscal de vendas avulsas para não-hóspedes diretamente do nosso sistema de vendas.'
   },
   {
     icon: MessageSquare,
@@ -79,7 +79,7 @@ export default function SaasLandingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden selection:bg-indigo-500/30">
-      
+
       {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -92,6 +92,7 @@ export default function SaasLandingPage() {
           <div className="hidden md:flex items-center gap-8 text-[13px] font-semibold text-white/60 uppercase tracking-widest">
             <a href="#features" className="hover:text-white transition-colors">Funcionalidades</a>
             <a href="#pricing" className="hover:text-white transition-colors">Planos</a>
+            <Link href="/guia" className="hover:text-white transition-colors">Guia de Uso</Link>
             <a href="/11111111-1111-1111-1111-111111111111" target="_blank" className="hover:text-white transition-colors text-purple-400">Ver Demo do Portal</a>
           </div>
           <div className="flex items-center gap-4">
@@ -108,22 +109,22 @@ export default function SaasLandingPage() {
       {/* Hero Section */}
       <section className="relative pt-40 pb-20 px-6 min-h-[90vh] flex flex-col items-center justify-center">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/20 blur-[120px] rounded-[100%] pointer-events-none" />
-        
+
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">O Sistema Operacional Definitivo para Hotéis</span>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-[1.1]">
             Gestão Hoteleira <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Simples e Lucrativa.</span>
           </h1>
-          
+
           <p className="text-lg md:text-xl text-white/40 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
             Abandone as planilhas e o trabalho manual. Um sistema que faz a sua recepção ser mais rápida, conecta seu hotel com a internet e ajuda você a lucrar mais, tudo em um só lugar.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/onboarding" className="w-full sm:w-auto px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[13px] uppercase tracking-widest rounded-full transition-all shadow-[0_0_30px_-5px_#6366f1] hover:scale-105 flex items-center justify-center gap-2">
               Começar Agora <ArrowRight className="w-4 h-4" />
@@ -172,7 +173,7 @@ export default function SaasLandingPage() {
                 <div className="h-48 bg-gradient-to-tr from-white/5 to-indigo-500/5 rounded-xl border border-white/5 relative overflow-hidden flex items-end p-6 gap-2">
                   {/* Fake Chart Bars */}
                   {[40, 70, 45, 90, 65, 80, 55, 100].map((h, i) => (
-                    <motion.div 
+                    <motion.div
                       key={i}
                       initial={{ height: 0 }}
                       animate={{ height: `${h}%` }}
@@ -197,7 +198,7 @@ export default function SaasLandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuresList.map((f, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 layoutId={`feature-card-${i}`}
                 initial={{ opacity: 0, y: 20 }}
@@ -224,7 +225,7 @@ export default function SaasLandingPage() {
         <AnimatePresence>
           {activeFeatureIndex !== null && (
             <>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -232,17 +233,17 @@ export default function SaasLandingPage() {
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               />
               <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none px-4">
-                <motion.div 
+                <motion.div
                   layoutId={`feature-card-${activeFeatureIndex}`}
                   className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden pointer-events-auto flex flex-col relative"
                 >
-                  <button 
+                  <button
                     onClick={() => setActiveFeatureIndex(null)}
                     className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors z-10"
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  
+
                   <div className="p-8 pb-0">
                     <motion.div layoutId={`feature-icon-${activeFeatureIndex}`} className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-400">
                       {React.createElement(featuresList[activeFeatureIndex].icon, { className: "w-8 h-8" })}
@@ -286,7 +287,7 @@ export default function SaasLandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {/* Bento Item 1 - Recepção (Span 2) */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -314,7 +315,7 @@ export default function SaasLandingPage() {
             </motion.div>
 
             {/* Bento Item 2 - Financeiro */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -338,7 +339,7 @@ export default function SaasLandingPage() {
             </motion.div>
 
             {/* Bento Item 3 - Customização Portal */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -360,7 +361,7 @@ export default function SaasLandingPage() {
             </motion.div>
 
             {/* Bento Item 4 - App Governança (Span 2) */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -387,7 +388,7 @@ export default function SaasLandingPage() {
               </div>
             </motion.div>
             {/* Bento Item 5 - Channel Manager (Span 2) */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -422,7 +423,7 @@ export default function SaasLandingPage() {
             </motion.div>
 
             {/* Bento Item 6 - Analytics */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -460,7 +461,7 @@ export default function SaasLandingPage() {
       {/* Pricing Section */}
       <section id="pricing" className="py-32 px-6 relative">
         <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-purple-600/10 blur-[150px] rounded-full pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Preços simples. Sem surpresas.</h2>
@@ -471,15 +472,15 @@ export default function SaasLandingPage() {
             {plans.map((plan, i) => {
               const isPro = i === 1 || plan.name.toLowerCase().includes('pro');
               return (
-                <motion.div 
+                <motion.div
                   key={plan.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`glass-card p-8 flex flex-col relative overflow-hidden group ${
-                    isPro 
-                      ? 'border-indigo-500/50 shadow-[0_0_40px_-10px_rgba(99,102,241,0.2)] transform md:-translate-y-4 bg-indigo-950/20' 
+                    isPro
+                      ? 'border-indigo-500/50 shadow-[0_0_40px_-10px_rgba(99,102,241,0.2)] transform md:-translate-y-4 bg-indigo-950/20'
                       : ''
                   }`}
                 >
@@ -489,7 +490,7 @@ export default function SaasLandingPage() {
                   {isPro && (
                     <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
                   )}
-                  
+
                   <h3 className={`text-xl font-bold mb-2 transition-colors group-hover:text-white ${isPro ? 'text-indigo-400' : 'text-white/80'}`}>{plan.name}</h3>
                   <p className="text-[13px] text-white/40 mb-6">{plan.description}</p>
                   <div className="mb-8">
@@ -503,8 +504,8 @@ export default function SaasLandingPage() {
                     ))}
                   </ul>
                   <Link href={`/onboarding?plan=${plan.name.toUpperCase()}`} className={`w-full py-4 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all text-center ${
-                    isPro 
-                      ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_-5px_#6366f1] hover:shadow-[0_0_30px_-5px_#6366f1]' 
+                    isPro
+                      ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_-5px_#6366f1] hover:shadow-[0_0_30px_-5px_#6366f1]'
                       : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 group-hover:border-white/20'
                   }`}>
                     {plan.name.toLowerCase() === 'corporativo' ? 'Falar com Vendas' : `Escolher ${plan.name}`}
@@ -523,7 +524,7 @@ export default function SaasLandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
             <p className="text-white/40">Tudo o que você precisa saber sobre o HOSPED.</p>
           </div>
-          
+
           <div className="space-y-4">
             <details className="group bg-white/[0.02] border border-white/5 rounded-2xl p-6 open:bg-white/[0.05] transition-colors cursor-pointer">
               <summary className="font-bold text-lg list-none flex justify-between items-center">

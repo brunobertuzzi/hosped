@@ -5,6 +5,7 @@ import { ShieldAlert, CreditCard, ArrowRight, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useTenantStore } from '../../../store/useTenantStore';
+import { toast } from 'sonner';
 
 export default function SuspendedPage() {
   const router = useRouter();
@@ -17,19 +18,18 @@ export default function SuspendedPage() {
   };
 
   const handlePay = () => {
-    // Aqui vai a integração real do Mercado Pago no futuro
-    alert('Redirecionando para o Gateway de Pagamento (Mercado Pago)...');
+    router.push('/admin/configuracoes');
   };
 
   return (
     <div className="min-h-screen bg-[#030014] flex flex-col items-center justify-center font-sans p-4 relative overflow-hidden">
       <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-red-500/10 rounded-full blur-[120px] pointer-events-none" />
-      
+
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md bg-[#0a0a0a] border border-white/5 p-8 rounded-3xl relative z-10 shadow-2xl text-center">
         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
           <ShieldAlert className="w-8 h-8 text-red-400" />
         </div>
-        
+
         <h1 className="text-2xl font-bold text-white tracking-tight mb-2">Conta Suspensa</h1>
         <p className="text-[13px] text-white/50 mb-8 leading-relaxed">
           Olá, {user?.nome}. O acesso ao seu painel administrativo foi temporariamente suspenso devido a pendências no faturamento da sua assinatura.
@@ -53,7 +53,7 @@ export default function SuspendedPage() {
           <button className="w-full py-3 px-6 bg-white/5 hover:bg-white/10 text-white/60 font-bold text-[12px] rounded-xl transition-all flex items-center justify-center gap-2">
             <Phone className="w-4 h-4" /> Falar com o Suporte
           </button>
-          
+
           <button onClick={handleLogout} className="text-[11px] text-white/30 hover:text-white transition-colors underline underline-offset-4">
             Voltar para o Login
           </button>

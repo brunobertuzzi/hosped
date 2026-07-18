@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Put,
   Delete,
   Param,
@@ -16,6 +17,11 @@ import { AuthGuard } from '../auth/auth.guard';
 @Controller('guests')
 export class GuestsController {
   constructor(private readonly guestsService: GuestsService) {}
+
+  @Post()
+  async create(@Body() data: any, @Request() req: any) {
+    return this.guestsService.create(data, req.user?.sub);
+  }
 
   @Get()
   findAll(@Query('page') page?: string, @Query('limit') limit?: string) {

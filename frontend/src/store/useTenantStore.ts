@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // ==========================================
-// MOCK DATA INICIAL (Sincronizado com o Seed)
+// LOADING DEFAULTS (sobrescrito pelo login/API)
 // ==========================================
 const INITIAL_HOTEL = {
   id: '',
@@ -9,8 +9,8 @@ const INITIAL_HOTEL = {
   razaoSocial: '',
   documentoFiscal: '',
   slug: '',
-  logo: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200',
-  banner: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600',
+  logo: '',
+  banner: '',
   cores: { primary: '#3b82f6', secondary: '#1e293b' },
   layout: { font: 'sans', heroVariant: 'standard' },
   webhooks: { onReservationComplete: '', onCheckIn: '' },
@@ -26,15 +26,8 @@ const INITIAL_AUDITS: any[] = [];
 const INITIAL_MAINTENANCE: any[] = [];
 const INITIAL_USERS: any[] = [];
 const INITIAL_BRANCHES: any[] = [];
-const INITIAL_CLEANING_TASKS: any[] = [
-  { id: 'ct_1', roomId: '1', status: 'PENDENTE', tipoLimpeza: 'LIMPEZA_GERAL', observacoes: '', branchId: 'b1' },
-  { id: 'ct_2', roomId: '2', status: 'EM_ANDAMENTO', tipoLimpeza: 'TROCADE_ENXOVAL', observacoes: 'Hóspede VIP', branchId: 'b1' },
-];
-const INITIAL_EXPENSES: any[] = [
-  { id: 'exp_1', description: 'Conta de Energia', amount: 850.50, dueDate: '2026-05-10', status: 'PAID', branchId: 'b1' },
-  { id: 'exp_2', description: 'Manutenção Ar Condicionado', amount: 350.00, dueDate: '2026-05-20', status: 'PENDING', branchId: 'b1' },
-  { id: 'exp_3', description: 'Materiais de Limpeza', amount: 1200.00, dueDate: '2026-05-25', status: 'PENDING', branchId: 'b1' }
-];
+const INITIAL_CLEANING_TASKS: any[] = [];
+const INITIAL_EXPENSES: any[] = [];
 
 interface TenantState {
   user: any;
@@ -52,7 +45,7 @@ interface TenantState {
   maintenance: any[];
   cleaningTasks: any[];
   expenses: any[];
-  
+
   // Actions
   setUser: (user: any) => void;
   setIsOffline: (status: boolean) => void;
@@ -61,7 +54,7 @@ interface TenantState {
   setBranches: (branches: any[]) => void;
   setHotelColors: (colors: { primary: string; secondary: string }) => void;
   setHotelLayout: (layout: { font: string; heroVariant: string }) => void;
-  
+
   // Hoteleiras
   addUser: (user: any) => void;
   updateUserStatus: (userId: string, status: string) => void;
@@ -79,11 +72,11 @@ interface TenantState {
   completeMaintenanceOrder: (maintId: string) => void;
   addCleaningTask: (task: any) => void;
   updateCleaningTaskStatus: (taskId: string, status: string) => void;
-  
+
   // Financeiro
   addExpense: (exp: any) => void;
   updateExpenseStatus: (id: string, status: string) => void;
-  
+
   // Hospedes
   addGuest: (guest: any) => void;
   updateGuest: (guestId: string, data: any) => void;
@@ -235,7 +228,7 @@ export const useTenantStore = create<TenantState>((set) => ({
 export const useActiveBranchData = () => {
   const store = useTenantStore();
   const bid = store.selectedBranchId;
-  
+
   return {
     ...store,
     users: store.users.filter(u => u.branchId === bid || u.role === 'HOTEL_OWNER'), // Dono vê tudo

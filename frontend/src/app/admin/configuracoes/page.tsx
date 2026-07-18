@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Settings, PaintBucket, Palette, Store, 
+import {
+  Settings, PaintBucket, Palette, Store,
   Save, LayoutTemplate, Shield, Webhook, Clock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ const COLOR_PRESETS = [
 
 export default function ConfiguracoesPage() {
   const { hotel, setHotelColors, setHotelLayout, addAuditLog, user } = useActiveBranchData();
-  
+
   const [primaryColor, setPrimaryColor] = useState(hotel.cores?.primary || '#3b82f6');
   const [backgroundColor, setBackgroundColor] = useState(hotel.cores?.secondary || '#000000');
   const [fontFamily, setFontFamily] = useState(hotel.layout?.font || 'sans');
@@ -75,11 +75,11 @@ export default function ConfiguracoesPage() {
       });
 
       setHotelLayout({ font: fontFamily, heroVariant });
-      
+
       // Mudar as variáveis de estilo injetadas em admin/layout
       document.documentElement.style.setProperty('--brand-primary', primaryColor);
       document.documentElement.style.setProperty('--brand-bg', backgroundColor);
-      
+
       addAuditLog({
         id: 'a_' + Date.now(),
         usuario: user?.nome || 'Administrador',
@@ -99,16 +99,16 @@ export default function ConfiguracoesPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20 max-w-5xl mx-auto">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Tenant Settings
+            Configurações
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Personalização de White-Label e configurações de marca da filial.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Personalize as cores, logotipo e informações do seu hotel.</p>
         </div>
-        <button 
+        <button
           onClick={handleSave}
           disabled={isSaving}
           className="px-8 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2 disabled:opacity-50"
@@ -119,10 +119,10 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
+
         {/* Painel Esquerdo: Brand Design */}
         <div className="md:col-span-2 space-y-8">
-          
+
           <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
             <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 border-b border-white/5 pb-4">
               <Store className="w-4 h-4 text-brand" /> Perfil Comercial
@@ -131,11 +131,11 @@ export default function ConfiguracoesPage() {
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Fantasia da Filial</label>
-                <input 
-                  type="text" 
-                  value={hotelName} 
+                <input
+                  type="text"
+                  value={hotelName}
                   onChange={e => setHotelName(e.target.value)}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
 
@@ -143,50 +143,50 @@ export default function ConfiguracoesPage() {
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL Personalizada do Portal (Slug/Domínio)</label>
                 <div className="flex flex-col md:flex-row md:items-center gap-2">
                   <span className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 hidden md:inline-block">https://frontend-production-2b45.up.railway.app/</span>
-                  <input 
-                    type="text" 
-                    value={slug} 
+                  <input
+                    type="text"
+                    value={slug}
                     onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
                     placeholder="hotel-galvan.com.br"
-                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                   />
                 </div>
                 <p className="text-[10px] text-white/30 mt-2">Os hóspedes acessarão sua página através deste link.</p>
               </div>
-              
+
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL da Logomarca (SVG/PNG)</label>
                 <div className="flex gap-4">
                   <div className="w-16 h-16 rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden p-2 shrink-0">
                     <img src={logoUrl} alt="Logo preview" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                   </div>
-                  <input 
-                    type="text" 
-                    value={logoUrl} 
+                  <input
+                    type="text"
+                    value={logoUrl}
                     onChange={e => setLogoUrl(e.target.value)}
-                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-12 self-center" 
+                    className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-12 self-center"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Slogan da Página Inicial</label>
-                <input 
-                  type="text" 
-                  value={slogan} 
+                <input
+                  type="text"
+                  value={slogan}
                   onChange={e => setSlogan(e.target.value)}
                   placeholder="Ex: O Padrão de Excelência em Hospedagem"
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
 
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Descrição Pública (Apresentação)</label>
-                <textarea 
-                  value={descricaoPublica} 
+                <textarea
+                  value={descricaoPublica}
                   onChange={e => setDescricaoPublica(e.target.value)}
                   placeholder="Viva estadias memoráveis nas localizações mais cobiçadas..."
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-24 resize-none" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand h-24 resize-none"
                 />
               </div>
 
@@ -199,15 +199,15 @@ export default function ConfiguracoesPage() {
                   {diferenciais.map((dif: any, index: number) => (
                     <div key={index} className="flex gap-3 bg-white/[0.02] border border-white/10 p-3 rounded-xl items-start">
                       <div className="flex-1 space-y-2">
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Título (ex: Wi-Fi Rápido)"
                           value={dif.titulo}
                           onChange={e => handleDiferencialChange(index, 'titulo', e.target.value)}
                           className="w-full bg-transparent border-b border-white/10 px-2 py-1 text-[12px] text-white outline-none focus:border-brand"
                         />
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Descrição (ex: Cobertura em 100% da área)"
                           value={dif.descricao}
                           onChange={e => handleDiferencialChange(index, 'descricao', e.target.value)}
@@ -233,26 +233,26 @@ export default function ConfiguracoesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Horário Padrão de Check-in</label>
-                <input 
-                  type="time" 
-                  value={localInfos.checkInTime} 
+                <input
+                  type="time"
+                  value={localInfos.checkInTime}
                   onChange={e => setLocalInfos({ ...localInfos, checkInTime: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Horário Padrão de Check-out</label>
-                <input 
-                  type="time" 
-                  value={localInfos.checkOutTime} 
+                <input
+                  type="time"
+                  value={localInfos.checkOutTime}
                   onChange={e => setLocalInfos({ ...localInfos, checkOutTime: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Fuso Horário (Timezone)</label>
-                <select 
-                  value={localInfos.timezone} 
+                <select
+                  value={localInfos.timezone}
                   onChange={e => setLocalInfos({ ...localInfos, timezone: e.target.value })}
                   className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 >
@@ -275,22 +275,22 @@ export default function ConfiguracoesPage() {
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nova Reserva Criada (POST)</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   placeholder="https://hooks.zapier.com/hooks/catch/..."
-                  value={webhooks.onReservationComplete} 
+                  value={webhooks.onReservationComplete}
                   onChange={e => setWebhooks({ ...webhooks, onReservationComplete: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in Realizado (POST)</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   placeholder="https://hooks.zapier.com/hooks/catch/..."
-                  value={webhooks.onCheckIn} 
+                  value={webhooks.onCheckIn}
                   onChange={e => setWebhooks({ ...webhooks, onCheckIn: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
                 />
               </div>
             </div>
@@ -314,8 +314,8 @@ export default function ConfiguracoesPage() {
                       key={preset.hex}
                       onClick={() => setPrimaryColor(preset.hex)}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
-                        primaryColor === preset.hex 
-                          ? 'border-white bg-white/10 text-white' 
+                        primaryColor === preset.hex
+                          ? 'border-white bg-white/10 text-white'
                           : 'border-white/10 bg-black text-white/50 hover:bg-white/5 hover:text-white/80'
                       }`}
                     >
@@ -330,19 +330,19 @@ export default function ConfiguracoesPage() {
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Cor Primária Personalizada (HEX)</label>
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <input 
-                      type="color" 
-                      value={primaryColor} 
+                    <input
+                      type="color"
+                      value={primaryColor}
                       onChange={e => setPrimaryColor(e.target.value)}
                       className="w-12 h-12 rounded-lg cursor-pointer bg-transparent border-0 p-0"
                     />
                     <div className="absolute inset-0 rounded-lg pointer-events-none ring-1 ring-inset ring-white/20" />
                   </div>
-                  <input 
-                    type="text" 
-                    value={primaryColor} 
+                  <input
+                    type="text"
+                    value={primaryColor}
                     onChange={e => setPrimaryColor(e.target.value)}
-                    className="w-32 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono uppercase" 
+                    className="w-32 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono uppercase"
                   />
                 </div>
               </div>
@@ -352,19 +352,19 @@ export default function ConfiguracoesPage() {
                 <p className="text-[11px] text-white/40 mb-4">Recomendado manter próximo ao preto (ex: #000000 ou #050505) para preservar o contraste do texto.</p>
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <input 
-                      type="color" 
-                      value={backgroundColor} 
+                    <input
+                      type="color"
+                      value={backgroundColor}
                       onChange={e => setBackgroundColor(e.target.value)}
                       className="w-12 h-12 rounded-lg cursor-pointer bg-transparent border-0 p-0"
                     />
                     <div className="absolute inset-0 rounded-lg pointer-events-none ring-1 ring-inset ring-white/20" />
                   </div>
-                  <input 
-                    type="text" 
-                    value={backgroundColor} 
+                  <input
+                    type="text"
+                    value={backgroundColor}
                     onChange={e => setBackgroundColor(e.target.value)}
-                    className="w-32 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono uppercase" 
+                    className="w-32 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand font-mono uppercase"
                   />
                   <button onClick={() => setBackgroundColor('#000000')} className="px-3 py-1.5 text-[10px] uppercase font-bold text-white/40 border border-white/10 rounded-lg hover:text-white transition-colors">Reset</button>
                 </div>
@@ -430,8 +430,8 @@ export default function ConfiguracoesPage() {
             </h3>
 
             <div className="space-y-4" style={{ fontFamily: fontFamily === 'serif' ? 'Playfair Display, serif' : fontFamily === 'mono' ? 'Fira Code, monospace' : 'Inter, sans-serif' }}>
-              
-              <div 
+
+              <div
                 className="rounded-2xl border transition-all duration-500 relative overflow-hidden shadow-2xl flex flex-col"
                 style={{ borderColor: `${primaryColor}40`, backgroundColor: backgroundColor, minHeight: '320px' }}
               >
@@ -451,18 +451,18 @@ export default function ConfiguracoesPage() {
 
                 {/* Hero Mock */}
                 <div className={`flex-1 flex ${heroVariant === 'split' ? 'flex-row' : 'flex-col items-center justify-center text-center'} relative overflow-hidden`}>
-                  
+
                   {heroVariant === 'standard' ? (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-transparent z-10" style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), ${backgroundColor})` }} />
                       <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400')" }} />
-                      
+
                       <div className="relative z-20 p-6 flex flex-col items-center">
                         <h4 className="text-white font-bold text-2xl mb-2 tracking-tight drop-shadow-xl">{hotelName || 'Nome do Hotel'}</h4>
                         <p className="text-white/80 text-[10px] mb-6 drop-shadow-md max-w-[80%] leading-relaxed">
                           {slogan || 'O seu slogan aparecerá aqui. Adicione uma frase de impacto.'}
                         </p>
-                        <button 
+                        <button
                           className="px-6 py-2 rounded-full text-black font-bold text-[9px] uppercase tracking-widest transition-all hover:scale-105"
                           style={{ backgroundColor: primaryColor, boxShadow: `0 0 20px ${primaryColor}60` }}
                         >
@@ -477,7 +477,7 @@ export default function ConfiguracoesPage() {
                         <p className="text-white/60 text-[9px] mb-5 leading-relaxed line-clamp-3">
                           {slogan || 'O seu slogan aparecerá aqui. Adicione uma frase de impacto.'}
                         </p>
-                        <button 
+                        <button
                           className="w-max px-4 py-2 rounded-lg text-black font-bold text-[8px] uppercase tracking-widest transition-all hover:scale-105"
                           style={{ backgroundColor: primaryColor, boxShadow: `0 0 15px ${primaryColor}60` }}
                         >
@@ -491,7 +491,7 @@ export default function ConfiguracoesPage() {
                       </div>
                     </>
                   )}
-                  
+
                   {/* Accent glow on the bottom right */}
                   <div className="absolute bottom-[-10%] right-[-10%] w-32 h-32 rounded-full blur-[50px] opacity-30 pointer-events-none z-10" style={{ backgroundColor: primaryColor }} />
                 </div>

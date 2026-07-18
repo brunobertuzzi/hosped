@@ -14,7 +14,7 @@ export default function ChannelManagerPage() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [syncs, setSyncs] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState('');
-  
+
   const [importUrls, setImportUrls] = useState<string[]>(['']);
   const [exportToken, setExportToken] = useState('');
   const [syncId, setSyncId] = useState('');
@@ -36,7 +36,7 @@ export default function ChannelManagerPage() {
       ]);
       setRooms(roomsData);
       setSyncs(syncsData);
-      
+
       if (roomsData.length > 0) {
         handleSelectRoom(roomsData[0].id, syncsData);
       }
@@ -79,7 +79,7 @@ export default function ChannelManagerPage() {
 
   const handleSave = async () => {
     if (!selectedRoom) return;
-    
+
     // Filter out empty URLs
     const filteredUrls = importUrls.filter(u => u.trim() !== '');
 
@@ -89,10 +89,10 @@ export default function ChannelManagerPage() {
         roomId: selectedRoom,
         importUrls: filteredUrls
       });
-      
+
       setSyncId(updatedSync.id);
       setExportToken(updatedSync.exportToken);
-      
+
       // Update local state
       const newSyncs = [...syncs];
       const idx = newSyncs.findIndex(s => s.roomId === selectedRoom);
@@ -167,16 +167,16 @@ export default function ChannelManagerPage() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             <Calendar className="w-8 h-8 text-brand" />
-            Channel Manager (iCal)
+            Conexão com Sites de Reserva
           </h1>
           <p className="text-white/60 text-sm">
-            Sincronize sua disponibilidade com Airbnb, Booking, Expedia e outras OTAs.
+            Sincronize sua disponibilidade com Airbnb, Booking, Expedia e outros sites.
           </p>
         </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Seletor de Quarto */}
         <div className="lg:col-span-1 space-y-4">
           <div className="glass-card border border-white/10 rounded-2xl p-6">
@@ -219,17 +219,17 @@ export default function ChannelManagerPage() {
               </h2>
 
               <div className="space-y-8">
-                
+
                 {/* Exportar (Hosped -> OTA) */}
                 <div className="p-5 bg-blue-500/5 border border-blue-500/20 rounded-xl space-y-3">
                   <h3 className="text-sm font-semibold text-blue-400">1. Exportar Calendário (Hosped ➔ Airbnb/Booking)</h3>
                   <p className="text-xs text-white/50">Copie o link abaixo e cole na área de "Importar Calendário" do seu anúncio na OTA.</p>
-                  
+
                   {exportToken ? (
                     <div className="flex gap-2">
-                      <input 
-                        readOnly 
-                        value={`${API_BASE}/ical/export/${exportToken}.ics`} 
+                      <input
+                        readOnly
+                        value={`${API_BASE}/ical/export/${exportToken}.ics`}
                         className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-sm text-white/70 font-mono"
                       />
                       <button onClick={copyExportUrl} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
@@ -247,7 +247,7 @@ export default function ChannelManagerPage() {
                 <div className="p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl space-y-4">
                   <h3 className="text-sm font-semibold text-emerald-400">2. Importar Calendários (Airbnb/Booking ➔ Hosped)</h3>
                   <p className="text-xs text-white/50">Cole aqui os links de "Exportar Calendário" fornecidos pelas OTAs.</p>
-                  
+
                   <div className="space-y-3">
                     {importUrls.map((url, index) => (
                       <div key={index} className="flex gap-2">
@@ -264,7 +264,7 @@ export default function ChannelManagerPage() {
                       </div>
                     ))}
                   </div>
-                  
+
                   <button onClick={handleAddUrl} className="text-xs flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-medium">
                     <Plus className="w-4 h-4" /> Adicionar outra URL
                   </button>
@@ -279,7 +279,7 @@ export default function ChannelManagerPage() {
                   >
                     {isSaving ? <span className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" /> : <><Save className="w-5 h-5" /> Salvar Configurações</>}
                   </button>
-                  
+
                   {syncId && (
                     <button
                       onClick={handleSyncNow}

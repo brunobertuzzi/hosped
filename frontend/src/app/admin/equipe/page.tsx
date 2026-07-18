@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Users, Shield, Plus, MoreVertical,
-  UserCheck, UserX, Mail, Key
+  UserCheck, UserX, Mail, Key, XCircle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
 
@@ -121,9 +121,9 @@ export default function EquipePage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Gestão de Equipe (RH)
+            Equipe (RH)
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de acessos, permissões e cadastro de funcionários.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Cadastro de funcionários e controle de permissões de acesso.</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -193,41 +193,51 @@ export default function EquipePage() {
       </div>
 
       {/* Modal Cadastro/Edição */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Users className="w-5 h-5 text-brand" /> {editingUserId ? 'Editar Funcionário' : 'Novo Funcionário'}
-            </h2>
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
 
-            <form onSubmit={handleSaveUser} className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Completo</label>
-                <input required type="text" value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+                <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                  <Users className="w-5 h-5 text-brand" /> {editingUserId ? 'Editar Funcionário' : 'Novo Funcionário'}
+                </h2>
+                <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
               </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail Corporativo</label>
-                <input required type="email" value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
-              </div>
+              <form onSubmit={handleSaveUser} className="flex flex-col">
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Completo</label>
+                    <input required type="text" value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
+                  </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Papel / Função</label>
-                <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
-                  {roles.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail Corporativo</label>
+                    <input required type="email" value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
+                  </div>
 
-              <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">
-                  {editingUserId ? 'Salvar Alterações' : 'Cadastrar Acesso'}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Papel / Função</label>
+                    <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
+                      {roles.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 bg-white hover:bg-white/90 text-black text-[13px] font-bold rounded-xl transition-all shadow-lg">
+                    {editingUserId ? 'Salvar Alterações' : 'Cadastrar Acesso'}
+                  </button>
+                </div>
+              </form>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </motion.div>
   );

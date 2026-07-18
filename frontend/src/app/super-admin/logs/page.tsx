@@ -37,8 +37,8 @@ export default function SystemLogsPage() {
   useEffect(() => {
     fetchLogs();
     fetchClients();
-    
-    // Polling a cada 5 segundos para simular "real-time" se nenhum termo de busca estiver ativo
+
+    // Polling a cada 5 segundos para buscar novos logs automaticamente
     const interval = setInterval(() => {
       if (!searchTerm && !startDate && !endDate) {
         fetchLogs();
@@ -49,16 +49,16 @@ export default function SystemLogsPage() {
   }, [selectedTenant, searchTerm, startDate, endDate]);
 
   const filteredLogs = logs.filter(log => {
-    const matchSearch = 
-      log?.entidade?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchSearch =
+      log?.entidade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log?.acao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log?.hotel?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log?.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log?.user?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log?.id?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
     const matchAction = selectedAction ? log?.acao?.includes(selectedAction) : true;
-    
+
     let matchDate = true;
     if (startDate || endDate) {
       const logDate = new Date(log.createdAt).getTime();
@@ -94,27 +94,27 @@ export default function SystemLogsPage() {
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Console em tempo real de eventos em todas as redes (Tenants).</p>
         </div>
-        
+
         <div className="flex gap-2 items-center flex-wrap justify-end">
           <div className="flex items-center gap-2">
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={e => setStartDate(e.target.value)} 
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500" 
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500"
             />
             <span className="text-white/30 text-[10px]">Até</span>
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={e => setEndDate(e.target.value)} 
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500" 
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-indigo-500"
             />
           </div>
-          <TenantFilterDropdown 
-            sistemaClients={sistemaClients} 
-            selectedTenant={selectedTenant} 
-            setSelectedTenant={setSelectedTenant} 
+          <TenantFilterDropdown
+            sistemaClients={sistemaClients}
+            selectedTenant={selectedTenant}
+            setSelectedTenant={setSelectedTenant}
           />
           <div className="relative">
             <Filter className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
@@ -150,12 +150,12 @@ export default function SystemLogsPage() {
               <Terminal className="w-3.5 h-3.5" /> super-admin / logs / stream
             </div>
           </div>
-          
+
           <div className="relative w-64">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Pesquisar..." 
+            <input
+              type="text"
+              placeholder="Pesquisar..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-white/[0.02] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-[11px] font-mono text-white outline-none focus:border-indigo-500 transition-colors placeholder:font-sans"
@@ -170,7 +170,7 @@ export default function SystemLogsPage() {
               <span className="text-white/40 font-sans">Carregando logs...</span>
             </div>
           )}
-          
+
           {filteredLogs.map(log => {
             const time = new Date(log.createdAt).toLocaleTimeString('pt-BR', { hour12: false, fractionalSecondDigits: 3 } as any);
             const date = new Date(log.createdAt).toLocaleDateString('pt-BR');
@@ -180,8 +180,8 @@ export default function SystemLogsPage() {
                 <div className={`w-28 shrink-0 font-bold ${getLevelColor(log.acao)}`}>{log.acao}</div>
                 <div className="w-24 shrink-0 text-white/50">[{log.entidade}]</div>
                 <div className="text-white/80 break-all flex-1">
-                  <span className="text-white/40">[{log.hotel?.nome || 'Sistema'}]</span> 
-                  {log.user ? ` (${log.user.nome} - ${log.user.email}):` : ':'} 
+                  <span className="text-white/40">[{log.hotel?.nome || 'Sistema'}]</span>
+                  {log.user ? ` (${log.user.nome} - ${log.user.email}):` : ':'}
                   {' '}
                   <span className="text-indigo-300">Antes: {log.dadosAnteriores ? JSON.stringify(log.dadosAnteriores) : 'null'}</span>
                   {' '} | {' '}
@@ -190,7 +190,7 @@ export default function SystemLogsPage() {
               </div>
             );
           })}
-          
+
           {!loading && filteredLogs.length === 0 && (
             <div className="text-white/30 text-center py-10 font-sans">Nenhum evento registrado no momento.</div>
           )}

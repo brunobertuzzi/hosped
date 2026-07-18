@@ -15,7 +15,7 @@ import { useTenantStore, useActiveBranchData } from '../../../store/useTenantSto
 import { api } from '../../../lib/api';
 
 export default function FinanceiroPage() {
-  const { reservations, hotel, expenses } = useActiveBranchData();
+  const { reservations, hotel, expenses, guests } = useActiveBranchData();
   const { updateExpenseStatus } = useTenantStore();
   const [activeTab, setActiveTab] = React.useState('GERAL'); // GERAL, RECEBER, PAGAR
 
@@ -47,7 +47,7 @@ export default function FinanceiroPage() {
         paymentsList.push({
           ...p,
           resId: res.id,
-          guestName: 'Cliente via Reserva', // Mockado para exibição rápida
+          guestName: guests.find((g: any) => g.id === res.guestId)?.nome || 'Cliente via Reserva',
         });
 
         // Agrupar por dia para o gráfico
@@ -59,7 +59,7 @@ export default function FinanceiroPage() {
     const chartData = Object.entries(dailyRevenue).map(([date, valor]) => ({
       date,
       valor
-    })).sort((a, b) => a.date.localeCompare(b.date)); // Ordenação simplificada p/ mock
+    })).sort((a, b) => a.date.localeCompare(b.date));
 
     return {
       totalReceita,
@@ -77,12 +77,12 @@ export default function FinanceiroPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Gestão Financeira
+            Financeiro
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de caixa, faturamento de diárias e transações de PDV.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de caixa, contas a pagar e receber, e faturamento.</p>
         </div>
         <button className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest border border-white/10 rounded-xl transition-all flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-brand" /> Mês Atual (Maio 2026)
+          <Calendar className="w-4 h-4 text-brand" /> {new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())}
         </button>
       </div>
 
@@ -118,7 +118,7 @@ export default function FinanceiroPage() {
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/50 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-brand" /> Receita Bruta
             </h3>
-            <span className="flex items-center text-emerald-400 text-[11px] font-bold tracking-widest"><ArrowUpRight className="w-3 h-3 mr-1" /> 14.5%</span>
+            <span className="flex items-center text-emerald-400 text-[11px] font-bold tracking-widest"><ArrowUpRight className="w-3 h-3 mr-1" /> {financialData.totalReceita > 0 ? ((financialData.totalReceita / (financialData.totalReceita + financialData.totalPendente || 1)) * 100).toFixed(1) : '0.0'}%</span>
           </div>
           <p className="text-3xl font-bold text-white tracking-tight font-mono">
             <span className="text-white/30 text-xl mr-1">R$</span>{financialData.totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}

@@ -67,7 +67,7 @@ export const useSuperAdminStore = create<SuperAdminState>()(
           status: inv.status === 'PAGO' ? 'PAID' : inv.status === 'ATRASADO' ? 'OVERDUE' : 'PENDING',
           dueDate: inv.dueDate,
           paidAt: inv.paidAt,
-          paymentMethod: 'CREDIT_CARD', // default mock as it's not in db yet
+          paymentMethod: 'CREDIT_CARD',
         }));
         set({ invoices: mappedInvoices });
       } catch (err) {

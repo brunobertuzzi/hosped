@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  BedDouble, Tag, Plus, Edit2, LayoutList, 
-  Settings2, Hash, Zap, Image as ImageIcon, Trash2
+import {
+  BedDouble, Tag, Plus, Edit2, LayoutList,
+  Settings2, Hash, Zap, Image as ImageIcon, Trash2, XCircle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
@@ -13,7 +13,7 @@ import { alerts } from '../../../lib/alerts';
 export default function QuartosPage() {
   const { roomCategories, rooms, addRoomCategory, updateRoomCategoryPhotos, addRoom, addAuditLog, user } = useActiveBranchData();
   const [activeTab, setActiveTab] = useState<'CATEGORIES' | 'ROOMS'>('CATEGORIES');
-  
+
   // Modals
   const [isCatModalOpen, setIsCatModalOpen] = useState(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
@@ -74,7 +74,7 @@ export default function QuartosPage() {
           capacidade: parseInt(catCap),
           comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
         });
-        
+
         addAuditLog({
           id: 'a_' + Date.now(),
           usuario: user?.nome || 'Admin',
@@ -131,15 +131,14 @@ export default function QuartosPage() {
   const handleSavePhotos = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingCatId) {
-      // The updateRoomCategoryPhotos from store might be fake too, but let's assume we need an API call for it if we had one. 
-      // Actually, api.ts doesn't have updateRoomCategory. Let's stick to the store one for photos for now, or use request directly.
+      // Atualiza fotos via API
       try {
         await request(`/rooms/categories/${editingCatId}`, {
           method: 'PUT',
           body: JSON.stringify({ fotos: editingCatFotos })
         });
         await api.getRoomCategories();
-        
+
         addAuditLog({
           id: 'a_' + Date.now(),
           usuario: user?.nome || 'Admin',
@@ -166,7 +165,7 @@ export default function QuartosPage() {
           numero: roomNum,
           categoryId: roomCatId
         });
-        
+
         addAuditLog({
           id: 'a_' + Date.now(),
           usuario: user?.nome || 'Admin',
@@ -228,24 +227,24 @@ export default function QuartosPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20 max-w-6xl mx-auto">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Gestão de Quartos
+            Quartos & Categorias
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Configure a precificação base, inventário e as fotos da página de vendas.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Configure preços, fotos e tipos de quarto para o site de vendas.</p>
         </div>
-        
+
         <div className="flex gap-3 bg-white/[0.03] p-1.5 rounded-xl border border-white/10">
-          <button 
+          <button
             onClick={() => setActiveTab('CATEGORIES')}
             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'CATEGORIES' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/80'}`}
           >
             <Tag className="w-3.5 h-3.5" /> Categorias & Fotos
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('ROOMS')}
             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'ROOMS' ? 'bg-white/10 text-white shadow-md' : 'text-white/40 hover:text-white/80'}`}
           >
@@ -279,7 +278,7 @@ export default function QuartosPage() {
                         <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border ${fotosCount > 0 ? 'bg-brand/10 text-brand border-brand/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>{fotosCount} Fotos</span>
                       </div>
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-white mb-1">{cat.nome}</h3>
                     <div className="flex items-center gap-2 text-white/40 text-[12px] font-medium mb-6">
                       <Zap className="w-3.5 h-3.5" /> Capacidade: {cat.capacidade} Pessoas
@@ -384,107 +383,129 @@ export default function QuartosPage() {
       )}
 
       {/* Modal Nova Categoria */}
-      {isCatModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6">{editingCatId ? 'Editar Categoria' : 'Nova Categoria'}</h2>
-            <form onSubmit={handleCreateCategory} className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
-                <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Diária Base (R$)</label>
-                  <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Capacidade (Pessoas)</label>
-                  <input required type="number" min="1" max="10" value={catCap} onChange={e => setCatCap(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
-                </div>
-              </div>
-              <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setIsCatModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">{editingCatId ? 'Salvar Alterações' : 'Criar Categoria'}</button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isCatModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCatModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
 
-      {/* Modal Gestão de Fotos */}
-      {isCatEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-2xl p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-2">Gerenciar Fotos</h2>
-            <p className="text-[13px] text-white/40 mb-6">Insira os links das imagens que aparecerão no portal de vendas.</p>
-            
-            <form onSubmit={handleSavePhotos} className="space-y-6">
-              <div className="flex gap-3">
-                <input 
-                  type="text" 
-                  value={newFotoUrl} 
-                  onChange={e => setNewFotoUrl(e.target.value)} 
-                  placeholder="Cole a URL da foto aqui (https://...)" 
-                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" 
-                />
-                <button type="button" onClick={handleAddFoto} className="px-6 py-3 bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">
-                  Adicionar
-                </button>
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+                <h2 className="text-lg font-bold text-white tracking-tight">{editingCatId ? 'Editar Categoria' : 'Nova Categoria'}</h2>
+                <button onClick={() => setIsCatModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
-                {editingCatFotos.map((url, idx) => (
-                  <div key={idx} className="relative group aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
-                    <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image')} />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button type="button" onClick={() => handleRemoveFoto(idx)} className="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500/40 transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+              <form onSubmit={handleCreateCategory} className="flex flex-col">
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nome Comercial</label>
+                    <input required type="text" value={catName} onChange={e => setCatName(e.target.value)} placeholder="Ex: Suíte Presidencial" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Diária Base (R$)</label>
+                      <input required type="number" min="0" step="0.01" value={catPrice} onChange={e => setCatPrice(e.target.value)} placeholder="250.00" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Capacidade (Pessoas)</label>
+                      <input required type="number" min="1" max="10" value={catCap} onChange={e => setCatCap(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner" />
                     </div>
                   </div>
-                ))}
-                {editingCatFotos.length === 0 && (
-                  <div className="col-span-full py-8 text-center border-2 border-dashed border-white/10 rounded-xl text-white/30 text-[12px] font-medium uppercase tracking-widest">
-                    Nenhuma foto cadastrada
-                  </div>
-                )}
+                </div>
+
+                <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">
+                  <button type="button" onClick={() => setIsCatModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 bg-white hover:bg-white/90 text-black text-[13px] font-bold rounded-xl transition-all shadow-lg">{editingCatId ? 'Salvar Alterações' : 'Criar Categoria'}</button>
+                </div>
+              </form>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Gestão de Fotos */}
+      <AnimatePresence>
+        {isCatEditModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCatEditModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col">
+
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+                <div>
+                  <h2 className="text-lg font-bold text-white tracking-tight">Gerenciar Fotos</h2>
+                  <p className="text-[11px] font-medium text-white/40 mt-1">Insira os links das imagens que aparecerão no portal de vendas.</p>
+                </div>
+                <button onClick={() => setIsCatEditModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
               </div>
 
-              <div className="pt-4 flex gap-3 border-t border-white/5">
-                <button type="button" onClick={() => setIsCatEditModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">Salvar Alterações</button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+              <form onSubmit={handleSavePhotos} className="flex flex-col">
+                <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+                  <div className="flex gap-3">
+                    <input type="text" value={newFotoUrl} onChange={e => setNewFotoUrl(e.target.value)} placeholder="Cole a URL da foto aqui (https://...)" className="flex-1 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                    <button type="button" onClick={handleAddFoto} className="px-6 py-3 bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">Adicionar</button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-h-60 overflow-y-auto pr-2">
+                    {editingCatFotos.map((url, idx) => (
+                      <div key={idx} className="relative group aspect-video bg-black rounded-xl overflow-hidden border border-white/10">
+                        <img src={url} alt="Room preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Invalid+Image')} />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => handleRemoveFoto(idx)} className="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500/40 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </div>
+                    ))}
+                    {editingCatFotos.length === 0 && (
+                      <div className="col-span-full py-8 text-center border-2 border-dashed border-white/10 rounded-xl text-white/30 text-[12px] font-medium uppercase tracking-widest">Nenhuma foto cadastrada</div>
+                    )}
+                  </div>
+                </div>
+                <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">
+                  <button type="button" onClick={() => setIsCatEditModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 bg-white hover:bg-white/90 text-black text-[13px] font-bold rounded-xl transition-all shadow-lg">Salvar Alterações</button>
+                </div>
+              </form>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Modal Novo Quarto */}
-      {isRoomModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel w-full max-w-md p-8 rounded-[24px] border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6">{editingRoomId ? 'Editar Quarto Físico' : 'Cadastrar Quarto Físico'}</h2>
-            <form onSubmit={handleCreateRoom} className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número / Identificação</label>
-                <input required type="text" value={roomNum} onChange={e => setRoomNum(e.target.value)} placeholder="Ex: 101" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-mono outline-none focus:border-brand" />
+      <AnimatePresence>
+        {isRoomModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsRoomModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black/40">
+                <h2 className="text-lg font-bold text-white tracking-tight">{editingRoomId ? 'Editar Quarto Físico' : 'Cadastrar Quarto Físico'}</h2>
+                <button onClick={() => setIsRoomModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
               </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vincular a Categoria</label>
-                <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
-                  <option value="" disabled>Selecione uma Categoria...</option>
-                  {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {c.valorBase.toFixed(2)})</option>)}
-                </select>
-              </div>
-              <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setIsRoomModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-black bg-white hover:bg-white/90 rounded-xl shadow-lg transition-colors">{editingRoomId ? 'Salvar Alterações' : 'Cadastrar Quarto'}</button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+
+              <form onSubmit={handleCreateRoom} className="flex flex-col">
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número / Identificação</label>
+                    <input required type="text" value={roomNum} onChange={e => setRoomNum(e.target.value)} placeholder="Ex: 101" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white font-mono outline-none focus:border-brand" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vincular a Categoria</label>
+                    <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
+                      <option value="" disabled>Selecione uma Categoria...</option>
+                      {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {c.valorBase.toFixed(2)})</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">
+                  <button type="button" onClick={() => setIsRoomModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 bg-white hover:bg-white/90 text-black text-[13px] font-bold rounded-xl transition-all shadow-lg">{editingRoomId ? 'Salvar Alterações' : 'Cadastrar Quarto'}</button>
+                </div>
+              </form>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </motion.div>
   );

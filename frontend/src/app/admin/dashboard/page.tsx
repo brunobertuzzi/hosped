@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { 
-  Activity, DollarSign, CheckCircle2, LogOut, AlertTriangle, 
+import {
+  Activity, DollarSign, CheckCircle2, LogOut, AlertTriangle,
   RefreshCcw, Bed, Plus, ArrowUpRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,7 +11,7 @@ import { api } from '../../../lib/api';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
-  const { 
+  const {
     rooms, reservations, inventory, maintenance, user, roomCategories
   } = useActiveBranchData();
 
@@ -46,8 +46,8 @@ export default function AdminDashboardPage() {
     });
 
     const graphData = last7Days.map(dateStr => {
-      return reservations.filter(r => 
-        r.dataCheckIn.substring(0, 10) <= dateStr && 
+      return reservations.filter(r =>
+        r.dataCheckIn.substring(0, 10) <= dateStr &&
         r.dataCheckOut.substring(0, 10) >= dateStr &&
         r.status !== 'CANCELADA'
       ).length;
@@ -73,8 +73,8 @@ export default function AdminDashboardPage() {
       return daysOfWeek[dateObj.getDay()];
     });
 
-    return { 
-      occupancyRate, monthRevenue, checkInsToday, checkOutsToday, 
+    return {
+      occupancyRate, monthRevenue, checkInsToday, checkOutsToday,
       lowStockAlerts, occupiedRoomsCount, totalRoomsCount,
       pathD, pathFill, graphLabels
     };
@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-white/5 pb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-            Visão Geral <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Ao Vivo</span>
+            Dashboard <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-widest text-white/40 uppercase">Ao Vivo</span>
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Indicadores financeiros e operacionais em tempo real.</p>
         </div>
@@ -139,7 +139,7 @@ export default function AdminDashboardPage() {
 
       {/* Grid de Métricas Premium */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        
+
         <div className="glass-card p-6 border-t-2 border-t-brand">
           <div className="flex items-center justify-between mb-4 text-white/40">
             <span className="text-[10px] font-bold uppercase tracking-widest">Ocupação Atual</span>
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest">Receita (Mês)</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">Faturamento do mês</span>
             <DollarSign className="w-4 h-4 text-white/60" />
           </div>
           <div>
@@ -173,7 +173,7 @@ export default function AdminDashboardPage() {
               {metrics.monthRevenue.toFixed(2)}
             </span>
             <div className="text-[11px] text-white/30 mt-1 font-medium flex items-center gap-1.5">
-              <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> Vivo</span> 
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Neste mês
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Gráfico Curva */}
         <div className="glass-panel p-6 lg:col-span-2">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 mb-8 flex items-center gap-2">
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
               <div className="w-full border-t border-white/[0.03]" />
               <div className="w-full border-t border-white/[0.03]" />
             </div>
-            
+
             <svg className="w-full h-full absolute inset-0 text-brand" viewBox="0 0 100 40" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="brand-grad" x1="0" y1="0" x2="0" y2="1">
@@ -271,7 +271,7 @@ export default function AdminDashboardPage() {
                 </button>
               )}
             </div>
-            
+
             {maintenance.length > 0 ? (
               <div className="space-y-2">
                 {maintenance.map(m => (
@@ -309,20 +309,20 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {rooms.map(r => {
             const catName = roomCategories.find(c => c.id === r.categoryId)?.nome || '';
-            
+
             let statusStyle = 'bg-white/[0.02] border-white/5 text-white/40';
             let badgeStyle = 'bg-white/5 text-white/40';
-            
+
             if (r.status === 'OCUPADO') { statusStyle = 'bg-brand/10 border-brand/20 text-brand'; badgeStyle = 'bg-brand/20 text-brand'; }
             if (r.status === 'LIMPEZA') { statusStyle = 'bg-purple-500/10 border-purple-500/20 text-purple-400'; badgeStyle = 'bg-purple-500/20 text-purple-400'; }
             if (r.status === 'MANUTENCAO') { statusStyle = 'bg-amber-500/10 border-amber-500/20 text-amber-400'; badgeStyle = 'bg-amber-500/20 text-amber-400'; }
             if (r.status === 'BLOQUEADO') { statusStyle = 'bg-red-500/10 border-red-500/20 text-red-400'; badgeStyle = 'bg-red-500/20 text-red-400'; }
-            
+
             return (
               <div key={r.id} className={`p-4 rounded-2xl border flex flex-col justify-between items-center text-center transition-all hover:scale-[1.02] ${statusStyle}`}>
                 <span className="text-xl font-bold tracking-tight text-white/90">{r.numero}</span>
                 <span className="text-[9px] uppercase font-bold mt-1 opacity-60 truncate w-full">{catName}</span>
-                
+
                 <div className="mt-4 w-full">
                   <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md block ${badgeStyle}`}>
                     {r.status}
@@ -341,11 +341,11 @@ export default function AdminDashboardPage() {
 
       <AnimatePresence>
         {isMaintModalOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
               className="w-full max-w-sm bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 shadow-2xl"
             >
