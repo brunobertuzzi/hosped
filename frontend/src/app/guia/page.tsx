@@ -391,7 +391,7 @@ export default function GuiaPage() {
 
   React.useEffect(() => {
     import('../../lib/api').then(({ api }) => {
-      api.getGlobalSettings().then((global: any) => {
+      api.getPublicGlobalSettings().then((global: any) => {
         if (global?.supportEmail) setSupportEmail(global.supportEmail);
       }).catch(console.error);
     });

@@ -618,6 +618,10 @@ export const api = {
 
   // ================= GLOBAL SETTINGS (Super Admin) =================
 
+  async getPublicGlobalSettings() {
+    return await request('/core/global-settings/public');
+  },
+
   async getGlobalSettings() {
     return await request('/core/global-settings');
   },

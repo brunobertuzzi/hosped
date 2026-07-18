@@ -10,12 +10,25 @@ const DEFAULT_SETTINGS = {
 };
 
 @Controller('core/global-settings')
-@UseGuards(AuthGuard)
 export class GlobalSettingsController {
 
   constructor(private readonly prisma: PrismaService) {}
 
+  @Get('public')
+  async getPublicSettings() {
+    const settings = await this.prisma.client.globalSettings.findUnique({
+      where: { id: '1' }
+    });
+    
+    return {
+      platformName: settings?.platformName || DEFAULT_SETTINGS.platformName,
+      supportEmail: settings?.supportEmail || DEFAULT_SETTINGS.supportEmail,
+      helpCenterUrl: settings?.helpCenterUrl || DEFAULT_SETTINGS.helpCenterUrl,
+    };
+  }
+
   @Get()
+  @UseGuards(AuthGuard)
   async getSettings(@Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
@@ -27,6 +40,7 @@ export class GlobalSettingsController {
   }
 
   @Put()
+  @UseGuards(AuthGuard)
   async updateSettings(@Body() body: any, @Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
