@@ -57,6 +57,12 @@ export default function GlobalSettingsPage() {
   const [newFlagName, setNewFlagName] = useState('');
   const [newFlagDesc, setNewFlagDesc] = useState('');
 
+  // Manage Tenants State
+  const [tenants, setTenants] = useState<any[]>([]);
+  const [isManageTenantsModalOpen, setIsManageTenantsModalOpen] = useState(false);
+  const [selectedFlagForTenants, setSelectedFlagForTenants] = useState<FeatureFlag | null>(null);
+  const [tenantSearch, setTenantSearch] = useState('');
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -67,16 +73,18 @@ export default function GlobalSettingsPage() {
       setLoadingFlags(true);
       const { api } = await import('../../../lib/api');
       
-      const [maintenanceRes, announcementsRes, global, flagsRes] = await Promise.all([
+      const [maintenanceRes, announcementsRes, global, flagsRes, tenantsRes] = await Promise.all([
         api.getGlobalMaintenance(),
         api.getAnnouncements(),
         api.getGlobalSettings(),
-        api.getFeatureFlags()
+        api.getFeatureFlags(),
+        api.getTenants()
       ]);
       
       setMaintenanceMode(maintenanceRes.maintenanceMode);
       setAnnouncements(announcementsRes || []);
       setFlags(flagsRes || []);
+      setTenants(tenantsRes || []);
 
       if (global) {
         setPlatformName(global.platformName || 'Hosped');
@@ -206,10 +214,28 @@ export default function GlobalSettingsPage() {
     }
   };
 
+  const handleToggleTenantInFlag = async (tenantId: string) => {
+    if (!selectedFlagForTenants) return;
+    const currentIds = selectedFlagForTenants.tenantIds || [];
+    const isAdded = currentIds.includes(tenantId);
+    const newIds = isAdded ? currentIds.filter(id => id !== tenantId) : [...currentIds, tenantId];
+    
+    const updatedFlag = { ...selectedFlagForTenants, tenantIds: newIds };
+    setSelectedFlagForTenants(updatedFlag);
+    setFlags(flags.map(f => f.id === updatedFlag.id ? updatedFlag : f));
+    
+    try {
+      const { api } = await import('../../../lib/api');
+      await api.updateFeatureFlag(updatedFlag.id, updatedFlag);
+    } catch (err) {
+      toast.error('Erro ao atualizar tenants da flag');
+    }
+  };
+
   const filteredAnnouncements = announcements.filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()));
   const filteredFlags = flags.filter(f => f.name.toLowerCase().includes(searchTermFlags.toLowerCase()));
 
-  const getTypeStyle = (type: AnnouncementType) => {
+  const getTypeStyle = (type: any) => {
     switch (type) {
       case 'WARNING': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
       case 'SUCCESS': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
@@ -218,7 +244,7 @@ export default function GlobalSettingsPage() {
     }
   };
 
-  const getTypeIcon = (type: AnnouncementType) => {
+  const getTypeIcon = (type: any) => {
     switch (type) {
       case 'WARNING': return <AlertTriangle className="w-3 h-3" />;
       case 'SUCCESS': return <CheckCircle2 className="w-3 h-3" />;
@@ -247,8 +273,6 @@ export default function GlobalSettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        {/* Gateway de Pagamento */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -282,7 +306,6 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* Controle do Sistema */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -320,7 +343,6 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* Identidade Visual e E-mail */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
@@ -348,7 +370,6 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* Central de Anúncios */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -446,7 +467,6 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* Feature Flags */}
         <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6 md:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -512,10 +532,17 @@ export default function GlobalSettingsPage() {
 
                       <div className="flex items-center gap-6">
                         {!flag.isEnabled && (
-                          <div className="flex items-center gap-2 text-white/40 text-[11px] font-medium">
+                          <button
+                            onClick={() => {
+                              setSelectedFlagForTenants(flag);
+                              setTenantSearch('');
+                              setIsManageTenantsModalOpen(true);
+                            }}
+                            className="flex items-center gap-2 text-white/40 text-[11px] font-medium hover:text-white transition-colors p-1.5 -m-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
+                          >
                             <Users className="w-4 h-4" />
                             {flag.tenantIds?.length || 0} Tenants Liberados
-                          </div>
+                          </button>
                         )}
 
                         <div className="h-8 w-px bg-white/10 hidden md:block"></div>
@@ -551,10 +578,8 @@ export default function GlobalSettingsPage() {
             </div>
           </div>
         </div>
-
       </div>
 
-      {/* Modal Add Announcement */}
       <AnimatePresence>
         {isAddModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
@@ -571,7 +596,7 @@ export default function GlobalSettingsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Tipo de Anúncio</label>
-                  <select required value={newType} onChange={e => setNewType(e.target.value as AnnouncementType)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
+                  <select required value={newType} onChange={e => setNewType(e.target.value)} className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 cursor-pointer">
                     <option value="INFO">Informativo</option>
                     <option value="RELEASE_NOTES">Novidades / Release Notes</option>
                     <option value="WARNING">Aviso / Manutenção</option>
@@ -592,7 +617,6 @@ export default function GlobalSettingsPage() {
         )}
       </AnimatePresence>
 
-      {/* Modal Add Flag */}
       <AnimatePresence>
         {isAddFlagModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
@@ -616,6 +640,66 @@ export default function GlobalSettingsPage() {
                   <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-pink-500 hover:bg-pink-600 rounded-xl shadow-[0_0_20px_-5px_#ec4899] transition-colors">Cadastrar</button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isManageTenantsModalOpen && selectedFlagForTenants && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-lg max-h-[90vh] flex flex-col bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+              <button onClick={() => setIsManageTenantsModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="absolute top-0 left-0 w-full h-1 bg-pink-500" />
+              <h2 className="text-xl font-bold text-white mb-2">Gerenciar Tenants</h2>
+              <p className="text-[12px] text-white/40 mb-6">Flag: <span className="text-pink-400 font-mono font-bold">{selectedFlagForTenants.name}</span></p>
+
+              <div className="relative mb-6">
+                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                <input
+                  type="text"
+                  placeholder="Buscar hotel por nome ou ID..."
+                  value={tenantSearch}
+                  onChange={e => setTenantSearch(e.target.value)}
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-pink-500 transition-colors"
+                />
+              </div>
+
+              <div className="flex-1 overflow-y-auto min-h-[300px] border border-white/5 rounded-xl bg-white/[0.01]">
+                {tenants.filter(t => (t.name || '').toLowerCase().includes(tenantSearch.toLowerCase()) || (t.id || '').includes(tenantSearch)).map(tenant => {
+                  const isEnabled = (selectedFlagForTenants.tenantIds || []).includes(tenant.id);
+                  return (
+                    <div key={tenant.id} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
+                      <div>
+                        <p className="text-[13px] font-bold text-white">{tenant.name}</p>
+                        <p className="text-[10px] text-white/30 font-mono mt-0.5">{tenant.id}</p>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <div
+                          onClick={() => handleToggleTenantInFlag(tenant.id)}
+                          className={`w-10 h-5 rounded-full relative transition-colors ${isEnabled ? 'bg-pink-500' : 'bg-white/10'}`}
+                        >
+                          <motion.div
+                            layout
+                            className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] ${isEnabled ? 'left-[22px]' : 'left-[3px]'}`}
+                          />
+                        </div>
+                      </label>
+                    </div>
+                  );
+                })}
+                {tenants.filter(t => (t.name || '').toLowerCase().includes(tenantSearch.toLowerCase()) || (t.id || '').includes(tenantSearch)).length === 0 && (
+                  <div className="p-8 text-center text-[12px] text-white/30 uppercase tracking-widest font-bold">Nenhum tenant encontrado.</div>
+                )}
+              </div>
+
+              <div className="pt-6">
+                <button type="button" onClick={() => setIsManageTenantsModalOpen(false)} className="w-full py-3 text-[11px] uppercase font-bold text-white bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
+                  Fechar
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
