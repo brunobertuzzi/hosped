@@ -96,13 +96,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Floating Sidebar Hosped */}
-      <div className={`fixed md:relative inset-y-0 left-0 z-50 flex shrink-0 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} py-5 pl-5 pr-5 md:pr-0 w-[280px] md:w-auto`}>
-        <aside className="w-full md:w-64 glass-card border border-white/5 rounded-[24px] flex flex-col justify-between p-5 overflow-y-auto h-[calc(100vh-40px)] relative bg-[#0a0a0a] md:bg-transparent">
+      <div className={`fixed md:relative inset-y-0 left-0 z-50 flex shrink-0 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} py-3 pl-3 pr-3 md:pr-0 w-[280px] md:w-[260px]`}>
+        <aside className="w-full glass-card border border-white/5 rounded-[24px] flex flex-col justify-between p-4 overflow-y-auto h-[calc(100vh-24px)] relative bg-[#0a0a0a] md:bg-transparent">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
 
-          <div className="space-y-10 relative z-10">
+          <div className="space-y-4 relative z-10">
             {/* Logo e Info Hotel */}
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow-lg">
                 <img src={hotel.logo || '/placeholder-hotel.svg'} alt="logo" className="w-full h-full object-cover" />
               </div>
@@ -113,7 +113,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Branch Selector (Matriz/Filial) */}
-            <div className="mb-6 p-3 rounded-xl bg-brand/5 border border-brand/20 relative group">
+            <div className="mb-4 p-3 rounded-xl bg-brand/5 border border-brand/20 relative group">
               <div className="flex items-center gap-2 mb-1">
                 <MapPin className="w-3.5 h-3.5 text-brand" />
                 <span className="text-[9px] uppercase font-bold tracking-widest text-brand/70">Operação Local</span>
@@ -130,62 +130,62 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Navegação Admin */}
-            <nav className="space-y-1">
-              <Link href="/admin/dashboard" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/dashboard' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+            <nav className="space-y-0.5">
+              <Link href="/admin/dashboard" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/dashboard' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <LayoutDashboard className="w-4 h-4" /> Dashboard
               </Link>
-              <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+              <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <CalendarDays className="w-4 h-4" /> Controle de Reservas
               </Link>
-              <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+              <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <Users className="w-4 h-4" /> Cadastro de Hóspedes
               </Link>
-              <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+              <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                 <Calendar className="w-4 h-4" /> Mapa de Ocupação
               </Link>
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'MAINTENANCE'].includes(user.role) && (
-                <Link href="/admin/manutencao" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/manutencao' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                <Link href="/admin/manutencao" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/manutencao' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Wrench className="w-4 h-4" /> Manutenção
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'HOUSEKEEPING'].includes(user.role) && (
-                <Link href="/admin/governanca" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/governanca' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                <Link href="/admin/governanca" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/governanca' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Sparkles className="w-4 h-4" /> Governança
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'INVENTORY'].includes(user.role) && (
-                <Link href="/admin/estoque" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/estoque' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                <Link href="/admin/estoque" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/estoque' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Package className="w-4 h-4" /> Estoque & Consumos
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
-                <Link href="/admin/auditoria" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/auditoria' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                <Link href="/admin/auditoria" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/auditoria' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <ShieldCheck className="w-4 h-4" /> Histórico de Ações
                 </Link>
               )}
               {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
-                <div className="pt-6 mt-6 border-t border-white/5 space-y-1">
+                <div className="pt-4 mt-4 border-t border-white/5 space-y-0.5">
                   <span className="block px-3 text-[10px] uppercase font-bold tracking-widest text-white/30 mb-2">Setup & Gestão</span>
-                  <Link href="/admin/equipe" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/equipe' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Link href="/admin/equipe" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/equipe' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <Users className="w-4 h-4" /> Equipe (RH)
                   </Link>
-                  <Link href="/admin/quartos" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/quartos' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Link href="/admin/quartos" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/quartos' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <Building2 className="w-4 h-4" /> Quartos & Categorias
                   </Link>
-                  <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <DollarSign className="w-4 h-4" /> Financeiro
                   </Link>
-                  <Link href="/admin/integracoes" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/integracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Link href="/admin/integracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/integracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <CloudLightning className="w-4 h-4" /> Integrações
                   </Link>
-                  <Link href="/admin/configuracoes" className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/configuracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Link href="/admin/configuracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/configuracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                     <Settings className="w-4 h-4" /> Configurações
                   </Link>
                 </div>
               )}
 
-              <div className="pt-6 mt-6 border-t border-white/5">
-                <Link href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
+              <div className="pt-4 mt-4 border-t border-white/5">
+                <Link href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
                   <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
                 </Link>
               </div>
@@ -222,26 +222,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Subtle background glow element */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand/10 blur-[120px] rounded-full pointer-events-none" />
 
-        {/* Topbar Superior */}
-        <header className="h-[88px] flex items-center justify-between px-4 md:px-10 sticky top-0 z-30 shrink-0 bg-black/40 backdrop-blur-xl border-b border-white/[0.02]">
-          <div className="flex items-center gap-2 md:gap-3">
+        {/* Mobile Header (Hidden on Desktop) */}
+        <header className="md:hidden h-[64px] flex items-center justify-between px-4 sticky top-0 z-30 shrink-0 bg-[#0a0a0a] border-b border-white/5">
+          <div className="flex items-center gap-3">
             <button
-              className="md:hidden p-2 -ml-2 text-white/70 hover:text-white"
+              className="p-2 -ml-2 text-white/70 hover:text-white transition-colors"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <Menu className="w-6 h-6" />
             </button>
-          </div>
-
-          <div className="flex items-center gap-6">
-
-            {/* Status indicators */}
-
+            <span className="text-sm font-semibold tracking-tight text-white/90">{hotel.nome}</span>
           </div>
         </header>
 
         {/* View da Rota Ativa */}
-        <main className="flex-1 overflow-y-auto px-4 md:px-10 pb-10 relative z-0">
+        <main className="flex-1 overflow-y-auto px-4 md:px-10 pb-10 pt-6 md:pt-10 relative z-0">
           <div className="max-w-6xl mx-auto">
             {children}
           </div>
