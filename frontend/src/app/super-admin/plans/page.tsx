@@ -143,18 +143,13 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="p-8 space-y-8 pb-20 relative">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20 relative">
       {/* HEADER ESTATÍSTICAS / TÍTULO */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+      <div className="flex items-end justify-between border-b border-white/5 pb-6 relative z-10">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-inner">
-              <CreditCard className="w-5 h-5 text-purple-400" />
-            </div>
-            <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
-              Planos e Preços
-            </h1>
-          </div>
+          <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            Planos e Preços
+          </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">
             Gerencie as assinaturas, limites e os valores cobrados dos seus clientes (Hotéis).
           </p>
@@ -162,10 +157,10 @@ export default function PlansPage() {
 
         <button
           onClick={() => openModal()}
-          className="bg-white text-black hover:bg-white/90 font-bold py-3 px-6 rounded-xl text-sm transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-white/10"
+          className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_-5px_#6366f1] flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          <span>Novo Plano</span>
+          Novo Plano
         </button>
       </div>
 
