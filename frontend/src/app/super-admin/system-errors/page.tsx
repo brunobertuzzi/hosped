@@ -189,12 +189,16 @@ export default function SystemErrorsPage() {
                     </summary>
                     <div className="mt-3 bg-[#050505] border border-white/5 rounded-xl p-4 overflow-x-auto">
                       <pre className="text-[10px] text-white/50 font-mono leading-relaxed">
-                        {log.stackTrace.split('\n').map((line, i) => (
-                          <div key={i}>
-                            <span className="text-white/30 mr-2">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
-                            {line}
-                          </div>
-                        ))}
+                        {log.stackTrace.split('\n').map((line, i) => {
+                          const match = line.match(/([^\/\\()\s]+):(\d+):\d+\)?$/);
+                          const fileInfo = match ? `[${match[1]}:${match[2]}] ` : '';
+                          return (
+                            <div key={i}>
+                              <span className="text-white/30 mr-2">[{new Date(log.createdAt).toLocaleTimeString()}] {fileInfo}</span>
+                              {line}
+                            </div>
+                          );
+                        })}
                       </pre>
                     </div>
                   </details>

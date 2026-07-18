@@ -1,19 +1,22 @@
-import { Controller, Get, Post, Body, UseGuards, Request, UnauthorizedException, Put, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, UnauthorizedException, Put, Param, Delete, NotFoundException, Inject } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Controller('core/broadcast')
 @UseGuards(AuthGuard)
 export class BroadcastController {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
 
   @Get('maintenance')
   async getMaintenanceMode() {
-    const setting = await this.prisma.client.globalSettings.findUnique({
-      where: { key: 'maintenanceMode' },
-    });
-    return { maintenanceMode: setting?.value === 'true' };
+    const isMaintenance = await this.cacheManager.get('maintenanceMode');
+    return { maintenanceMode: isMaintenance === 'true' };
   }
 
   @Put('maintenance')
@@ -21,11 +24,8 @@ export class BroadcastController {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
     }
-    await this.prisma.client.globalSettings.upsert({
-      where: { key: 'maintenanceMode' },
-      create: { key: 'maintenanceMode', value: String(body.maintenanceMode) },
-      update: { value: String(body.maintenanceMode) },
-    });
+    // Set with no expiration (0) if supported, or very long time
+    await this.cacheManager.set('maintenanceMode', String(body.maintenanceMode), 0);
     return { success: true, maintenanceMode: body.maintenanceMode };
   }
 
