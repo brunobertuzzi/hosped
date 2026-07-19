@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   Building, Activity, Server, Users, DollarSign, 
-  Settings, LogOut, Hexagon, Terminal, Radio, ToggleLeft, Menu, X, Puzzle
+  Settings, LogOut, Hexagon, Terminal, Radio, ToggleLeft, Menu, X
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
 
@@ -92,10 +92,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
             <Link href="/super-admin/plans" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/plans' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
               <Settings className="w-4 h-4" /> Planos e Preços
-            </Link>
-
-            <Link href="/super-admin/modules" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/modules' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Puzzle className="w-4 h-4" /> Módulos por Tenant
             </Link>
 
             <Link href="/super-admin/invoices" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/invoices' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>

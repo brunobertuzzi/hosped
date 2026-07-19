@@ -131,9 +131,13 @@ export default function SuperAdminTenants() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isModulesModalOpen, setIsModulesModalOpen] = useState(false);
 
   // State
   const [editingClient, setEditingClient] = useState<SistemaClient | null>(null);
+  const [modulesClient, setModulesClient] = useState<SistemaClient | null>(null);
+  const [modulesClientModules, setModulesClientModules] = useState<string[]>([]);
+  const [modulesSaving, setModulesSaving] = useState(false);
   const [metricsLoading, setMetricsLoading] = useState(false);
   const [metricsData, setMetricsData] = useState<any>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
@@ -265,6 +269,43 @@ export default function SuperAdminTenants() {
       toast.error('Erro ao realizar impersonation. Talvez o hotel não tenha um dono configurado corretamente no banco.');
     } finally {
       setImpersonating(null);
+    }
+  };
+
+  const handleModulesOpen = async (client: SistemaClient) => {
+    setModulesClient(client);
+    try {
+      const tenants = await api.getTenants();
+      const fresh = tenants.find((t: any) => t.id === client.id);
+      setModulesClientModules(fresh?.enabledModules || fresh?.features || []);
+    } catch {
+      setModulesClientModules(client.features || []);
+    }
+    setIsModulesModalOpen(true);
+  };
+
+  const toggleModulesModule = (moduleId: string) => {
+    const mod = ALL_MODULES.find(m => m.id === moduleId);
+    if (mod?.defaultEnabled) return;
+    setModulesClientModules(prev =>
+      prev.includes(moduleId)
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
+
+  const handleModulesSave = async () => {
+    if (!modulesClient) return;
+    setModulesSaving(true);
+    try {
+      await api.updateTenantModules(modulesClient.id, modulesClientModules);
+      toast.success(`Módulos de "${modulesClient.name}" atualizados!`);
+      await fetchClients();
+      setIsModulesModalOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao salvar módulos.');
+    } finally {
+      setModulesSaving(false);
     }
   };
 
@@ -409,6 +450,13 @@ export default function SuperAdminTenants() {
                         className="px-3 py-1.5 bg-white/5 hover:bg-amber-500/20 border border-white/10 hover:border-amber-500/50 rounded-lg text-[10px] uppercase font-bold tracking-widest text-white/60 hover:text-amber-400 transition-colors flex items-center gap-1.5"
                       >
                         <BarChart2 className="w-3 h-3" /> Métricas
+                      </button>
+
+                      <button
+                        onClick={() => handleModulesOpen(client)}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-purple-500/20 border border-white/10 hover:border-purple-500/50 rounded-lg text-[10px] uppercase font-bold tracking-widest text-white/60 hover:text-purple-400 transition-colors flex items-center gap-1.5"
+                      >
+                        <Puzzle className="w-3 h-3" /> Módulos
                       </button>
 
                       <button
@@ -694,6 +742,52 @@ export default function SuperAdminTenants() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Modules */}
+      <AnimatePresence>
+        {isModulesModalOpen && modulesClient && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+              <button onClick={() => setIsModulesModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white z-10">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="absolute top-0 left-0 w-full h-1 bg-purple-500" />
+              <h2 className="text-xl font-bold text-white mb-1">Gerenciar Módulos</h2>
+              <p className="text-[13px] text-white/50 mb-6 font-mono">{modulesClient.name}</p>
+
+              <ModuleGrid
+                modules={ALL_MODULES}
+                enabledModules={modulesClientModules}
+                onToggle={toggleModulesModule}
+              />
+
+              <p className="text-[10px] text-white/30 mt-2 mb-6 leading-relaxed">
+                Módulos com <span className="text-emerald-400 font-bold">Sempre Ativo</span> são obrigatórios e não podem ser desabilitados.
+                Novos módulos adicionados em <code className="text-indigo-400">modules.ts</code> aparecem aqui automaticamente.
+              </p>
+
+              <div className="flex gap-3 pt-4 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setIsModulesModalOpen(false)}
+                  className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleModulesSave}
+                  disabled={modulesSaving}
+                  className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-purple-500 hover:bg-purple-600 rounded-xl shadow-[0_0_20px_-5px_#a855f7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {modulesSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  Salvar Módulos
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
