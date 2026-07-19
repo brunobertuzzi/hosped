@@ -373,7 +373,7 @@ export default function PlansPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass-panel w-full max-w-md relative z-10 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[90vh]"
+              className="glass-panel w-full max-w-2xl relative z-10 rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[90vh]"
             >
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
