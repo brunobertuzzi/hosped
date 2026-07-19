@@ -27,6 +27,8 @@ export default function InvoicesPage() {
   const [loadingPayment, setLoadingPayment] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'FATURAS' | 'WEBHOOKS'>('FATURAS');
+  const [selectedHotelId, setSelectedHotelId] = useState<string>('');
+  const [lastGeneration, setLastGeneration] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -93,19 +95,6 @@ export default function InvoicesPage() {
     }
   };
 
-  const handleGenerateInvoice = async (hotelId: string) => {
-    setLoadingAction(hotelId);
-    try {
-      await api.generateInvoice(hotelId);
-      toast.success('Fatura gerada!');
-      await fetchData();
-    } catch {
-      toast.error('Erro ao gerar fatura.');
-    } finally {
-      setLoadingAction(null);
-    }
-  };
-
   const handleGenerateAll = async () => {
     setLoadingAction('all');
     try {
@@ -140,6 +129,21 @@ export default function InvoicesPage() {
       await fetchData();
     } catch {
       toast.error('Erro ao sincronizar.');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleGenerateForHotel = async () => {
+    if (!selectedHotelId) return toast.error('Selecione um hotel.');
+    setLoadingAction('hotel');
+    try {
+      await api.generateInvoice(selectedHotelId);
+      toast.success('Fatura gerada!');
+      setLastGeneration(new Date().toLocaleString('pt-BR'));
+      await fetchData();
+    } catch {
+      toast.error('Erro ao gerar fatura.');
     } finally {
       setLoadingAction(null);
     }
@@ -220,21 +224,55 @@ export default function InvoicesPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 border-b border-white/10 pb-px">
-        <button
-          onClick={() => setActiveTab('FATURAS')}
-          className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'FATURAS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
-        >
-          Faturas
-          {activeTab === 'FATURAS' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full" />}
-        </button>
-        <button
-          onClick={() => setActiveTab('WEBHOOKS')}
-          className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'WEBHOOKS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
-        >
-          Gateway Webhooks (Logs)
-          {activeTab === 'WEBHOOKS' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full" />}
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex gap-4 border-b border-white/10 pb-px">
+          <button
+            onClick={() => setActiveTab('FATURAS')}
+            className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'FATURAS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
+          >
+            Faturas
+            {activeTab === 'FATURAS' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full" />}
+          </button>
+          <button
+            onClick={() => setActiveTab('WEBHOOKS')}
+            className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'WEBHOOKS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
+          >
+            Gateway Webhooks (Logs)
+            {activeTab === 'WEBHOOKS' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full" />}
+          </button>
+        </div>
+
+        {activeTab === 'FATURAS' && (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedHotelId}
+                onChange={e => setSelectedHotelId(e.target.value)}
+                className="bg-[#111] border border-white/10 rounded-xl px-3 py-2 text-[12px] text-white outline-none focus:border-indigo-500 cursor-pointer min-w-[200px]"
+              >
+                <option value="">Selecionar hotel...</option>
+                {tenants.map((t: any) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name || t.nome}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleGenerateForHotel}
+                disabled={!selectedHotelId || loadingAction === 'hotel'}
+                className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl border border-white/10 transition-all flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {loadingAction === 'hotel' ? <Loader2 className="w-3 h-3 animate-spin" /> : <PlusCircle className="w-3 h-3" />}
+                Gerar Fatura
+              </button>
+            </div>
+            {lastGeneration && (
+              <span className="text-[10px] text-white/30 font-medium whitespace-nowrap">
+                Última geração: {lastGeneration}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6">
@@ -316,14 +354,6 @@ export default function InvoicesPage() {
                                 </button>
                               </>
                             )}
-                            <button
-                              onClick={() => handleGenerateInvoice(inv.hotelId || inv.tenantId)}
-                              disabled={loadingAction === (inv.hotelId || inv.tenantId)}
-                              className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] uppercase font-bold tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
-                            >
-                              {loadingAction === (inv.hotelId || inv.tenantId) ? <Loader2 className="w-3 h-3 animate-spin" /> : <PlusCircle className="w-3 h-3" />}
-                              Nova
-                            </button>
                           </div>
                         </td>
                       </tr>
