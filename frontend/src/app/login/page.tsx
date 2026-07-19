@@ -154,8 +154,8 @@ export default function LoginPage() {
           <span>Criptografia Ponta a Ponta</span>
         </div>
         <div className="text-center mt-4">
-          <a href="/register" className="text-[11px] font-medium text-indigo-400/70 hover:text-indigo-300 transition-colors">
-            Não tem conta? <span className="font-bold underline">Cadastre-se</span>
+          <a href="/" className="text-[11px] font-medium text-indigo-400/70 hover:text-indigo-300 transition-colors">
+            Não tem conta? <span className="font-bold underline">Assine Agora</span>
           </a>
         </div>
       </motion.div>

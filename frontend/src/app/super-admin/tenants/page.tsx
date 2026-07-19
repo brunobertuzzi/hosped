@@ -5,13 +5,115 @@ import { useRouter } from 'next/navigation';
 import { useSuperAdminStore, SistemaClient, TenantPlan, TenantStatus } from '../../../store/useSuperAdminStore';
 import {
   Building, Search, Plus, ShieldAlert, CheckCircle2,
-  Ban, CreditCard, Edit, LogIn, BarChart2, Loader2, X, Trash2
+  Ban, CreditCard, Edit, LogIn, BarChart2, Loader2, X, Trash2,
+  Puzzle, LayoutDashboard, Calendar, Users, Building2,
+  Sparkles, Wrench, Package, DollarSign, CloudLightning,
+  Palette, Globe, Landmark, ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../../lib/api';
 import { formatCNPJ } from '../../../lib/masks';
 import { toast } from 'sonner';
-import { PREMIUM_MODULES } from '../../../lib/modules';
+import { PREMIUM_MODULES, ALL_MODULES } from '../../../lib/modules';
+
+// Mapa de ícones (Lucide) por nome de string
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  LayoutDashboard, Calendar, Users, Building2, Sparkles, Wrench,
+  Package, DollarSign, CloudLightning, Palette, Globe, Landmark, ShieldCheck,
+};
+
+function ModuleIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICON_MAP[name] || Puzzle;
+  return <Icon className={className} />;
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  core: 'Núcleo',
+  operations: 'Operacional',
+  commercial: 'Comercial',
+  advanced: 'Avançado',
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  core: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  operations: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  commercial: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+  advanced: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+};
+
+const CATEGORY_ORDER = ['core', 'operations', 'commercial', 'advanced'];
+
+function ModuleGrid({ modules, enabledModules, onToggle }: {
+  modules: typeof ALL_MODULES;
+  enabledModules: string[];
+  onToggle: (moduleId: string) => void;
+}) {
+  const modulesByCategory = modules.reduce<Record<string, typeof ALL_MODULES>>((acc, mod) => {
+    if (!acc[mod.category]) acc[mod.category] = [];
+    acc[mod.category].push(mod);
+    return acc;
+  }, {});
+
+  return (
+    <>
+      {CATEGORY_ORDER.map(category => {
+        const mods = modulesByCategory[category] || [];
+        if (!mods.length) return null;
+        return (
+          <div key={category} className="mb-4">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest mb-2 ${CATEGORY_COLORS[category] || 'text-white/40 bg-white/5 border-white/10'}`}>
+              {CATEGORY_LABELS[category] || category}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {mods.map(mod => {
+                const isDefault = mod.defaultEnabled;
+                const isEnabled = isDefault || enabledModules.includes(mod.id);
+                return (
+                  <button
+                    key={mod.id}
+                    type="button"
+                    onClick={() => onToggle(mod.id)}
+                    disabled={isDefault}
+                    className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                      isDefault
+                        ? 'bg-white/[0.02] border-white/5 cursor-default opacity-60'
+                        : isEnabled
+                        ? 'bg-indigo-500/10 border-indigo-500/30 hover:border-indigo-500/50'
+                        : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04] hover:border-white/10'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      isEnabled ? 'bg-indigo-500/20' : 'bg-white/5'
+                    }`}>
+                      <ModuleIcon name={mod.icon} className={`w-4 h-4 ${isEnabled ? 'text-indigo-400' : 'text-white/30'}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[11px] font-bold ${isEnabled ? 'text-white' : 'text-white/50'}`}>
+                          {mod.label}
+                        </span>
+                        {isDefault && (
+                          <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                            Sempre Ativo
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                      isEnabled ? 'bg-indigo-500 border-indigo-500' : 'border-white/20 bg-transparent'
+                    }`}>
+                      {isEnabled && <CheckCircle2 className="w-2.5 h-2.5 text-white" />}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
 
 export default function SuperAdminTenants() {
   const router = useRouter();
@@ -50,6 +152,7 @@ export default function SuperAdminTenants() {
   const [editEmail, setEditEmail] = useState('');
   const [editMrr, setEditMrr] = useState(0);
   const [editStatus, setEditStatus] = useState<TenantStatus>('ACTIVE');
+  const [editModules, setEditModules] = useState<string[]>([]);
 
   // Usa o registry centralizado — adicionar módulos em modules.ts os expõe aqui automaticamente
   const AVAILABLE_FEATURES = PREMIUM_MODULES;
@@ -116,7 +219,18 @@ export default function SuperAdminTenants() {
     setEditEmail(client.email);
     setEditMrr(client.mrr);
     setEditStatus(client.status);
+    setEditModules(client.enabledModules || client.features || []);
     setIsEditModalOpen(true);
+  };
+
+  const toggleEditModule = (moduleId: string) => {
+    const mod = ALL_MODULES.find(m => m.id === moduleId);
+    if (mod?.defaultEnabled) return; // módulos default não podem ser desativados
+    setEditModules(prev =>
+      prev.includes(moduleId)
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
   };
 
   const handleEditSave = async (e: React.FormEvent) => {
@@ -133,14 +247,8 @@ export default function SuperAdminTenants() {
       if (editStatus !== editingClient.status) {
         await api.updateTenantStatus(editingClient.id, editStatus);
       }
-      // Auto-propaga módulos do novo plano ao trocar
-      if (editPlan !== editingClient.plan) {
-        const plans = await api.getSystemPlans();
-        const planData = plans.find((p: any) => p.name === editPlan);
-        if (planData?.modules?.length) {
-          await api.updateTenantModules(editingClient.id, planData.modules);
-        }
-      }
+      // Salva módulos
+      await api.updateTenantModules(editingClient.id, editModules);
       await fetchClients();
       setIsEditModalOpen(false);
     } catch (err) {
@@ -388,7 +496,10 @@ export default function SuperAdminTenants() {
       <AnimatePresence>
         {isEditModalOpen && editingClient && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+              <button onClick={() => setIsEditModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white z-10">
+                <X className="w-5 h-5" />
+              </button>
               <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500" />
               <h2 className="text-xl font-bold text-white mb-2">Editar Tenant</h2>
               <p className="text-[11px] text-white/40 mb-6 font-mono">ID: {editingClient.id}</p>
@@ -436,17 +547,17 @@ export default function SuperAdminTenants() {
                 </div>
 
                 <div className="border-t border-white/5 pt-4">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Módulos do Sistema</label>
-                    <a
-                      href="/super-admin/modules"
-                      className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 underline underline-offset-2 transition-colors"
-                    >
-                      Gerenciar na página de Módulos →
-                    </a>
-                  </div>
-                  <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
-                    Ao trocar de plano, os módulos do novo plano são aplicados automaticamente.
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Módulos do Sistema</label>
+
+                  {/* Categorias de módulos */}
+                  <ModuleGrid
+                    modules={ALL_MODULES}
+                    enabledModules={editModules}
+                    onToggle={toggleEditModule}
+                  />
+
+                  <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
+                    Módulos com <span className="text-emerald-400 font-bold">Sempre Ativo</span> são obrigatórios e não podem ser desabilitados.
                   </p>
                 </div>
 
