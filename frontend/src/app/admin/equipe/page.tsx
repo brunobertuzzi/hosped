@@ -3,12 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import {
   Users, Shield, Plus, MoreVertical,
-  UserCheck, UserX, Mail, Key, XCircle
+  UserCheck, UserX, Mail, Key, XCircle, CheckCircle2,
+  LayoutDashboard, CalendarDays, Building2, DollarSign,
+  Sparkles, Wrench, Package, Calendar, Globe,
+  CloudLightning, Settings, CreditCard, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
 import { toast } from 'sonner';
+import { PAGE_PERMISSIONS, PERMISSION_CATEGORIES, getDefaultPermissions } from '../../../lib/permissions';
+
+const PERM_ICONS: Record<string, React.ComponentType<any>> = {
+  LayoutDashboard, CalendarDays, Users, Building2, DollarSign,
+  Sparkles, Wrench, Package, Calendar, Globe, CloudLightning,
+  Settings, CreditCard, Shield,
+};
 
 export default function EquipePage() {
   const { users, addAuditLog, user: currentUser } = useActiveBranchData();
@@ -17,6 +27,7 @@ export default function EquipePage() {
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserRole, setNewUserRole] = useState('RECEPTIONIST');
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
 
   useEffect(() => {
     api.getTeam().catch(err => console.error("Erro ao buscar time do backend:", err));
@@ -36,14 +47,32 @@ export default function EquipePage() {
       setNewUserName(user.nome);
       setNewUserEmail(user.email);
       setNewUserRole(user.role);
+      setUserPermissions(user.permissions || getDefaultPermissions(user.role));
     } else {
       setEditingUserId(null);
       setNewUserName('');
       setNewUserEmail('');
       setNewUserRole('RECEPTIONIST');
+      setUserPermissions(getDefaultPermissions('RECEPTIONIST'));
     }
     setIsModalOpen(true);
   };
+
+  const handleRoleChange = (role: string) => {
+    setNewUserRole(role);
+    // Auto-preenche permissões padrão da role ao trocar
+    setUserPermissions(getDefaultPermissions(role));
+  };
+
+  const togglePermission = (permKey: string) => {
+    setUserPermissions(prev =>
+      prev.includes(permKey)
+        ? prev.filter(p => p !== permKey)
+        : [...prev, permKey]
+    );
+  };
+
+  const isOwner = newUserRole === 'HOTEL_OWNER';
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +84,7 @@ export default function EquipePage() {
           nome: newUserName,
           email: newUserEmail,
           role: newUserRole,
+          permissions: isOwner ? ['*'] : userPermissions,
         });
 
         addAuditLog({
@@ -71,7 +101,8 @@ export default function EquipePage() {
           nome: newUserName,
           email: newUserEmail,
           role: newUserRole,
-          password: tempPassword
+          password: tempPassword,
+          permissions: isOwner ? ['*'] : userPermissions,
         });
 
         toast.success(`Funcionário criado! Senha temporária: ${tempPassword}`, { duration: 8000 });
@@ -166,7 +197,11 @@ export default function EquipePage() {
                   <Mail className="w-4 h-4 text-white/20" /> {u.email}
                 </div>
                 <div className="flex items-center gap-3 text-[12px] text-white/50">
-                  <Shield className="w-4 h-4 text-white/20" /> Acesso Base Restrito
+                  <Shield className="w-4 h-4 text-white/20" />
+                  {u.permissions?.includes('*')
+                    ? 'Acesso Total (Admin)'
+                    : `${u.permissions?.length || 0} páginas liberadas`
+                  }
                 </div>
               </div>
 
@@ -224,10 +259,76 @@ export default function EquipePage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Papel / Função</label>
-                    <select value={newUserRole} onChange={e => setNewUserRole(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
+                    <select value={newUserRole} onChange={e => handleRoleChange(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
                       {roles.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
                     </select>
                   </div>
+
+                  {/* Permissões por Página */}
+                  {!isOwner ? (
+                    <div className="border-t border-white/5 pt-4">
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">
+                        Páginas que este funcionário pode acessar
+                      </label>
+                      <div className="space-y-4 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
+                        {(['business', 'setup', 'settings'] as const).map(category => {
+                          const perms = PAGE_PERMISSIONS.filter(p => p.category === category);
+                          if (!perms.length) return null;
+                          return (
+                            <div key={category}>
+                              <p className="text-[9px] uppercase font-bold tracking-widest text-white/30 mb-2">
+                                {PERMISSION_CATEGORIES[category]}
+                              </p>
+                              <div className="space-y-1.5">
+                                {perms.map(perm => {
+                                  const isEnabled = userPermissions.includes(perm.key);
+                                  const PermIcon = PERM_ICONS[perm.icon as keyof typeof PERM_ICONS] || Shield;
+                                  return (
+                                    <label
+                                      key={perm.key}
+                                      onClick={() => togglePermission(perm.key)}
+                                      className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                                        isEnabled
+                                          ? 'bg-indigo-500/10 border-indigo-500/30'
+                                          : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04]'
+                                      }`}
+                                    >
+                                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                                        isEnabled ? 'bg-indigo-500/20' : 'bg-white/5'
+                                      }`}>
+                                        <PermIcon className={`w-3.5 h-3.5 ${isEnabled ? 'text-indigo-400' : 'text-white/30'}`} />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <span className={`text-[11px] font-bold ${isEnabled ? 'text-white' : 'text-white/50'}`}>
+                                          {perm.label}
+                                        </span>
+                                        <p className="text-[9px] text-white/30 leading-tight mt-0.5">{perm.description}</p>
+                                      </div>
+                                      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                                        isEnabled ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'
+                                      }`}>
+                                        {isEnabled && <CheckCircle2 className="w-2.5 h-2.5 text-white" />}
+                                      </div>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-t border-white/5 pt-4">
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                        <Shield className="w-5 h-5 text-amber-400 shrink-0" />
+                        <div>
+                          <p className="text-[12px] font-bold text-amber-400">Acesso Total</p>
+                          <p className="text-[10px] text-white/40">Administradores têm acesso a todas as páginas do sistema.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">

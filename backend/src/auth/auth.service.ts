@@ -151,7 +151,7 @@ export class AuthService {
         },
       });
 
-      // 2. Criar Primeira Filial (Branch)
+      // 2. Criar Primeira Filial (Branch) — Se for trial, não criar branch com status
       const branch = await tx.branch.create({
         data: {
           hotelId: hotel.id,
@@ -161,9 +161,25 @@ export class AuthService {
           estado: 'EX',
           telefone: '00000000000',
           email: email,
-          status: 'ACTIVE',
+          ...(data.isTrial ? {} : { status: 'ACTIVE' }),
         },
       });
+
+      // Se for trial, configurar trialEndsAt
+      if (data.isTrial) {
+        const trialDays = data.trialDays || 14;
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + trialDays);
+        await tx.hotel.update({
+          where: { id: hotel.id },
+          data: {
+            status: 'ACTIVE',
+            trialEndsAt: trialEnd,
+            nextBillingDate: trialEnd,
+            mrr: 0,
+          },
+        });
+      }
 
       // 3. Criar Owner
       const user = await tx.user.create({
@@ -293,6 +309,7 @@ export class AuthService {
         role: true,
         status: true,
         branchId: true,
+        permissions: true,
       },
     });
   }
@@ -302,7 +319,7 @@ export class AuthService {
     branchId: string | undefined,
     data: any,
   ) {
-    const { nome, email, password, role } = data;
+    const { nome, email, password, role, permissions } = data;
     const exists = await this.prisma.client.user.findUnique({
       where: { email },
     });
@@ -330,6 +347,7 @@ export class AuthService {
         email,
         password: hashedPassword,
         role: role || 'RECEPTIONIST',
+        permissions: permissions || [],
         status: 'ATIVO',
       },
       select: {
@@ -339,6 +357,7 @@ export class AuthService {
         role: true,
         status: true,
         branchId: true,
+        permissions: true,
       },
     });
   }
@@ -375,6 +394,7 @@ export class AuthService {
         nome: data.nome,
         email: data.email,
         role: data.role,
+        permissions: data.permissions,
       },
       select: {
         id: true,
@@ -383,6 +403,7 @@ export class AuthService {
         role: true,
         status: true,
         branchId: true,
+        permissions: true,
       },
     });
   }

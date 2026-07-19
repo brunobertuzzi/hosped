@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       await api.login(loginEmail, loginPassword);
-      
+
       const user = useTenantStore.getState().user;
       useTenantStore.getState().addAuditLog({
         id: 'a_' + Date.now(),
@@ -60,13 +60,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-black font-sans selection:bg-white/20">
-      
+
       {/* Background Cinematographic Lighting */}
       <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-white/[0.03] rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.015] pointer-events-none mix-blend-overlay"></div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -88,8 +88,8 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">E-mail</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={loginEmail}
                 onChange={e => setLoginEmail(e.target.value)}
                 placeholder="nome@hotel.com"
@@ -106,8 +106,8 @@ export default function LoginPage() {
                   Esqueci minha senha
                 </a>
               </div>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={loginPassword}
                 onChange={e => setLoginPassword(e.target.value)}
                 placeholder="••••••••"
@@ -119,7 +119,7 @@ export default function LoginPage() {
 
             <AnimatePresence mode="wait">
               {loginError && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
@@ -133,7 +133,7 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
-            <button 
+            <button
               type="submit"
               disabled={loading}
               className="w-full bg-white text-black hover:bg-white/90 font-bold py-3.5 px-4 rounded-xl text-[13px] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 mt-4 flex items-center justify-center gap-2"
@@ -146,12 +146,17 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
-        
+
         {/* Footer info */}
-        <div className="text-center mt-8 text-[11px] font-medium text-white/30 flex items-center justify-center gap-4">
+        <div className="text-center mt-6 text-[11px] font-medium text-white/30 flex items-center justify-center gap-4">
           <span>Sistema Seguro</span>
           <span className="w-1 h-1 rounded-full bg-white/20"></span>
           <span>Criptografia Ponta a Ponta</span>
+        </div>
+        <div className="text-center mt-4">
+          <a href="/register" className="text-[11px] font-medium text-indigo-400/70 hover:text-indigo-300 transition-colors">
+            Não tem conta? <span className="font-bold underline">Cadastre-se grátis</span>
+          </a>
         </div>
       </motion.div>
     </div>

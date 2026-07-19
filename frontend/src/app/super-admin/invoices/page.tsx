@@ -33,7 +33,7 @@ export default function InvoicesPage() {
   const filteredInvoices = invoices.filter(inv => {
     const client = sistemaClients.find(c => c.id === inv.tenantId);
     if (!client) return false;
-    return client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    return client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
            client.document.includes(searchTerm);
   });
 
@@ -48,6 +48,7 @@ export default function InvoicesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <DollarSign className="w-7 h-7 text-indigo-400" />
             Faturas e Integração de Pagamentos
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de pagamentos de assinaturas e eventos do Gateway (Stripe/Asaas).</p>
@@ -55,15 +56,15 @@ export default function InvoicesPage() {
       </div>
 
       <div className="flex gap-4 border-b border-white/10 pb-px">
-        <button 
-          onClick={() => setActiveTab('FATURAS')} 
+        <button
+          onClick={() => setActiveTab('FATURAS')}
           className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'FATURAS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
         >
           Faturas
           {activeTab === 'FATURAS' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 rounded-t-full" />}
         </button>
-        <button 
-          onClick={() => setActiveTab('WEBHOOKS')} 
+        <button
+          onClick={() => setActiveTab('WEBHOOKS')}
           className={`pb-3 text-sm font-bold uppercase tracking-widest transition-colors relative ${activeTab === 'WEBHOOKS' ? 'text-indigo-400' : 'text-white/40 hover:text-white/70'}`}
         >
           Gateway Webhooks (Logs)
@@ -75,9 +76,9 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Buscar por cliente ou CNPJ..." 
+            <input
+              type="text"
+              placeholder="Buscar por cliente ou CNPJ..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500 transition-colors"
@@ -120,7 +121,7 @@ export default function InvoicesPage() {
                       </td>
                       <td className="py-4 px-4 text-right">
                         {inv.status !== 'PAID' ? (
-                          <button 
+                          <button
                             onClick={() => handleSimulatePayment(inv.tenantId)}
                             disabled={loadingPayment === inv.tenantId}
                             className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-[10px] uppercase font-bold tracking-widest text-white transition-colors flex items-center justify-end ml-auto gap-1.5 disabled:opacity-50"

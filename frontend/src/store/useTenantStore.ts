@@ -15,7 +15,10 @@ const INITIAL_HOTEL = {
   layout: { font: 'sans', heroVariant: 'standard' },
   webhooks: { onReservationComplete: '', onCheckIn: '' },
   localInfos: { checkInTime: '14:00', checkOutTime: '12:00', timezone: 'America/Sao_Paulo' },
-  enabledModules: []
+  enabledModules: [] as string[],
+  plan: 'STARTUP' as string,
+  mrr: 0 as number,
+  status: 'ACTIVE' as string,
 };
 
 const INITIAL_ROOM_CATEGORIES: any[] = [];

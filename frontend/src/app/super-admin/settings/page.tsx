@@ -72,7 +72,7 @@ export default function GlobalSettingsPage() {
       setLoadingAnnouncements(true);
       setLoadingFlags(true);
       const { api } = await import('../../../lib/api');
-      
+
       const [maintenanceRes, announcementsRes, global, flagsRes, tenantsRes] = await Promise.all([
         api.getGlobalMaintenance(),
         api.getAnnouncements(),
@@ -80,7 +80,7 @@ export default function GlobalSettingsPage() {
         api.getFeatureFlags(),
         api.getTenants()
       ]);
-      
+
       setMaintenanceMode(maintenanceRes.maintenanceMode);
       setAnnouncements(announcementsRes || []);
       setFlags(flagsRes || []);
@@ -219,11 +219,11 @@ export default function GlobalSettingsPage() {
     const currentIds = selectedFlagForTenants.tenantIds || [];
     const isAdded = currentIds.includes(tenantId);
     const newIds = isAdded ? currentIds.filter(id => id !== tenantId) : [...currentIds, tenantId];
-    
+
     const updatedFlag = { ...selectedFlagForTenants, tenantIds: newIds };
     setSelectedFlagForTenants(updatedFlag);
     setFlags(flags.map(f => f.id === updatedFlag.id ? updatedFlag : f));
-    
+
     try {
       const { api } = await import('../../../lib/api');
       await api.updateFeatureFlag(updatedFlag.id, updatedFlag);
@@ -258,6 +258,7 @@ export default function GlobalSettingsPage() {
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <Settings className="w-7 h-7 text-indigo-400" />
             Configurações Globais
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Gateway de pagamento, white label, manutenção e anúncios.</p>

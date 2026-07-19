@@ -89,6 +89,11 @@ enum InvoiceStatus {
   CANCELADO
 }
 
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
 enum AnnouncementType {
   INFO
   WARNING
@@ -114,9 +119,13 @@ model Hotel {
   slug                 String?   @unique
 
   plan                 String    @default("STARTUP")
+  billingCycle         BillingCycle @default(MONTHLY)
   status               String    @default("ACTIVE")
   mrr                  Float     @default(150.0)
   nextBillingDate      DateTime?
+  trialEndsAt          DateTime?
+  downgradeToPlan      String?   // Plano para downgrade automático se não pagar
+  lastInvoiceId        String?   // Última fatura gerada
 
   storageUsedMB        Float     @default(0)
   storageLimitMB       Float     @default(1024)
@@ -151,6 +160,8 @@ model Hotel {
   webhookEvents  WebhookEvent[]
   icalSyncs      IcalSync[]
   systemInvoices SystemInvoice[]
+  hotelAddons    HotelAddon[]
+  billingLogs    BillingLog[]
 }
 
 model Branch {
@@ -583,21 +594,27 @@ model SystemPlan {
 }
 
 model SystemInvoice {
-  id          String        @id @default(uuid())
-  hotelId     String        @map("hotel_id")
-  amount      Decimal       @db.Decimal(10, 2)
-  status      InvoiceStatus @default(PENDENTE)
-  dueDate     DateTime
-  paidAt      DateTime?
-  periodStart DateTime?
-  periodEnd   DateTime?
-  paymentLink String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id               String        @id @default(uuid())
+  hotelId          String        @map("hotel_id")
+  amount           Decimal       @db.Decimal(10, 2)
+  status           InvoiceStatus @default(PENDENTE)
+  dueDate          DateTime
+  paidAt           DateTime?
+  periodStart      DateTime?
+  periodEnd        DateTime?
+  paymentMethod    String?       // "PIX", "CREDIT_CARD", "BOLETO"
+  gatewayPaymentId String?       // ID no gateway (Mercado Pago, Stripe, Asaas)
+  paymentLink      String?       // Link de pagamento (boleto/PIX)
+  attemptCount     Int           @default(0) // Tentativas de cobrança
+  lastAttemptAt    DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
 
   @@index([hotelId])
+  @@index([status])
+  @@index([dueDate])
 }
 
 model FeatureFlag {
@@ -627,5 +644,68 @@ model GlobalSettings {
   platformName    String @default("Hosped")
   supportEmail    String @default("suporte@hosped.com")
   helpCenterUrl   String @default("/guia")
+}
+
+/// Cupom de desconto para assinatura
+model Coupon {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  description String?
+  discountPercent Int  @default(0) // 0-100
+  discountFixed Decimal? @db.Decimal(10, 2) // Valor fixo, se aplicável
+  maxUses     Int      @default(0) // 0 = ilimitado
+  usedCount   Int      @default(0)
+  validFrom   DateTime @default(now())
+  validUntil  DateTime?
+  isActive    Boolean  @default(true)
+  targetPlans String[] // Vazio = todos os planos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Add-on pago avulso (ex: "Channel Manager", "IA Assistant")
+model Addon {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  moduleKey   String   @unique // Chave do módulo no SYSTEM_MODULES (ex: "CHANNEL_MANAGER")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  hotelAddons HotelAddon[]
+}
+
+/// Add-ons contratados por um hotel específico
+model HotelAddon {
+  id          String   @id @default(uuid())
+  hotelId     String   @map("hotel_id")
+  addonId     String   @map("addon_id")
+  price       Decimal  @db.Decimal(10, 2) // Preço contratado (pode ser diferente do atual)
+  isActive    Boolean  @default(true)
+  addedAt     DateTime @default(now())
+  removedAt   DateTime?
+
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  addon Addon @relation(fields: [addonId], references: [id])
+
+  @@unique([hotelId, addonId])
+  @@index([hotelId])
+}
+
+/// Log de eventos de faturamento (cobranças, tentativas, erros)
+model BillingLog {
+  id        String   @id @default(uuid())
+  hotelId   String   @map("hotel_id")
+  event     String   // "INVOICE_CREATED", "PAYMENT_ATTEMPT", "PAYMENT_SUCCESS", "PAYMENT_FAILED", "SUSPENDED", "REACTIVATED", "UPGRADED", "DOWNGRADED", "TRIAL_STARTED", "TRIAL_ENDED"
+  detail    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([hotelId])
+  @@index([createdAt])
 }
 

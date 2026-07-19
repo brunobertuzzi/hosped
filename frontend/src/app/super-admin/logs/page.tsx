@@ -90,6 +90,7 @@ export default function SystemLogsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <Terminal className="w-7 h-7 text-indigo-400" />
             Logs de Auditoria
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Console em tempo real de eventos em todas as redes (Tenants).</p>

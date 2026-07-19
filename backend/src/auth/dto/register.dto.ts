@@ -5,27 +5,28 @@ import {
   MinLength,
   IsOptional,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
-  companyName: string;
+  companyName!: string;
 
   @IsString()
   @IsNotEmpty()
-  companyDoc: string;
+  companyDoc!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @IsNotEmpty()
-  userName: string;
+  userName!: string;
 
   @IsString()
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
-  password: string;
+  password!: string;
 
   @IsString()
   @IsOptional()
@@ -37,4 +38,16 @@ export class RegisterDto {
 
   @IsOptional()
   paymentData?: any;
+
+  @IsBoolean()
+  @IsOptional()
+  isTrial?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  trialDays?: number;
+
+  @IsString()
+  @IsOptional()
+  couponCode?: string;
 }

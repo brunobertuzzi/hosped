@@ -744,4 +744,140 @@ export const api = {
     await this.getExpenses();
     return res;
   },
+
+  // ================= BILLING / ASSINATURA =================
+
+  /** Gera fatura manualmente para um hotel (Super Admin) */
+  async generateInvoice(hotelId: string) {
+    return await request(`/core/billing/invoices/generate/${hotelId}`, { method: 'POST' });
+  },
+
+  /** Gera faturas para todos os hotéis (Super Admin) */
+  async generateAllInvoices() {
+    return await request('/core/billing/invoices/generate-all', { method: 'POST' });
+  },
+
+  /** Cobrar fatura via gateway (Super Admin) */
+  async payInvoice(invoiceId: string) {
+    return await request(`/core/billing/invoices/${invoiceId}/pay`, { method: 'POST' });
+  },
+
+  /** Confirmar pagamento manual (Super Admin) */
+  async confirmInvoicePayment(invoiceId: string, gatewayId?: string, method?: string) {
+    return await request(`/core/billing/invoices/${invoiceId}/confirm`, {
+      method: 'POST',
+      body: JSON.stringify({ gatewayId, method }),
+    });
+  },
+
+  /** Sincronizar pagamentos pendentes com gateway (Super Admin) */
+  async syncBillingPayments() {
+    return await request('/core/billing/sync-payments', { method: 'POST' });
+  },
+
+  /** Mudar de plano (upgrade/downgrade) */
+  async changePlan(plan: string) {
+    return await request('/core/billing/change-plan', {
+      method: 'POST',
+      body: JSON.stringify({ plan }),
+    });
+  },
+
+  /** Mudar plano de qualquer hotel (Super Admin) */
+  async changeTenantPlan(hotelId: string, plan: string) {
+    return await request(`/core/billing/change-plan/${hotelId}`, {
+      method: 'POST',
+      body: JSON.stringify({ plan }),
+    });
+  },
+
+  /** Listar add-ons disponíveis */
+  async listAddons() {
+    return await request('/core/billing/addons');
+  },
+
+  /** Listar add-ons contratados pelo hotel */
+  async getHotelAddons() {
+    return await request('/core/billing/addons/hotel');
+  },
+
+  /** Ativar add-on */
+  async activateAddon(addonId: string) {
+    return await request('/core/billing/addons/activate', {
+      method: 'POST',
+      body: JSON.stringify({ addonId }),
+    });
+  },
+
+  /** Desativar add-on */
+  async deactivateAddon(addonId: string) {
+    return await request('/core/billing/addons/deactivate', {
+      method: 'POST',
+      body: JSON.stringify({ addonId }),
+    });
+  },
+
+  /** Listar todos add-ons (Super Admin) */
+  async getAllAddons() {
+    return await request('/core/billing/addons/manage');
+  },
+
+  /** Criar add-on (Super Admin) */
+  async createAddon(data: { name: string; description?: string; price: number; moduleKey: string }) {
+    return await request('/core/billing/addons/manage', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /** Atualizar add-on (Super Admin) */
+  async updateAddon(id: string, data: any) {
+    return await request(`/core/billing/addons/manage/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /** Validar cupom */
+  async validateCoupon(code: string, plan?: string) {
+    const query = plan ? `?plan=${plan}` : '';
+    return await request(`/core/billing/coupons/validate/${code}${query}`);
+  },
+
+  /** Métricas MRR (Super Admin) */
+  async getMrrMetrics() {
+    return await request('/core/billing/metrics/mrr');
+  },
+
+  /** Logs de faturamento (Super Admin) */
+  async getBillingLogs(hotelId?: string) {
+    const query = hotelId ? `?hotelId=${hotelId}` : '';
+    return await request(`/core/billing/logs${query}`);
+  },
+
+  /** Iniciar trial para hotel (Super Admin) */
+  async startTrial(hotelId: string, days: number = 14) {
+    return await request(`/core/billing/trial/start/${hotelId}?days=${days}`, { method: 'POST' });
+  },
+
+  /** Processar trials expirados (Super Admin) */
+  async processExpiredTrials() {
+    return await request('/core/billing/trial/process-expired', { method: 'POST' });
+  },
+
+  /** Ativar add-on em hotel via admin */
+  async adminActivateAddon(hotelId: string, addonId: string) {
+    return await request(`/core/billing/addons/admin/${hotelId}/activate`, {
+      method: 'POST',
+      body: JSON.stringify({ addonId }),
+    });
+  },
+
+  /** Desativar add-on em hotel via admin */
+  async adminDeactivateAddon(hotelId: string, addonId: string) {
+    return await request(`/core/billing/addons/admin/${hotelId}/deactivate`, {
+      method: 'POST',
+      body: JSON.stringify({ addonId }),
+    });
+  },
 };

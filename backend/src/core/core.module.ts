@@ -17,6 +17,9 @@ import { HealthController } from './health.controller';
 import { BroadcastController } from './broadcast.controller';
 import { FeatureFlagsController } from './feature-flags.controller';
 import { GlobalSettingsController } from './global-settings.controller';
+import { BillingController } from './billing.controller';
+import { BillingService } from './billing.service';
+import { BillingNotifications } from './billing-notifications';
 
 @Global()
 @Module({
@@ -31,13 +34,16 @@ import { GlobalSettingsController } from './global-settings.controller';
     BroadcastController,
     FeatureFlagsController,
     GlobalSettingsController,
+    BillingController,
   ],
   providers: [
     PrismaService,
     TenantService,
     UploadService,
     BillingTask,
+    BillingService,
+    BillingNotifications,
   ],
-  exports: [PrismaService, TenantService, UploadService],
+  exports: [PrismaService, TenantService, UploadService, BillingService],
 })
 export class CoreModule {}

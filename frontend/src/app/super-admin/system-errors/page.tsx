@@ -50,13 +50,13 @@ export default function SystemErrorsPage() {
 
   const filteredLogs = logs.filter(log => {
     const term = searchTerm.toLowerCase();
-    const matchSearch = 
+    const matchSearch =
       log.errorMessage.toLowerCase().includes(term) ||
       log.route?.toLowerCase().includes(term) ||
       log.hotel?.nome?.toLowerCase().includes(term);
-      
+
     const matchTenant = selectedTenant ? log.hotelId === selectedTenant : true;
-    
+
     let matchDate = true;
     if (startDate || endDate) {
       const logDate = new Date(log.createdAt).getTime();
@@ -71,7 +71,7 @@ export default function SystemErrorsPage() {
         if (logDate > end.getTime()) matchDate = false;
       }
     }
-    
+
     return matchSearch && matchTenant && matchDate;
   });
 
@@ -80,6 +80,7 @@ export default function SystemErrorsPage() {
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <ShieldAlert className="w-7 h-7 text-red-400" />
             System Error Logs
             <span className="px-2.5 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
               <Bug className="w-3 h-3" /> Monitoramento
@@ -89,26 +90,26 @@ export default function SystemErrorsPage() {
         </div>
         <div className="flex gap-2 items-center flex-wrap justify-end">
           <div className="flex items-center gap-2">
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={e => setStartDate(e.target.value)} 
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500" 
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500"
             />
             <span className="text-white/30 text-[10px]">Até</span>
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={e => setEndDate(e.target.value)} 
-              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500" 
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white/70 outline-none focus:border-red-500"
             />
           </div>
-          <TenantFilterDropdown 
-            sistemaClients={sistemaClients} 
-            selectedTenant={selectedTenant} 
-            setSelectedTenant={setSelectedTenant} 
+          <TenantFilterDropdown
+            sistemaClients={sistemaClients}
+            selectedTenant={selectedTenant}
+            setSelectedTenant={setSelectedTenant}
           />
-          
+
 
           <button onClick={fetchLogs} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 border border-white/10">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -125,9 +126,9 @@ export default function SystemErrorsPage() {
           </div>
           <div className="relative w-64">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
-            <input 
-              type="text" 
-              placeholder="Buscar erro, rota ou hotel..." 
+            <input
+              type="text"
+              placeholder="Buscar erro, rota ou hotel..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full bg-white/[0.02] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-[11px] font-mono text-white outline-none focus:border-red-500 transition-colors placeholder:font-sans"
@@ -171,7 +172,7 @@ export default function SystemErrorsPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-4 mb-3">
                   <div className="flex items-center gap-2 text-red-400 font-bold text-[12px] mb-2">
                     <AlertTriangle className="w-4 h-4" /> Mensagem do Erro

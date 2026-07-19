@@ -6,12 +6,14 @@ import Link from 'next/link';
 import {
   Building2, Activity, Calendar, Package, ShieldCheck, LogOut, MapPin,
   ChevronRight, AlertTriangle, Moon, Palette, CheckCircle2, CloudLightning,
-  Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X, Lock
+  Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X, Lock,
+  CreditCard
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
 import { api } from '../../lib/api';
 import { CommandPalette } from '../../components/CommandPalette';
 import { useModule } from '../../hooks/useModule';
+import { canAccessPage } from '../../lib/permissions';
 
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +28,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const canUseGantt = useModule('GANTT_CHART');
   const canUseWebhooks = useModule('WEBHOOKS');
   const canUseMultipleBranches = useModule('MULTIPLE_BRANCHES');
+
+  // Permission guards — controlados por permissões do usuário
+  const userPerms = user?.permissions || [];
+  const hasAccess = (pageKey: string) => canAccessPage(userPerms, pageKey);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -143,80 +149,101 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navegação Admin */}
             <nav className="space-y-0.5">
-              <Link href="/admin/dashboard" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/dashboard' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <LayoutDashboard className="w-4 h-4" /> Dashboard
-              </Link>
-              <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <CalendarDays className="w-4 h-4" /> Controle de Reservas
-              </Link>
-              <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                <Users className="w-4 h-4" /> Cadastro de Hóspedes
-              </Link>
-              {canUseGantt ? (
+              {hasAccess('page.dashboard') && (
+                <Link href="/admin/dashboard" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/dashboard' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+                </Link>
+              )}
+              {hasAccess('page.reservas') && (
+                <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <CalendarDays className="w-4 h-4" /> Controle de Reservas
+                </Link>
+              )}
+              {hasAccess('page.hospedes') && (
+                <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                  <Users className="w-4 h-4" /> Cadastro de Hóspedes
+                </Link>
+              )}
+              {hasAccess('page.gantt') && canUseGantt ? (
                 <Link href="/admin/gantt" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/gantt' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Calendar className="w-4 h-4" /> Mapa de Ocupação
                 </Link>
-              ) : (
+              ) : hasAccess('page.gantt') ? (
                 <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-white/20 cursor-not-allowed select-none" title="Módulo não disponível no seu plano">
                   <Calendar className="w-4 h-4" />
                   <span>Mapa de Ocupação</span>
                   <Lock className="w-3 h-3 ml-auto" />
                 </div>
-              )}
-              {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'MAINTENANCE'].includes(user.role) && (
+              ) : null}
+              {hasAccess('page.manutencao') && (
                 <Link href="/admin/manutencao" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/manutencao' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Wrench className="w-4 h-4" /> Manutenção
                 </Link>
               )}
-              {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'HOUSEKEEPING'].includes(user.role) && (
+              {hasAccess('page.governanca') && (
                 <Link href="/admin/governanca" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/governanca' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Sparkles className="w-4 h-4" /> Governança
                 </Link>
               )}
-              {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER', 'INVENTORY'].includes(user.role) && (
+              {hasAccess('page.estoque') && (
                 <Link href="/admin/estoque" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/estoque' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <Package className="w-4 h-4" /> Estoque & Consumos
                 </Link>
               )}
-              {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
+              {hasAccess('page.auditoria') && (
                 <Link href="/admin/auditoria" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/auditoria' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                   <ShieldCheck className="w-4 h-4" /> Histórico de Ações
                 </Link>
               )}
-              {['HOTEL_OWNER', 'PLATFORM_OWNER', 'MANAGER'].includes(user.role) && (
+              {(hasAccess('page.equipe') || hasAccess('page.quartos') || hasAccess('page.financeiro') || hasAccess('page.integracoes') || hasAccess('page.meu-plano') || hasAccess('page.configuracoes')) && (
                 <div className="pt-4 mt-4 border-t border-white/5 space-y-0.5">
                   <span className="block px-3 text-[10px] uppercase font-bold tracking-widest text-white/30 mb-2">Setup & Gestão</span>
-                  <Link href="/admin/equipe" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/equipe' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                    <Users className="w-4 h-4" /> Equipe (RH)
-                  </Link>
-                  <Link href="/admin/quartos" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/quartos' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                    <Building2 className="w-4 h-4" /> Quartos & Categorias
-                  </Link>
-                  <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                    <DollarSign className="w-4 h-4" /> Financeiro
-                  </Link>
-                  {canUseWebhooks ? (
+                  {hasAccess('page.equipe') && (
+                    <Link href="/admin/equipe" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/equipe' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <Users className="w-4 h-4" /> Equipe (RH)
+                    </Link>
+                  )}
+                  {hasAccess('page.quartos') && (
+                    <Link href="/admin/quartos" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/quartos' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <Building2 className="w-4 h-4" /> Quartos & Categorias
+                    </Link>
+                  )}
+                  {hasAccess('page.financeiro') && (
+                    <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <DollarSign className="w-4 h-4" /> Financeiro
+                    </Link>
+                  )}
+                  {hasAccess('page.integracoes') && canUseWebhooks ? (
                     <Link href="/admin/integracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/integracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                       <CloudLightning className="w-4 h-4" /> Integrações
                     </Link>
-                  ) : (
+                  ) : hasAccess('page.integracoes') ? (
                     <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-white/20 cursor-not-allowed select-none" title="Módulo Webhooks & API não disponível no seu plano">
                       <CloudLightning className="w-4 h-4" />
                       <span>Integrações</span>
                       <Lock className="w-3 h-3 ml-auto" />
                     </div>
+                  ) : null}
+                  {hasAccess('page.meu-plano') && (
+                    <Link href="/admin/meu-plano" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/meu-plano' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <CreditCard className="w-4 h-4" /> Meu Plano
+                    </Link>
                   )}
-                  <Link href="/admin/configuracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/configuracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                    <Settings className="w-4 h-4" /> Configurações
-                  </Link>
+                  {hasAccess('page.configuracoes') && (
+                    <Link href="/admin/configuracoes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/configuracoes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <Settings className="w-4 h-4" /> Configurações
+                    </Link>
+                  )}
                 </div>
               )}
 
-              <div className="pt-4 mt-4 border-t border-white/5">
-                <Link href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
-                  <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
-                </Link>
-              </div>
+              {hasAccess('page.site-reservas') && (
+                <div className="pt-4 mt-4 border-t border-white/5">
+                  <a href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
+                    <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
+                  </a>
+                </div>
+              )}
             </nav>
           </div>
 

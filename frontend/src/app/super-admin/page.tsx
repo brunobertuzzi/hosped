@@ -1,139 +1,210 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useSuperAdminStore } from '../../store/useSuperAdminStore';
-import { DollarSign, Activity, Users, Building2, ArrowUpRight, TrendingUp, AlertTriangle, Wallet, CreditCard, CheckCircle2, Clock, ArrowRight, Zap, Database, ServerCrash, Download, ShieldCheck } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, Building2, CreditCard, Activity, AlertTriangle, CheckCircle2, Zap, BarChart3, Wallet } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { api } from '../../lib/api';
 
-export default function SuperAdminDashboard() {
-  const { sistemaClients, invoices, fetchClients, fetchInvoices } = useSuperAdminStore();
+interface MrrMetrics {
+  mrr: {
+    current: number;
+    lastMonth: number;
+    growth: number;
+    history: Array<{ month: string; mrr: number }>;
+    byPlan: Record<string, number>;
+  };
+  arr: number;
+  arpu: number;
+  clients: {
+    active: number;
+    newThisMonth: number;
+    churnedThisMonth: number;
+  };
+  churn: {
+    rate: number;
+    lostMRR: number;
+  };
+  plans: {
+    distribution: Record<string, number>;
+  };
+  addons: {
+    active: number;
+    revenue: number;
+  };
+}
 
-  const [healthData, setHealthData] = React.useState<any>(null);
+const planLabels: Record<string, string> = {
+  STARTUP: 'Startup',
+  PRO: 'Pro',
+  ENTERPRISE: 'Enterprise',
+};
+
+const planColors: Record<string, string> = {
+  STARTUP: 'from-indigo-500 to-indigo-600',
+  PRO: 'from-violet-500 to-violet-600',
+  ENTERPRISE: 'from-amber-500 to-amber-600',
+};
+
+const planBadgeColors: Record<string, string> = {
+  STARTUP: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+  PRO: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+  ENTERPRISE: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+};
+
+export default function MrrDashboard() {
+  const [metrics, setMetrics] = React.useState<MrrMetrics | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    fetchClients();
-    fetchInvoices();
-    fetchHealth();
-  }, [fetchClients, fetchInvoices]);
+    fetchMrrMetrics();
+  }, []);
 
-  const fetchHealth = async () => {
+  const fetchMrrMetrics = async () => {
     try {
-      const { api } = await import('../../lib/api');
-      const res = await api.getHealth();
-      setHealthData(res);
+      const data = await api.getMrrMetrics();
+      setMetrics(data);
     } catch (e) {
-      console.error('Health Check falhou', e);
+      console.error('Falha ao buscar métricas MRR', e);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const kpis = useMemo(() => {
-    const realClients = sistemaClients.filter(c => c.id !== '11111111-1111-1111-1111-111111111111');
-    const realInvoices = invoices.filter(i => i.tenantId !== '11111111-1111-1111-1111-111111111111');
-
-    const activeClients = realClients.filter(c => c.status === 'ACTIVE');
-    const totalMRR = activeClients.reduce((sum, c) => sum + c.mrr, 0);
-    const totalBranches = activeClients.reduce((sum, c) => sum + c.branchesCount, 0);
-    const suspended = realClients.filter(c => c.status === 'SUSPENDED').length;
-    const arr = totalMRR * 12;
-
-    const totalClients = realClients.length;
-    const churnRate = totalClients > 0 ? (suspended / totalClients) * 100 : 0;
-    const arpu = activeClients.length > 0 ? totalMRR / activeClients.length : 0;
-
-    const pendingRevenue = realInvoices.filter(i => i.status !== 'PAID').reduce((sum, i) => sum + i.amount, 0);
-    const collectedRevenue = realInvoices.filter(i => i.status === 'PAID').reduce((sum, i) => sum + i.amount, 0);
-
-    return { totalMRR, arr, activeCount: activeClients.length, totalBranches, suspended, churnRate, arpu, pendingRevenue, collectedRevenue };
-  }, [sistemaClients, invoices]);
-
   const chartData = useMemo(() => {
-    const validClients = sistemaClients.filter(
-      c => c.id !== '11111111-1111-1111-1111-111111111111' && c.status !== 'CHURNED'
-    );
-
-    const months = [];
-    const revenues = [];
-    const today = new Date();
-
-    // Generate last 7 months data (cumulative MRR)
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const monthStr = d.toLocaleString('pt-BR', { month: 'short' });
-      months.push(monthStr.charAt(0).toUpperCase() + monthStr.slice(1, 3));
-
-      // Clients created before the end of this month
-      const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59);
-
-      const mrr = validClients
-        .filter(c => new Date(c.createdAt) <= endOfMonth)
-        .reduce((acc, c) => acc + c.mrr, 0);
-
-      revenues.push(mrr);
-    }
-
+    if (!metrics) return { months: [], revenues: [], heights: [] };
+    const revenues = metrics.mrr.history.map(h => h.mrr);
     const maxRev = Math.max(...revenues, 1);
     const heights = revenues.map(r => (r / maxRev) * 100);
+    return { months: metrics.mrr.history.map(h => h.month), revenues, heights };
+  }, [metrics]);
 
-    // Calcula crescimento percentual do último mês completo vs anterior
-    const lastMonth = revenues[revenues.length - 1];
-    const prevMonth = revenues[revenues.length - 2];
-    const growth = prevMonth > 0 ? ((lastMonth - prevMonth) / prevMonth) * 100 : 0;
+  const totalByPlan = useMemo(() => {
+    if (!metrics) return [];
+    return Object.entries(metrics.mrr.byPlan).map(([plan, value]) => ({
+      plan,
+      label: planLabels[plan] || plan,
+      value,
+      color: planColors[plan] || 'from-gray-500 to-gray-600',
+    }));
+  }, [metrics]);
 
-    return { months, revenues, heights, growth };
-  }, [sistemaClients]);
+  const clientDistribution = useMemo(() => {
+    if (!metrics) return [];
+    return Object.entries(metrics.plans.distribution).map(([plan, count]) => ({
+      plan,
+      label: planLabels[plan] || plan,
+      count,
+    }));
+  }, [metrics]);
+
+  const totalClientsDistributed = useMemo(() => {
+    if (!metrics) return 0;
+    return Object.values(metrics.plans.distribution).reduce((a, b) => a + b, 0);
+  }, [metrics]);
+
+  if (loading) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3 text-white/40 text-sm font-medium">
+          <Activity className="w-4 h-4 animate-pulse text-indigo-400" />
+          Carregando métricas financeiras...
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20">
+      {/* Header */}
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
-            Financials
+            <BarChart3 className="w-7 h-7 text-indigo-400" />
+            MRR & Financials
             <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
               <Zap className="w-3 h-3" /> Live
             </span>
           </h1>
-          <p className="text-[13px] text-white/40 mt-1 font-medium">Acompanhe métricas, pagamentos e retenção de Tenants.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">
+            Acompanhe receita recorrente, ARR, churn e distribuição de planos.
+          </p>
         </div>
       </div>
 
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {/* Total MRR */}
+        {/* Current MRR */}
         <div className="lg:col-span-2 bg-[#0a0a0a] border-t-2 border-t-indigo-500 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl" />
           <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Total MRR</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">MRR Atual</span>
             <DollarSign className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
             <span className="text-3xl font-bold text-white tracking-tight">
               <span className="text-white/30 text-xl mr-1">R$</span>
-              {kpis.totalMRR.toFixed(2)}
+              {metrics?.mrr.current.toFixed(2) ?? '0.00'}
             </span>
             <div className="text-[11px] text-white/30 mt-2 font-medium flex items-center gap-1.5">
-              {chartData.growth >= 0 ? (
-                <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5" /> {chartData.growth.toFixed(1)}%</span>
+              {(metrics?.mrr.growth ?? 0) >= 0 ? (
+                <span className="text-emerald-400/90 flex items-center bg-emerald-500/10 px-1.5 py-0.5 rounded font-bold">
+                  <TrendingUp className="w-3 h-3 mr-0.5" /> +{metrics?.mrr.growth.toFixed(1) ?? 0}%
+                </span>
               ) : (
-                <span className="text-red-400/90 flex items-center bg-red-500/10 px-1.5 rounded"><ArrowUpRight className="w-3 h-3 mr-0.5 rotate-90" /> {Math.abs(chartData.growth).toFixed(1)}%</span>
+                <span className="text-red-400/90 flex items-center bg-red-500/10 px-1.5 py-0.5 rounded font-bold">
+                  <TrendingUp className="w-3 h-3 mr-0.5 rotate-180" /> {metrics?.mrr.growth.toFixed(1) ?? 0}%
+                </span>
               )}
-              este mês
+              vs. mês anterior
             </div>
           </div>
         </div>
 
-        {/* ARR Estimado */}
-        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
+        {/* ARR */}
+        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl" />
           <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest">ARR Estimado</span>
-            <TrendingUp className="w-4 h-4 text-white/60" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">ARR</span>
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
           <div>
             <span className="text-3xl font-bold text-white tracking-tight">
               <span className="text-white/30 text-xl mr-1">R$</span>
-              {kpis.arr.toFixed(2)}
+              {metrics?.arr.toFixed(2) ?? '0.00'}
             </span>
-            <div className="text-[11px] text-white/30 mt-2 font-medium flex justify-between">
-              <span>Receita Anualizada</span>
+            <div className="text-[11px] text-white/30 mt-2 font-medium">Receita Anual Recorrente</div>
+          </div>
+        </div>
+
+        {/* ARPU */}
+        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl" />
+          <div className="flex items-center justify-between mb-4 text-white/40">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-violet-400">ARPU</span>
+            <Users className="w-4 h-4 text-violet-400" />
+          </div>
+          <div>
+            <span className="text-3xl font-bold text-white tracking-tight">
+              <span className="text-white/30 text-xl mr-1">R$</span>
+              {metrics?.arpu.toFixed(2) ?? '0.00'}
+            </span>
+            <div className="text-[11px] text-white/30 mt-2 font-medium">Receita Média por Cliente</div>
+          </div>
+        </div>
+
+        {/* Active Clients */}
+        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
+          <div className="flex items-center justify-between mb-4 text-white/40">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Clientes Ativos</span>
+            <Building2 className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div>
+            <span className="text-3xl font-bold text-white tracking-tight">{metrics?.clients.active ?? 0}</span>
+            <div className="text-[11px] text-white/30 mt-2 font-medium flex items-center gap-3">
+              <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-emerald-400/70" /> +{metrics?.clients.newThisMonth ?? 0} este mês</span>
+              {(metrics?.clients.churnedThisMonth ?? 0) > 0 && (
+                <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-400/70" /> {metrics?.clients.churnedThisMonth} perdidos</span>
+              )}
             </div>
           </div>
         </div>
@@ -142,78 +213,66 @@ export default function SuperAdminDashboard() {
         <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 text-white/40">
             <span className="text-[10px] font-bold uppercase tracking-widest">Taxa de Churn</span>
-            <AlertTriangle className={`w-4 h-4 ${kpis.churnRate > 5 ? 'text-red-400' : 'text-emerald-400'}`} />
+            <AlertTriangle className={`w-4 h-4 ${(metrics?.churn.rate ?? 0) > 5 ? 'text-red-400' : 'text-emerald-400'}`} />
           </div>
           <div>
-            <span className="text-3xl font-bold text-white tracking-tight">{kpis.churnRate.toFixed(1)}%</span>
-            <div className="text-[11px] text-white/30 mt-2 font-medium">Contas inativas/canceladas</div>
+            <span className="text-3xl font-bold text-white tracking-tight">{metrics?.churn.rate.toFixed(2) ?? '0.00'}%</span>
+            <div className="text-[11px] text-white/30 mt-2 font-medium">
+              MRR Perdido: R$ {metrics?.churn.lostMRR.toFixed(2) ?? '0.00'}
+            </div>
           </div>
         </div>
 
-        {/* Tenants Ativos */}
+        {/* Add-on Revenue */}
         <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest">Tenants Ativos</span>
-            <Building2 className="w-4 h-4 text-emerald-400/80" />
-          </div>
-          <div>
-            <span className="text-3xl font-bold text-white tracking-tight">{kpis.activeCount}</span>
-            <div className="text-[11px] text-white/30 mt-2 font-medium">Hotéis/Redes Ativas</div>
-          </div>
-        </div>
-
-        {/* ARPU */}
-        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
-          <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest">ARPU Médio</span>
-            <Users className="w-4 h-4 text-white/60" />
-          </div>
-          <div>
-            <span className="text-3xl font-bold text-white tracking-tight">
-              <span className="text-white/30 text-xl mr-1">R$</span>
-              {kpis.arpu.toFixed(2)}
-            </span>
-            <div className="text-[11px] text-white/30 mt-2 font-medium">Receita Média por Usuário</div>
-          </div>
-        </div>
-
-        {/* Pending Revenue */}
-        <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl">
-          <div className="flex items-center justify-between mb-4 text-white/40">
-            <span className="text-[10px] font-bold uppercase tracking-widest">Faturas Pendentes</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Receita de Add-ons</span>
             <Wallet className="w-4 h-4 text-amber-400" />
           </div>
           <div>
             <span className="text-3xl font-bold text-white tracking-tight">
               <span className="text-white/30 text-xl mr-1">R$</span>
-              {kpis.pendingRevenue.toFixed(2)}
+              {metrics?.addons.revenue.toFixed(2) ?? '0.00'}
             </span>
-            <div className="text-[11px] text-white/30 mt-2 font-medium">Esperando processamento</div>
+            <div className="text-[11px] text-white/30 mt-2 font-medium">
+              {metrics?.addons.active ?? 0} add-ons ativos
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Growth Chart */}
+        {/* MRR History Chart */}
         <div className="lg:col-span-2 bg-[#0a0a0a] border border-white/5 rounded-[24px] p-8 relative overflow-hidden">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-indigo-500" /> Histórico de Receita
+              <Activity className="w-4 h-4 text-indigo-500" /> Histórico MRR (6 meses)
             </h3>
-            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded font-bold uppercase tracking-widest border border-emerald-500/20">Crescimento Estável</span>
+            {(metrics?.mrr.growth ?? 0) >= 0 ? (
+              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded font-bold uppercase tracking-widest border border-emerald-500/20">
+                <TrendingUp className="w-3 h-3 inline mr-1" />+{metrics?.mrr.growth.toFixed(1)}% crescimento
+              </span>
+            ) : (
+              <span className="text-[10px] text-red-400 bg-red-500/10 px-2 py-1 rounded font-bold uppercase tracking-widest border border-red-500/20">
+                <TrendingUp className="w-3 h-3 inline mr-1 rotate-180" />{metrics?.mrr.growth.toFixed(1)}% declínio
+              </span>
+            )}
           </div>
+
           <div className="h-64 relative w-full flex flex-col justify-end gap-2 items-end pt-4">
+            {/* Grid lines */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
-              <div className="w-full border-t border-white/[0.03]" />
-              <div className="w-full border-t border-white/[0.03]" />
-              <div className="w-full border-t border-white/[0.03]" />
-              <div className="w-full border-t border-white/[0.03]" />
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className="w-full border-t border-white/[0.03]" />
+              ))}
             </div>
 
+            {/* Bars */}
             <div className="w-full h-full flex items-end justify-between px-2 gap-2 z-10">
               {chartData.heights.map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col justify-end items-center group relative h-full">
-                  <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  <div className="absolute -top-8 bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                     R$ {chartData.revenues[i].toFixed(2)}
                   </div>
                   <motion.div
@@ -228,95 +287,139 @@ export default function SuperAdminDashboard() {
               ))}
             </div>
 
+            {/* Month labels */}
             <div className="w-full flex justify-between px-4 text-[10px] font-medium text-white/30 mt-4 z-10 border-t border-white/5 pt-3">
-              {chartData.months.map((m, i) => <span key={i}>{m}</span>)}
+              {chartData.months.map((m, i) => (
+                <span key={i}>{m}</span>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* System Health Check Widget */}
-        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none" />
-          <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2 mb-6">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Saúde do Servidor
-            </h3>
-            <div className="space-y-5">
-              <div>
-                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
-                  <span>Uso de CPU (VPS)</span>
-                  <span className="text-white">{healthData ? healthData.cpuUsagePercentage.toFixed(1) : 0}%</span>
-                </div>
-                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                  <div className="bg-emerald-500 h-full transition-all" style={{ width: `${healthData ? healthData.cpuUsagePercentage : 0}%` }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
-                  <span>Memória RAM ({healthData ? healthData.memoryTotalGB : 0}GB)</span>
-                  <span className="text-white">{healthData ? healthData.memoryUsedGB : 0} GB</span>
-                </div>
-                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                  <div className="bg-emerald-500 h-full transition-all" style={{ width: `${healthData ? healthData.memoryUsagePercentage : 0}%` }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold flex-col gap-1">
-                  <div className="flex justify-between w-full">
-                    <span className="flex items-center gap-1.5"><Database className="w-3 h-3 text-indigo-400"/> PostgreSQL (Produção)</span>
-                    <span className="text-emerald-400">{healthData ? healthData.postgresStatus : 'OFFLINE'}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="flex items-center gap-1.5"><ServerCrash className="w-3 h-3 text-red-400"/> Redis (Cache)</span>
-                    <span className="text-emerald-400">{healthData ? healthData.redisStatus : 'OFFLINE'}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* MRR by Plan */}
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[60px] rounded-full pointer-events-none" />
+          <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2 mb-6">
+            <CreditCard className="w-4 h-4 text-indigo-400" /> MRR por Plano
+          </h3>
 
-          <button className="w-full mt-6 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-white/10">
-            <Download className="w-3.5 h-3.5" /> Forçar Backup SQL
-          </button>
+          <div className="space-y-4">
+            {totalByPlan.map(({ plan, label, value, color }) => (
+              <div key={plan}>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${planBadgeColors[plan] || 'bg-white/5 text-white/60 border-white/10'}`}>
+                    {label}
+                  </span>
+                  <span className="text-[12px] font-bold text-white">R$ {value.toFixed(2)}</span>
+                </div>
+                <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full bg-gradient-to-r ${color} transition-all`}
+                    style={{ width: `${metrics ? (value / metrics.mrr.current) * 100 : 0}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+            {totalByPlan.length === 0 && (
+              <div className="text-center text-white/20 text-xs py-10">Nenhum dado de plano disponível.</div>
+            )}
+          </div>
         </div>
       </div>
 
+      {/* Bottom Row: Client Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Invoices Widget */}
-        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-white/60" /> Últimos Pagamentos
-            </h3>
-            <Link href="/super-admin/invoices" className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
-              Ver Todas <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/5 blur-[60px] rounded-full pointer-events-none" />
+          <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2 mb-6">
+            <Users className="w-4 h-4 text-violet-400" /> Distribuição de Clientes por Plano
+          </h3>
 
-          <div className="flex-1 overflow-y-auto space-y-4">
-            {invoices.length === 0 ? (
-              <div className="text-center text-white/20 text-xs py-10">Nenhuma transação recente.</div>
-            ) : (
-              [...invoices].reverse().slice(0, 5).map(inv => {
-                const client = sistemaClients.find(c => c.id === inv.tenantId);
-                return (
-                  <div key={inv.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
-                    <div>
-                      <div className="text-[12px] font-bold text-white mb-0.5">{client?.name || 'Cliente'}</div>
-                      <div className="text-[10px] text-white/40 font-mono">ID: {inv.id.split('_')[1]}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[12px] font-bold text-white mb-0.5">R$ {inv.amount.toFixed(2)}</div>
-                      {inv.status === 'PAID' ? (
-                        <div className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest flex items-center gap-1 justify-end"><CheckCircle2 className="w-3 h-3" /> Pago</div>
-                      ) : (
-                        <div className="text-[9px] text-amber-400 font-bold uppercase tracking-widest flex items-center gap-1 justify-end"><Clock className="w-3 h-3" /> Pendente</div>
-                      )}
-                    </div>
-                  </div>
-                )
-              })
+          <div className="space-y-5">
+            {clientDistribution.map(({ plan, label, count }) => (
+              <div key={plan}>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${planBadgeColors[plan] || 'bg-white/5 text-white/60 border-white/10'}`}>
+                    {label}
+                  </span>
+                  <span className="text-[12px] font-bold text-white">
+                    {count} {count === 1 ? 'cliente' : 'clientes'}
+                    <span className="text-white/30 font-normal ml-1">
+                      ({totalClientsDistributed > 0 ? ((count / totalClientsDistributed) * 100).toFixed(1) : 0}%)
+                    </span>
+                  </span>
+                </div>
+                <div className="w-full bg-white/5 h-2.5 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: totalClientsDistributed > 0 ? `${(count / totalClientsDistributed) * 100}%` : '0%' }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                    className={`h-full rounded-full bg-gradient-to-r ${planColors[plan] || 'from-gray-500 to-gray-600'}`}
+                  />
+                </div>
+              </div>
+            ))}
+            {clientDistribution.length === 0 && (
+              <div className="text-center text-white/20 text-xs py-10">Nenhum cliente encontrado.</div>
             )}
+          </div>
+        </div>
+
+        {/* Summary Card */}
+        <div className="bg-[#0a0a0a] border border-white/5 rounded-[24px] p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none" />
+          <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-2 mb-6">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Resumo do Período
+          </h3>
+
+          <div className="space-y-5">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <div className="text-[11px] text-white/40 font-medium">Novos Clientes</div>
+                  <div className="text-lg font-bold text-white">{metrics?.clients.newThisMonth ?? 0}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] text-white/40 font-medium">Churn</div>
+                <div className="text-lg font-bold text-red-400">{metrics?.clients.churnedThisMonth ?? 0}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                  <Wallet className="w-5 h-5 text-indigo-400" />
+                </div>
+                <div>
+                  <div className="text-[11px] text-white/40 font-medium">Receita Add-ons</div>
+                  <div className="text-lg font-bold text-white">R$ {metrics?.addons.revenue.toFixed(2) ?? '0.00'}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] text-white/40 font-medium">Add-ons Ativos</div>
+                <div className="text-lg font-bold text-white">{metrics?.addons.active ?? 0}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-[11px] text-white/40 font-medium">MRR Perdido (Churn)</div>
+                  <div className="text-lg font-bold text-white">R$ {metrics?.churn.lostMRR.toFixed(2) ?? '0.00'}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] text-white/40 font-medium">Taxa Churn</div>
+                <div className="text-lg font-bold text-red-400">{metrics?.churn.rate.toFixed(2) ?? '0.00'}%</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

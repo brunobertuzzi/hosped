@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../../lib/api';
-import { PREMIUM_MODULES } from '../../../lib/modules';
+import { PREMIUM_MODULES, ALL_MODULES } from '../../../lib/modules';
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -145,6 +145,7 @@ export default function PlansPage() {
       <div className="flex items-end justify-between border-b border-white/5 pb-6 relative z-10">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <CreditCard className="w-7 h-7 text-indigo-400" />
             Planos e Preços
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">
@@ -298,6 +299,24 @@ export default function PlansPage() {
                     )}
                   </ul>
                 </div>
+
+                {/* Módulos do Sistema Inclusos */}
+                {plan.modules && plan.modules.length > 0 && (
+                  <div className="pt-4 mt-4 border-t border-white/5">
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos</p>
+                    <div className="flex flex-wrap gap-2">
+                      {plan.modules.map((modId: string) => {
+                        const mod = ALL_MODULES.find(m => m.id === modId);
+                        if (!mod) return null;
+                        return (
+                          <span key={modId} className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest ${theme.bgClass} ${theme.textClass} border ${theme.borderClass}`}>
+                            {mod.label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2 relative z-10 mt-auto pt-6 border-t border-white/5">

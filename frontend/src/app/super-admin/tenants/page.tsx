@@ -17,9 +17,11 @@ export default function SuperAdminTenants() {
   const router = useRouter();
   const { sistemaClients, fetchClients } = useSuperAdminStore();
   const [searchTerm, setSearchTerm] = useState('');
+  const [systemPlans, setSystemPlans] = useState<any[]>([]);
 
   React.useEffect(() => {
     fetchClients();
+    api.getSystemPlans().then(setSystemPlans).catch(() => {});
   }, [fetchClients]);
 
   // Modals
@@ -48,28 +50,19 @@ export default function SuperAdminTenants() {
   const [editEmail, setEditEmail] = useState('');
   const [editMrr, setEditMrr] = useState(0);
   const [editStatus, setEditStatus] = useState<TenantStatus>('ACTIVE');
-  const [editFeatures, setEditFeatures] = useState<string[]>([]);
 
   // Usa o registry centralizado — adicionar módulos em modules.ts os expõe aqui automaticamente
   const AVAILABLE_FEATURES = PREMIUM_MODULES;
 
   const handleAddPlanChange = (newPlan: TenantPlan) => {
     setPlan(newPlan);
-    if (newPlan === 'STARTUP') setAddFeatures([]);
-    if (newPlan === 'PRO') setAddFeatures(['GANTT_CHART', 'WEBHOOKS']);
-    if (newPlan === 'ENTERPRISE') setAddFeatures(['WHITE_LABEL', 'WEBHOOKS', 'GANTT_CHART', 'MULTIPLE_BRANCHES']);
+    // Auto-preenche módulos do plano selecionado
+    const planData = systemPlans.find((p: any) => p.name === newPlan);
+    setAddFeatures(planData?.modules || []);
   };
 
   const toggleAddFeature = (featureId: string) => {
     setAddFeatures(prev =>
-      prev.includes(featureId)
-        ? prev.filter(f => f !== featureId)
-        : [...prev, featureId]
-    );
-  };
-
-  const toggleFeature = (featureId: string) => {
-    setEditFeatures(prev =>
       prev.includes(featureId)
         ? prev.filter(f => f !== featureId)
         : [...prev, featureId]
@@ -123,7 +116,6 @@ export default function SuperAdminTenants() {
     setEditEmail(client.email);
     setEditMrr(client.mrr);
     setEditStatus(client.status);
-    setEditFeatures(client.enabledModules || []);
     setIsEditModalOpen(true);
   };
 
@@ -136,11 +128,18 @@ export default function SuperAdminTenants() {
         plan: editPlan,
         mrr: Number(editMrr),
         name: editName,
-        email: editEmail,
-        enabledModules: editFeatures
+        email: editEmail
       });
       if (editStatus !== editingClient.status) {
         await api.updateTenantStatus(editingClient.id, editStatus);
+      }
+      // Auto-propaga módulos do novo plano ao trocar
+      if (editPlan !== editingClient.plan) {
+        const plans = await api.getSystemPlans();
+        const planData = plans.find((p: any) => p.name === editPlan);
+        if (planData?.modules?.length) {
+          await api.updateTenantModules(editingClient.id, planData.modules);
+        }
       }
       await fetchClients();
       setIsEditModalOpen(false);
@@ -203,6 +202,7 @@ export default function SuperAdminTenants() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight flex items-center gap-3">
+            <Building className="w-7 h-7 text-indigo-400" />
             Gestão de Tenants
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Controle de clientes, planos e acessos fantasmas (Impersonation).</p>
@@ -435,18 +435,19 @@ export default function SuperAdminTenants() {
                   <input required type="number" step="0.01" value={editMrr} onChange={e => setEditMrr(Number(e.target.value))} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Recursos Extras Habilitados</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {AVAILABLE_FEATURES.map(feat => (
-                      <label key={feat.id} onClick={() => toggleFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${editFeatures.includes(feat.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
-                          {editFeatures.includes(feat.id) && <CheckCircle2 className="w-3 h-3 text-white" />}
-                        </div>
-                        <span className="text-[10px] uppercase font-bold text-white/80">{feat.label}</span>
-                      </label>
-                    ))}
+                <div className="border-t border-white/5 pt-4">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Módulos do Sistema</label>
+                    <a
+                      href="/super-admin/modules"
+                      className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 underline underline-offset-2 transition-colors"
+                    >
+                      Gerenciar na página de Módulos →
+                    </a>
                   </div>
+                  <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
+                    Ao trocar de plano, os módulos do novo plano são aplicados automaticamente.
+                  </p>
                 </div>
 
                 <div className="border-t border-white/5 pt-4">
