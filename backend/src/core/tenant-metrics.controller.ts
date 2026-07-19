@@ -21,12 +21,19 @@ export class TenantMetricsController {
       throw new UnauthorizedException('Acesso restrito ao Super Admin.');
     }
 
-    const [usersCount, roomsCount, reservationsCount, guestsCount] =
+    const [usersCount, roomsCount, reservationsCount, guestsCount, branchesCount, invoicesCount, paidInvoicesCount, pendingInvoicesAmount] =
       await Promise.all([
         this.prisma.client.user.count({ where: { hotelId } }),
         this.prisma.client.room.count({ where: { hotelId } }),
         this.prisma.client.reservation.count({ where: { hotelId } }),
         this.prisma.client.guest.count({ where: { hotelId } }),
+        this.prisma.client.branch.count({ where: { hotelId } }),
+        this.prisma.client.systemInvoice.count({ where: { tenantId: hotelId } }),
+        this.prisma.client.systemInvoice.count({ where: { tenantId: hotelId, status: 'PAID' } }),
+        this.prisma.client.systemInvoice.aggregate({
+          where: { tenantId: hotelId, status: 'PENDING' },
+          _sum: { amount: true },
+        }),
       ]);
 
     return {
@@ -34,6 +41,10 @@ export class TenantMetricsController {
       roomsCount,
       reservationsCount,
       guestsCount,
+      branchesCount,
+      invoicesCount,
+      paidInvoicesCount,
+      pendingInvoicesAmount: pendingInvoicesAmount._sum.amount || 0,
     };
   }
 }

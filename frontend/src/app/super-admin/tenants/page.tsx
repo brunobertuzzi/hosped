@@ -626,6 +626,24 @@ export default function SuperAdminTenants() {
                       <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Reservas</div>
                       <div className="text-2xl font-bold text-white">{metricsData.reservationsCount}</div>
                     </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Filiais</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.branchesCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Total Faturas</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.invoicesCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Faturas Pagas</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.paidInvoicesCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Valor Pendente</div>
+                      <div className="text-2xl font-bold text-amber-400">
+                        R$ {Number(metricsData.pendingInvoicesAmount || 0).toFixed(2)}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Monitoramento de Uso */}
@@ -652,7 +670,7 @@ export default function SuperAdminTenants() {
                       </div>
                     </div>
                     <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                      Você pode oferecer pacotes de upsell caso o cliente atinja o limite.
+                      Limites configuráveis por plano em Planos e Preços.
                     </p>
                   </div>
                 </div>
@@ -738,11 +756,6 @@ export default function SuperAdminTenants() {
                 enabledModules={modulesClientModules}
                 onToggle={toggleModulesModule}
               />
-
-              <p className="text-[10px] text-white/30 mt-2 mb-6 leading-relaxed">
-                Módulos com <span className="text-emerald-400 font-bold">Sempre Ativo</span> são obrigatórios e não podem ser desabilitados.
-                Novos módulos adicionados em <code className="text-indigo-400">modules.ts</code> aparecem aqui automaticamente.
-              </p>
 
               <div className="flex gap-3 pt-4 border-t border-white/5">
                 <button

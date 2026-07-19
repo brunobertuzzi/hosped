@@ -453,12 +453,6 @@ export default function PlansPage() {
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Módulos do Sistema Habilitados</label>
 
-                      {/* Aviso sobre módulos core */}
-                      <p className="text-[10px] text-white/30 mb-4 leading-relaxed">
-                        Módulos da categoria <strong className="text-blue-400">Núcleo</strong> estão sempre ativos em qualquer plano.
-                        Selecione os módulos <strong className="text-white/60">comerciais</strong> e <strong className="text-white/60">avançados</strong> que este plano incluirá.
-                      </p>
-
                       {categoryOrder.map(category => {
                         const mods = modulesByCategory[category] || [];
                         if (!mods.length) return null;
