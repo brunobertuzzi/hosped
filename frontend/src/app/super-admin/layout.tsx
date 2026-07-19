@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  Building, Activity, Server, Users, DollarSign, 
+import {
+  Building, Activity, Server, Users, DollarSign,
   Settings, LogOut, Hexagon, Terminal, Radio, ToggleLeft, Menu, X
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
@@ -54,7 +54,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
       {/* Mobile Backdrop */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 z-40 md:hidden backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -63,7 +63,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       {/* Cyber/Sistema Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 md:relative w-[280px] md:w-64 bg-[#050505] border-r border-white/5 flex flex-col justify-between shrink-0 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} overflow-y-auto`}>
         <div className="p-6 relative">
-          <button 
+          <button
             className="md:hidden absolute top-6 right-6 text-white/50 hover:text-white"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -81,11 +81,11 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
           <nav className="space-y-1">
             <span className="block px-3 text-[10px] uppercase font-bold tracking-widest text-white/30 mb-2">Plataforma</span>
-            
+
             <Link href="/super-admin" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
               <Activity className="w-4 h-4" /> Dashboard MRR
             </Link>
-            
+
             <Link href="/super-admin/tenants" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/tenants' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
               <Building className="w-4 h-4" /> Gestão de Tenants
             </Link>
@@ -132,7 +132,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-y-auto relative">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none" />
-        
+
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#030014]/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </div>
             <span className="text-sm font-bold text-white/90">God Mode</span>
           </div>
-          <button 
+          <button
             className="p-2 -mr-2 text-white/70 hover:text-white"
             onClick={() => setIsMobileMenuOpen(true)}
           >
