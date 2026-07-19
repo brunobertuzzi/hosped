@@ -602,6 +602,35 @@ export class BillingService {
 
     return { success: true };
   }
+
+  /**
+   * Tenta cobrar todas as faturas pendentes (máx 5 tentativas cada)
+   */
+  async chargePendingInvoices(): Promise<number> {
+    const pendingInvoices = await this.prisma.client.systemInvoice.findMany({
+      where: {
+        status: 'PENDENTE',
+        attemptCount: { lt: 5 },
+      },
+      orderBy: { dueDate: 'asc' },
+      take: 100,
+    });
+
+    let charged = 0;
+    for (const inv of pendingInvoices) {
+      try {
+        const result = await this.processInvoicePayment(inv.id);
+        if (result.status === 'approved' || result.status === 'in_process') {
+          charged++;
+        }
+      } catch (err) {
+        this.logger.warn(`Erro ao cobrar fatura ${inv.id}:`, err);
+        continue;
+      }
+    }
+    return charged;
+  }
+
   // ============================================================
   //  MÉTRICAS MRR / CHURN
   // ============================================================

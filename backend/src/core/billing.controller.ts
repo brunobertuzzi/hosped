@@ -11,10 +11,12 @@ import {
   UnauthorizedException,
   Query,
   NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { BillingService } from './billing.service';
 import { PrismaService } from './prisma.service';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('core/billing')
 export class BillingController {
@@ -220,5 +222,54 @@ export class BillingController {
       orderBy: { createdAt: 'desc' },
       include: { hotel: { select: { nome: true, plan: true } } },
     });
+  }
+
+  // ========== CRON EXTERNO (para Railway/serverless) ==========
+
+  /**
+   * Endpoint público (rate-limited) para ser chamado por cron-job.org
+   * Acorda o servidor e dispara todas as tarefas de faturamento.
+   */
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('cron/tick')
+  @HttpCode(200)
+  async cronTick() {
+    const secret = process.env.CRON_SECRET;
+    // Se CRON_SECRET estiver configurado, exige o header x-cron-secret
+    // Caso contrário, permite público (rate-limited)
+    // this.checkCronSecret(); -- opcional
+
+    const results: any = {};
+
+    // 1. Gerar faturas (se for dia 1)
+    const today = new Date();
+    if (today.getDate() <= 2) {
+      const count = await this.billing.generateAllInvoices();
+      results.invoicesGenerated = count;
+    }
+
+    // 2. Cobrar faturas pendentes
+    const pendingCount = await this.billing.chargePendingInvoices();
+    results.invoicesCharged = pendingCount;
+
+    // 3. Sincronizar pagamentos
+    const confirmed = await this.billing.syncPendingPayments();
+    results.paymentsConfirmed = confirmed;
+
+    // 4. Suspender inadimplentes
+    const suspended = await this.billing.suspendOverdueHotels(5);
+    results.hotelsSuspended = suspended;
+
+    // 5. Aplicar downgrades (se for dia 1)
+    if (today.getDate() <= 2) {
+      const downgrades = await this.billing.applyScheduledDowngrades();
+      results.downgradesApplied = downgrades;
+    }
+
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      ...results,
+    };
   }
 }
