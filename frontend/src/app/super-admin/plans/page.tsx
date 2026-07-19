@@ -65,6 +65,17 @@ export default function PlansPage() {
     );
   };
 
+  // Seleciona/desseleciona todos os módulos premium
+  const toggleAllPremium = () => {
+    const premiumIds = ALL_MODULES.filter(m => !m.defaultEnabled).map(m => m.id);
+    const allSelected = premiumIds.every(id => systemFeatures.includes(id));
+    if (allSelected) {
+      setSystemFeatures(prev => prev.filter(id => !premiumIds.includes(id)));
+    } else {
+      setSystemFeatures(prev => [...new Set([...prev, ...premiumIds])]);
+    }
+  };
+
   // Gera automaticamente a lista de recursos do plano com base nos módulos
   const buildPlanFeatures = (): string[] => {
     const selectedMods = systemFeatures;
@@ -86,7 +97,7 @@ export default function PlansPage() {
       }
     });
 
-    return lines;
+    return lines.sort();
   };
 
   // Preview atualizado sempre que os campos mudam
@@ -303,7 +314,6 @@ export default function PlansPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white/90">Até {plan.maxBranches === -1 ? 'Ilimitadas' : plan.maxBranches} Filiais</p>
-                    <p className="text-xs text-white/40 font-medium">Hotéis por conta</p>
                   </div>
                 </div>
 
@@ -313,7 +323,6 @@ export default function PlansPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white/90">{plan.maxRooms === -1 ? 'Quartos Ilimitados' : `Até ${plan.maxRooms} Quartos`}</p>
-                    <p className="text-xs text-white/40 font-medium">Unidades habitacionais</p>
                   </div>
                 </div>
 
@@ -323,12 +332,11 @@ export default function PlansPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white/90">{plan.maxUsers === -1 ? 'Usuários Ilimitados' : `Até ${plan.maxUsers} Usuários`}</p>
-                    <p className="text-xs text-white/40 font-medium">Funcionários ativos</p>
                   </div>
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-white/5">
-                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos</p>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos ({plan.features?.length || 0})</p>
 
                   {/* Módulos do plano (features agora são os módulos) */}
                   {plan.features && plan.features.length > 0 && (
@@ -460,6 +468,16 @@ export default function PlansPage() {
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Módulos do Sistema Habilitados</label>
 
+                      <button
+                        type="button"
+                        onClick={toggleAllPremium}
+                        className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors mb-3"
+                      >
+                        {ALL_MODULES.filter(m => !m.defaultEnabled).every(id => systemFeatures.includes(id.id))
+                          ? '✓ Todos os premium selecionados (clique para limpar)'
+                          : 'Selecionar todos os módulos premium'}
+                      </button>
+
                       {categoryOrder.map(category => {
                         const mods = modulesByCategory[category] || [];
                         if (!mods.length) return null;
@@ -526,7 +544,7 @@ export default function PlansPage() {
                           ))}
                         </ul>
                         <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                            Gerado automaticamente com base nos limites e módulos selecionados acima.
+                          Gerado automaticamente com base nos módulos selecionados acima.
                         </p>
                       </div>
                     </div>

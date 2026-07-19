@@ -68,13 +68,19 @@ export default function SaasLandingPage() {
   const [activeFeatureIndex, setActiveFeatureIndex] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    import('../lib/api').then(({ api }) => {
-      api.getSystemPlans()
-        .then(data => {
-          setPlans(data.filter((p: any) => p.isActive));
-        })
-        .catch(err => console.error('Error fetching plans:', err));
-    });
+    const fetchPlans = () => {
+      import('../lib/api').then(({ api }) => {
+        api.getSystemPlans()
+          .then(data => {
+            setPlans(data.filter((p: any) => p.isActive));
+          })
+          .catch(err => console.error('Error fetching plans:', err));
+      });
+    };
+
+    fetchPlans();
+    document.addEventListener('visibilitychange', fetchPlans);
+    return () => document.removeEventListener('visibilitychange', fetchPlans);
   }, []);
 
   return (
