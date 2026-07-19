@@ -13,8 +13,32 @@ export class WebhooksService {
     // Processa notificação de pagamento PIX
     if (payload.type === 'payment' || payload.action === 'payment.updated') {
       status = WebhookStatus.PROCESSADO;
-      // Aqui poderia atualizar o status do pagamento no banco
-      // Ex: buscar transacaoId no payload e atualizar payment.status
+
+      // Atualiza o status do pagamento no banco
+      const paymentId = payload.data?.id?.toString() || payload.id?.toString();
+      if (paymentId) {
+        try {
+          const payment = await this.prisma.client.payment.findFirst({
+            where: { transacaoId: paymentId },
+          });
+
+          if (payment) {
+            const mpStatus = payload.data?.status || payload.status;
+            const isApproved =
+              mpStatus === 'approved' || mpStatus === 'aprovado';
+
+            await this.prisma.client.payment.update({
+              where: { id: payment.id },
+              data: { status: isApproved ? 'APROVADO' : 'RECUSADO' },
+            });
+          }
+        } catch (err) {
+          console.error(
+            `[Webhook MP] Erro ao atualizar pagamento ${paymentId}:`,
+            err,
+          );
+        }
+      }
     }
 
     const webhook = await this.prisma.client.webhookEvent.create({

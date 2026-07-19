@@ -178,6 +178,7 @@ export class ReservationsService {
             valorTotal: calculatedValorTotal,
             status: ReservationStatus.PENDENTE,
             origem,
+            guestToken: uuidv4(),
           },
           include: { guest: true, category: true },
         });
@@ -695,7 +696,7 @@ export class ReservationsService {
    */
   async preCheckIn(guestToken: string, documentoCheckIn: string) {
     const reservation = await this.prisma.client.reservation.findUnique({
-      where: { id: guestToken },
+      where: { guestToken },
       include: { guest: true },
     });
 
