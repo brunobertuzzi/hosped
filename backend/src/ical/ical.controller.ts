@@ -42,12 +42,12 @@ export class IcalController {
   @UseGuards(AuthGuard)
   @Get('settings')
   async getSettings(@Request() req: any) {
-    return this.icalService.getSettings(req.hotelId);
+    return this.icalService.getSettings(req.user?.hotelId);
   }
 
   @UseGuards(AuthGuard)
   @Post('settings')
   async saveSettings(@Request() req: any, @Body() data: any) {
-    return this.icalService.saveSettings(req.hotelId, data);
+    return this.icalService.saveSettings(req.user?.hotelId, data);
   }
 }

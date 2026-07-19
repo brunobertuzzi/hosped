@@ -28,10 +28,10 @@ export class TenantMetricsController {
         this.prisma.client.reservation.count({ where: { hotelId } }),
         this.prisma.client.guest.count({ where: { hotelId } }),
         this.prisma.client.branch.count({ where: { hotelId } }),
-        this.prisma.client.systemInvoice.count({ where: { tenantId: hotelId } }),
-        this.prisma.client.systemInvoice.count({ where: { tenantId: hotelId, status: 'PAID' } }),
+        this.prisma.client.systemInvoice.count({ where: { hotelId } }),
+        this.prisma.client.systemInvoice.count({ where: { hotelId, status: 'PAGO' } }),
         this.prisma.client.systemInvoice.aggregate({
-          where: { tenantId: hotelId, status: 'PENDING' },
+          where: { hotelId, status: 'PENDENTE' },
           _sum: { amount: true },
         }),
       ]);

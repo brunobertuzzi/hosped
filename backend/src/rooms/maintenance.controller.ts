@@ -52,14 +52,14 @@ export class MaintenanceController {
     );
   }
 
-  @UseGuards(PermissionsGuard)
+  @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('rooms.manage')
   @Put(':id')
   update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
     return this.roomsService.updateMaintenance(id, data, req.user?.sub);
   }
 
-  @UseGuards(PermissionsGuard)
+  @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('rooms.manage')
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {

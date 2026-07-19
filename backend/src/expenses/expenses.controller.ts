@@ -27,28 +27,28 @@ export class ExpensesController {
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('financial.manage')
   @Post()
   create(@Body() data: { descricao: string; valor: number; dataVencimento: string; categoria: string; fornecedor?: string }, @Request() req: any) {
     return this.expensesService.create(data, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('financial.manage')
   @Put(':id')
   update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
     return this.expensesService.update(id, data, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('financial.manage')
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() body: { status: ExpenseStatus }, @Request() req: any) {
     return this.expensesService.updateStatus(id, body.status, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('financial.manage')
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     return this.expensesService.remove(id, req.user?.sub);

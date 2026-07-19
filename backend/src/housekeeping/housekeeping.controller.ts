@@ -26,21 +26,21 @@ export class HousekeepingController {
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('housekeeping.manage')
   @Post()
   create(@Body() data: { roomId: string; tipoLimpeza: string; observacoes?: string; responsavelId?: string }, @Request() req: any) {
     return this.housekeepingService.create(data, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('housekeeping.manage')
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() body: { status: CleaningStatus }, @Request() req: any) {
     return this.housekeepingService.updateStatus(id, body.status, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
-  @Permissions('rooms.manage')
+  @Permissions('housekeeping.manage')
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     return this.housekeepingService.remove(id, req.user?.sub);

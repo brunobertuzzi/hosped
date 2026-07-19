@@ -132,6 +132,9 @@ model Hotel {
   apiRequestsCount     Int       @default(0)
   apiRequestsLimit     Int       @default(10000)
   enabledModules       String[]  @default([])
+  layout               Json?    // Configurações de layout: { font, heroVariant }
+  webhooks             Json?    // URLs de webhook: { onReservationComplete, onCheckIn }
+  localInfos           Json?    // Informações locais: { checkInTime, checkOutTime, timezone }
 
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
@@ -173,6 +176,7 @@ model Branch {
   estado    String
   telefone  String
   email     String
+  status    String   @default("ACTIVE")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -292,6 +296,7 @@ model Reservation {
   checkInAt        DateTime?
   checkOutAt       DateTime?
   otaReservationId String? // ID da reserva na OTA (ex: Booking, Airbnb) para evitar duplicatas
+  guestToken       String? @unique // Token único para acesso do hóspede ao painel público
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
