@@ -156,7 +156,6 @@ export default function SuperAdminTenants() {
   const [editEmail, setEditEmail] = useState('');
   const [editMrr, setEditMrr] = useState(0);
   const [editStatus, setEditStatus] = useState<TenantStatus>('ACTIVE');
-  const [editModules, setEditModules] = useState<string[]>([]);
 
   // Usa o registry centralizado — adicionar módulos em modules.ts os expõe aqui automaticamente
   const AVAILABLE_FEATURES = PREMIUM_MODULES;
@@ -223,18 +222,7 @@ export default function SuperAdminTenants() {
     setEditEmail(client.email);
     setEditMrr(client.mrr);
     setEditStatus(client.status);
-    setEditModules(client.enabledModules || client.features || []);
     setIsEditModalOpen(true);
-  };
-
-  const toggleEditModule = (moduleId: string) => {
-    const mod = ALL_MODULES.find(m => m.id === moduleId);
-    if (mod?.defaultEnabled) return; // módulos default não podem ser desativados
-    setEditModules(prev =>
-      prev.includes(moduleId)
-        ? prev.filter(id => id !== moduleId)
-        : [...prev, moduleId]
-    );
   };
 
   const handleEditSave = async (e: React.FormEvent) => {
@@ -251,8 +239,6 @@ export default function SuperAdminTenants() {
       if (editStatus !== editingClient.status) {
         await api.updateTenantStatus(editingClient.id, editStatus);
       }
-      // Salva módulos
-      await api.updateTenantModules(editingClient.id, editModules);
       await fetchClients();
       setIsEditModalOpen(false);
     } catch (err) {
@@ -544,7 +530,7 @@ export default function SuperAdminTenants() {
       <AnimatePresence>
         {isEditModalOpen && editingClient && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#050505] border border-white/10 rounded-[24px] p-8 shadow-2xl relative">
               <button onClick={() => setIsEditModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white z-10">
                 <X className="w-5 h-5" />
               </button>
@@ -594,48 +580,6 @@ export default function SuperAdminTenants() {
                   <input required type="number" step="0.01" value={editMrr} onChange={e => setEditMrr(Number(e.target.value))} className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-indigo-500" />
                 </div>
 
-                <div className="border-t border-white/5 pt-4">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Módulos do Sistema</label>
-
-                  {/* Categorias de módulos */}
-                  <ModuleGrid
-                    modules={ALL_MODULES}
-                    enabledModules={editModules}
-                    onToggle={toggleEditModule}
-                  />
-
-                  <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                    Módulos com <span className="text-emerald-400 font-bold">Sempre Ativo</span> são obrigatórios e não podem ser desabilitados.
-                  </p>
-                </div>
-
-                <div className="border-t border-white/5 pt-4">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Monitoramento de Uso (Quotas)</label>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
-                        <span>Armazenamento (Fotos e Docs)</span>
-                        <span>{editingClient.storageUsedMB || 0} MB / {(editingClient.storageLimitMB || 1024) >= 1024 ? `${(editingClient.storageLimitMB || 1024) / 1024} GB` : `${editingClient.storageLimitMB} MB`}</span>
-                      </div>
-                      <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                        <div className="bg-emerald-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.storageUsedMB || 0) / (editingClient.storageLimitMB || 1024)) * 100, 100)}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
-                        <span>Requisições de API (Mensal)</span>
-                        <span className="text-amber-400">{editingClient.apiRequestsCount || 0} / {editingClient.apiRequestsLimit || 10000}</span>
-                      </div>
-                      <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                        <div className="bg-amber-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.apiRequestsCount || 0) / (editingClient.apiRequestsLimit || 10000)) * 100, 100)}%` }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                    Você pode oferecer pacotes de upsell caso o cliente atinja o limite.
-                  </p>
-                </div>
-
                 <div className="pt-4 flex gap-3">
                   <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 text-[11px] uppercase font-bold text-white/50 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">Cancelar</button>
                   <button type="submit" className="flex-1 py-3 text-[11px] uppercase font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl shadow-[0_0_20px_-5px_#6366f1] transition-colors">Salvar Alterações</button>
@@ -664,22 +608,52 @@ export default function SuperAdminTenants() {
                   <span className="text-[11px] text-white/40 uppercase tracking-widest font-bold">Calculando no banco...</span>
                 </div>
               ) : metricsData ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-                    <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Usuários</div>
-                    <div className="text-2xl font-bold text-white">{metricsData.usersCount}</div>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Usuários</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.usersCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Quartos</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.roomsCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Hóspedes</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.guestsCount}</div>
+                    </div>
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                      <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Reservas</div>
+                      <div className="text-2xl font-bold text-white">{metricsData.reservationsCount}</div>
+                    </div>
                   </div>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-                    <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Quartos</div>
-                    <div className="text-2xl font-bold text-white">{metricsData.roomsCount}</div>
-                  </div>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-                    <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Hóspedes</div>
-                    <div className="text-2xl font-bold text-white">{metricsData.guestsCount}</div>
-                  </div>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-                    <div className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Reservas</div>
-                    <div className="text-2xl font-bold text-white">{metricsData.reservationsCount}</div>
+
+                  {/* Monitoramento de Uso */}
+                  <div className="border-t border-white/5 pt-6">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-4">Monitoramento de Uso (Quotas)</label>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                          <span>Armazenamento (Fotos e Docs)</span>
+                          <span>{editingClient.storageUsedMB || 0} MB / {(editingClient.storageLimitMB || 1024) >= 1024 ? `${(editingClient.storageLimitMB || 1024) / 1024} GB` : `${editingClient.storageLimitMB} MB`}</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                          <div className="bg-emerald-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.storageUsedMB || 0) / (editingClient.storageLimitMB || 1024)) * 100, 100)}%` }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[10px] text-white/70 mb-1 font-bold">
+                          <span>Requisições de API (Mensal)</span>
+                          <span className="text-amber-400">{editingClient.apiRequestsCount || 0} / {editingClient.apiRequestsLimit || 10000}</span>
+                        </div>
+                        <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                          <div className="bg-amber-500 h-full transition-all" style={{ width: `${Math.min(((editingClient.apiRequestsCount || 0) / (editingClient.apiRequestsLimit || 10000)) * 100, 100)}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
+                      Você pode oferecer pacotes de upsell caso o cliente atinja o limite.
+                    </p>
                   </div>
                 </div>
               ) : (
