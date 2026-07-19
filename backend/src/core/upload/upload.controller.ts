@@ -8,6 +8,7 @@ import {
   UseGuards,
   BadRequestException,
   Res,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
@@ -23,11 +24,11 @@ export class UploadController {
   @Post()
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado.');
     }
-    const url = await this.uploadService.uploadFile(file);
+    const url = await this.uploadService.uploadFile(file, req.user?.hotelId);
     return { url };
   }
 
