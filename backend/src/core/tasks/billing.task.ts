@@ -78,11 +78,4 @@ export class BillingTask {
     this.logger.log(`${count} downgrades aplicados.`);
   }
 
-  // Roda todo dia às 07:00 — Processa trials expirados
-  @Cron('0 7 * * *')
-  async processTrials() {
-    this.logger.log('Processando trials expirados...');
-    const result = await this.billing.processExpiredTrials();
-    this.logger.log(`Trials: ${result.converted} convertidos, ${result.suspended} suspensos, ${result.notified} notificados.`);
-  }
 }

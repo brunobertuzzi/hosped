@@ -855,16 +855,6 @@ export const api = {
     return await request(`/core/billing/logs${query}`);
   },
 
-  /** Iniciar trial para hotel (Super Admin) */
-  async startTrial(hotelId: string, days: number = 14) {
-    return await request(`/core/billing/trial/start/${hotelId}?days=${days}`, { method: 'POST' });
-  },
-
-  /** Processar trials expirados (Super Admin) */
-  async processExpiredTrials() {
-    return await request('/core/billing/trial/process-expired', { method: 'POST' });
-  },
-
   /** Ativar add-on em hotel via admin */
   async adminActivateAddon(hotelId: string, addonId: string) {
     return await request(`/core/billing/addons/admin/${hotelId}/activate`, {

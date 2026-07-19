@@ -183,22 +183,6 @@ export class BillingController {
     return this.prisma.client.addon.findMany({ orderBy: { price: 'asc' } });
   }
 
-  // ========== TRIAL ==========
-
-  @Post('trial/start/:hotelId')
-  @UseGuards(AuthGuard)
-  async startTrial(@Param('hotelId') hotelId: string, @Query('days') days: string, @Request() req: any) {
-    this.checkSuperAdmin(req);
-    return this.billing.startTrial(hotelId, days ? parseInt(days) : 14);
-  }
-
-  @Post('trial/process-expired')
-  @UseGuards(AuthGuard)
-  async processExpiredTrials(@Request() req: any) {
-    this.checkSuperAdmin(req);
-    return this.billing.processExpiredTrials();
-  }
-
   // ========== CUPONS ==========
 
   @Get('coupons/validate/:code')

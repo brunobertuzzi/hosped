@@ -151,7 +151,7 @@ export class AuthService {
         },
       });
 
-      // 2. Criar Primeira Filial (Branch) — Se for trial, não criar branch com status
+      // 2. Criar Primeira Filial (Branch)
       const branch = await tx.branch.create({
         data: {
           hotelId: hotel.id,
@@ -161,25 +161,9 @@ export class AuthService {
           estado: 'EX',
           telefone: '00000000000',
           email: email,
-          ...(data.isTrial ? {} : { status: 'ACTIVE' }),
+          status: 'ACTIVE',
         },
       });
-
-      // Se for trial, configurar trialEndsAt
-      if (data.isTrial) {
-        const trialDays = data.trialDays || 14;
-        const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + trialDays);
-        await tx.hotel.update({
-          where: { id: hotel.id },
-          data: {
-            status: 'ACTIVE',
-            trialEndsAt: trialEnd,
-            nextBillingDate: trialEnd,
-            mrr: 0,
-          },
-        });
-      }
 
       // 3. Criar Owner
       const user = await tx.user.create({

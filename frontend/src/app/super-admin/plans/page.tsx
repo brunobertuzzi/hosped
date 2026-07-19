@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../../lib/api';
-import { PREMIUM_MODULES, ALL_MODULES } from '../../../lib/modules';
+import { ALL_MODULES } from '../../../lib/modules';
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -37,8 +37,26 @@ export default function PlansPage() {
   const [systemFeatures, setSystemFeatures] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
 
-  // Usa o registry centralizado — adicionar módulos aqui automaticamente os expõe
-  const AVAILABLE_FEATURES = PREMIUM_MODULES;
+  // Agrupa todos os módulos por categoria
+  const modulesByCategory = ALL_MODULES.reduce<Record<string, typeof ALL_MODULES>>((acc, mod) => {
+    if (!acc[mod.category]) acc[mod.category] = [];
+    acc[mod.category].push(mod);
+    return acc;
+  }, {});
+
+  const categoryOrder = ['core', 'operations', 'commercial', 'advanced'];
+  const CATEGORY_LABELS: Record<string, string> = {
+    core: 'Núcleo (sempre ativo)',
+    operations: 'Operacional',
+    commercial: 'Comercial',
+    advanced: 'Avançado',
+  };
+  const CATEGORY_COLORS: Record<string, string> = {
+    core: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+    operations: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    commercial: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+    advanced: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  };
 
   const toggleSystemFeature = (featureId: string) => {
     setSystemFeatures(prev =>
@@ -434,16 +452,65 @@ export default function PlansPage() {
 
                     <div className="col-span-2">
                       <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Módulos do Sistema Habilitados</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {AVAILABLE_FEATURES.map(feat => (
-                          <label key={feat.id} onClick={() => toggleSystemFeature(feat.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500/10 border-purple-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${systemFeatures.includes(feat.id) ? 'bg-purple-500 border-purple-500' : 'border-white/20'}`}>
-                              {systemFeatures.includes(feat.id) && <CheckCircle2 className="w-3 h-3 text-white" />}
+
+                      {/* Aviso sobre módulos core */}
+                      <p className="text-[10px] text-white/30 mb-4 leading-relaxed">
+                        Módulos da categoria <strong className="text-blue-400">Núcleo</strong> estão sempre ativos em qualquer plano.
+                        Selecione os módulos <strong className="text-white/60">comerciais</strong> e <strong className="text-white/60">avançados</strong> que este plano incluirá.
+                      </p>
+
+                      {categoryOrder.map(category => {
+                        const mods = modulesByCategory[category] || [];
+                        if (!mods.length) return null;
+                        return (
+                          <div key={category} className="mb-5">
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-widest mb-3 ${CATEGORY_COLORS[category] || 'text-white/40 bg-white/5 border-white/10'}`}>
+                              {CATEGORY_LABELS[category] || category}
                             </div>
-                            <span className="text-[10px] uppercase font-bold text-white/80">{feat.label}</span>
-                          </label>
-                        ))}
-                      </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {mods.map(mod => {
+                                const isDefault = mod.defaultEnabled;
+                                const isSelected = systemFeatures.includes(mod.id);
+                                return (
+                                  <label
+                                    key={mod.id}
+                                    onClick={() => !isDefault && toggleSystemFeature(mod.id)}
+                                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                                      isDefault
+                                        ? 'bg-blue-500/5 border-blue-500/10 opacity-60 cursor-default'
+                                        : isSelected
+                                        ? 'bg-purple-500/10 border-purple-500/30'
+                                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                                    }`}
+                                  >
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                                      isDefault
+                                        ? 'bg-blue-500/30 border-blue-500/50'
+                                        : isSelected
+                                        ? 'bg-purple-500 border-purple-500'
+                                        : 'border-white/20'
+                                    }`}>
+                                      {(isDefault || isSelected) && <CheckCircle2 className="w-3 h-3 text-white" />}
+                                    </div>
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className={`text-[10px] uppercase font-bold truncate ${
+                                        isDefault ? 'text-blue-400' : isSelected ? 'text-white' : 'text-white/60'
+                                      }`}>
+                                        {mod.label}
+                                      </span>
+                                      {isDefault && (
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0">
+                                          Sempre Ativo
+                                        </span>
+                                      )}
+                                    </div>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div className="col-span-2">

@@ -5,7 +5,6 @@ import {
   MinLength,
   IsOptional,
   IsNumber,
-  IsBoolean,
 } from 'class-validator';
 
 export class RegisterDto {
@@ -38,14 +37,6 @@ export class RegisterDto {
 
   @IsOptional()
   paymentData?: any;
-
-  @IsBoolean()
-  @IsOptional()
-  isTrial?: boolean;
-
-  @IsNumber()
-  @IsOptional()
-  trialDays?: number;
 
   @IsString()
   @IsOptional()
