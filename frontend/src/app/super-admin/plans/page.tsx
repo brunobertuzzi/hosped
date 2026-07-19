@@ -33,7 +33,6 @@ export default function PlansPage() {
   const [maxBranches, setMaxBranches] = useState('');
   const [maxRooms, setMaxRooms] = useState('');
   const [maxUsers, setMaxUsers] = useState('');
-  const [featuresText, setFeaturesText] = useState('');
   const [systemFeatures, setSystemFeatures] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
 
@@ -105,7 +104,6 @@ export default function PlansPage() {
   };
 
   // Preview atualizado sempre que os campos mudam
-  const [showPreview, setShowPreview] = useState(false);
   const autoFeatures = buildPlanFeatures();
 
   useEffect(() => {
@@ -133,7 +131,6 @@ export default function PlansPage() {
       setMaxBranches(plan.maxBranches.toString());
       setMaxRooms(plan.maxRooms?.toString() || '-1');
       setMaxUsers(plan.maxUsers.toString());
-      setFeaturesText(plan.features ? plan.features.join('\n') : '');
       setSystemFeatures(plan.modules || plan.systemFeatures || []);
       setIsActive(plan.isActive);
     } else {
@@ -144,7 +141,6 @@ export default function PlansPage() {
       setMaxBranches('1');
       setMaxRooms('20');
       setMaxUsers('5');
-      setFeaturesText('');
       setSystemFeatures([]);
       setIsActive(true);
     }
@@ -160,10 +156,6 @@ export default function PlansPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const finalFeatures = featuresText.trim()
-        ? featuresText.split('\n').filter(f => f.trim() !== '')
-        : buildPlanFeatures();
-
       const data = {
         name,
         description,
@@ -171,7 +163,7 @@ export default function PlansPage() {
         maxBranches: parseInt(maxBranches, 10),
         maxRooms: parseInt(maxRooms, 10),
         maxUsers: parseInt(maxUsers, 10),
-        features: finalFeatures,
+        features: buildPlanFeatures(),
         modules: systemFeatures,
         isActive,
       };
@@ -554,50 +546,20 @@ export default function PlansPage() {
                     </div>
 
                     <div className="col-span-2">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="block text-xs font-medium text-white/50 uppercase tracking-wider">Recursos (Preview Automático)</label>
-                        <button
-                          type="button"
-                          onClick={() => setShowPreview(!showPreview)}
-                          className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                          {showPreview ? 'Ocultar preview' : 'Ver preview'}
-                        </button>
+                      <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Recursos (Preview Automático)</label>
+                      <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4">
+                        <ul className="space-y-2">
+                          {autoFeatures.map((feat, i) => (
+                            <li key={i} className="flex items-start gap-2 text-[12px] text-white/70 font-medium">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                              <span>{feat}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
+                            Gerado automaticamente com base nos limites e módulos selecionados acima.
+                        </p>
                       </div>
-
-                      {showPreview && (
-                        <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4 mb-3">
-                          <ul className="space-y-2">
-                            {autoFeatures.map((feat, i) => (
-                              <li key={i} className="flex items-start gap-2 text-[12px] text-white/70 font-medium">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                                <span>{feat}</span>
-                              </li>
-                            ))}
-                          </ul>
-                          <p className="text-[10px] text-white/30 mt-3 leading-relaxed">
-                            ✅ Lista gerada automaticamente com base nos limites e módulos selecionados.
-                            Os dados reais salvos no banco serão estes.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Textarea opcional para personalização */}
-                      <details className="mt-2">
-                        <summary className="text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white/50 cursor-pointer transition-colors">
-                          Personalizar recursos manualmente
-                        </summary>
-                        <textarea
-                          rows={3}
-                          value={featuresText}
-                          onChange={e => setFeaturesText(e.target.value)}
-                          placeholder="Deixe em branco para usar o preview automático."
-                          className="w-full input-premium rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 resize-none mt-2"
-                        />
-                      </details>
-                      <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
-                        Se vazio, o sistema usa a lista automática. Se preenchido, usa seu texto personalizado.
-                      </p>
                     </div>
 
                     <div className="col-span-2 flex items-center gap-3 mt-2">
