@@ -65,26 +65,12 @@ export default function PlansPage() {
     );
   };
 
-  // Gera automaticamente a lista de recursos do plano com base nos campos
+  // Gera automaticamente a lista de recursos do plano com base nos módulos
   const buildPlanFeatures = (): string[] => {
-    const b = parseInt(maxBranches) || 0;
-    const r = parseInt(maxRooms) || 0;
-    const u = parseInt(maxUsers) || 0;
     const selectedMods = systemFeatures;
     const lines: string[] = [];
 
-    // Limites
-    if (b === -1) lines.push('Filiais ilimitadas');
-    else if (b === 1) lines.push('1 filial');
-    else if (b > 1) lines.push(`Até ${b} filiais`);
-
-    if (r === -1) lines.push('Quartos ilimitados');
-    else if (r > 0) lines.push(`Até ${r} quartos`);
-
-    if (u === -1) lines.push('Usuários ilimitados');
-    else if (u > 0) lines.push(`Até ${u} usuários`);
-
-    // Módulos default (sempre ativos) — agrupa os de core/operations
+    // Módulos default (sempre ativos) — core + operations
     const defaultMods = ALL_MODULES.filter(m => m.defaultEnabled);
     defaultMods.forEach(mod => {
       if (!lines.includes(mod.label)) {
@@ -342,37 +328,20 @@ export default function PlansPage() {
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-white/5">
-                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Recursos Inclusos</p>
-                  <ul className="space-y-3">
-                    {plan.features.slice(0, 5).map((f: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-white/70 font-medium">
-                        <CheckCircle2 className={`w-4 h-4 shrink-0 ${theme.textClass}`} />
-                        <span className="pt-0.5">{f}</span>
-                      </li>
-                    ))}
-                    {plan.features.length > 5 && (
-                      <li className={`text-xs font-bold pl-6.5 mt-2 ${theme.textClass}`}>+ {plan.features.length - 5} recursos adicionais</li>
-                    )}
-                  </ul>
-                </div>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos</p>
 
-                {/* Módulos do Sistema Inclusos */}
-                {plan.modules && plan.modules.length > 0 && (
-                  <div className="pt-4 mt-4 border-t border-white/5">
-                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos</p>
-                    <div className="flex flex-wrap gap-2">
-                      {plan.modules.map((modId: string) => {
-                        const mod = ALL_MODULES.find(m => m.id === modId);
-                        if (!mod) return null;
-                        return (
-                          <span key={modId} className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest ${theme.bgClass} ${theme.textClass} border ${theme.borderClass}`}>
-                            {mod.label}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                  {/* Módulos do plano (features agora são os módulos) */}
+                  {plan.features && plan.features.length > 0 && (
+                    <ul className="space-y-2">
+                      {plan.features.map((f: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2.5 text-xs text-white/70 font-medium">
+                          <CheckCircle2 className={`w-4 h-4 shrink-0 ${theme.textClass}`} />
+                          <span className="pt-0.5">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-2 relative z-10 mt-auto pt-6 border-t border-white/5">
