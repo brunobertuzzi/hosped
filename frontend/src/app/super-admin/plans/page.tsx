@@ -100,6 +100,29 @@ export default function PlansPage() {
     return lines.sort();
   };
 
+  // Versão para usar nos cards (recebe modules direto do objeto plan)
+  const buildPlanFeaturesFromModules = (modules: string[]): string[] => {
+    const lines: string[] = [];
+
+    // Módulos default (sempre ativos)
+    const defaultMods = ALL_MODULES.filter(m => m.defaultEnabled);
+    defaultMods.forEach(mod => {
+      if (!lines.includes(mod.label)) {
+        lines.push(mod.label);
+      }
+    });
+
+    // Módulos premium selecionados
+    modules.forEach(modId => {
+      const mod = ALL_MODULES.find(m => m.id === modId);
+      if (mod && !lines.includes(mod.label)) {
+        lines.push(mod.label);
+      }
+    });
+
+    return lines.sort();
+  };
+
   // Preview atualizado sempre que os campos mudam
   const autoFeatures = buildPlanFeatures();
 
@@ -336,11 +359,11 @@ export default function PlansPage() {
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-white/5">
-                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos ({buildCardFeatures(plan.modules || []).length})</p>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos ({buildPlanFeaturesFromModules(plan.modules || []).length})</p>
 
                   {/* Módulos do plano — calculados dos modules */}
                   {(() => {
-                    const cardFeatures = buildCardFeatures(plan.modules || []);
+                    const cardFeatures = buildPlanFeaturesFromModules(plan.modules || []);
                     return (
                       <ul className="space-y-2">
                         {cardFeatures.map((f: string, idx: number) => (
