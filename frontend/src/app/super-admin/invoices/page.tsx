@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../lib/api';
-import { DollarSign, Search, CheckCircle2, AlertCircle, CreditCard, Clock, Loader2, RefreshCcw, PlusCircle, Zap, Wallet } from 'lucide-react';
+import { DollarSign, Search, CheckCircle2, AlertCircle, CreditCard, Clock, Loader2, RefreshCcw, PlusCircle, Zap, Wallet, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -146,6 +146,20 @@ export default function InvoicesPage() {
       toast.error('Erro ao gerar fatura.');
     } finally {
       setLoadingAction(null);
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta fatura?')) return;
+    setLoadingPayment(`del-${invoiceId}`);
+    try {
+      await api.deleteInvoice(invoiceId);
+      toast.success('Fatura excluída!');
+      await fetchData();
+    } catch {
+      toast.error('Erro ao excluir fatura.');
+    } finally {
+      setLoadingPayment(null);
     }
   };
 
@@ -354,6 +368,15 @@ export default function InvoicesPage() {
                                 </button>
                               </>
                             )}
+                            <button
+                              onClick={() => handleDeleteInvoice(inv.id)}
+                              disabled={loadingPayment === `del-${inv.id}`}
+                              className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-[10px] uppercase font-bold tracking-widest text-red-400 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                              title="Excluir fatura"
+                            >
+                              {loadingPayment === `del-${inv.id}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                              Excluir
+                            </button>
                           </div>
                         </td>
                       </tr>

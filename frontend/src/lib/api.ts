@@ -476,6 +476,12 @@ export const api = {
     });
   },
 
+  async deleteInvoice(invoiceId: string) {
+    return await request(`/core/invoices/${invoiceId}`, {
+      method: 'DELETE',
+    });
+  },
+
   async getTenantMetrics(tenantId: string) {
     return await request(`/core/tenant-metrics/${tenantId}`);
   },

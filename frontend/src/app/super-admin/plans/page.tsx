@@ -336,19 +336,22 @@ export default function PlansPage() {
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-white/5">
-                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos ({plan.features?.length || 0})</p>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Módulos Inclusos ({buildCardFeatures(plan.modules || []).length})</p>
 
-                  {/* Módulos do plano (features agora são os módulos) */}
-                  {plan.features && plan.features.length > 0 && (
-                    <ul className="space-y-2">
-                      {plan.features.map((f: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2.5 text-xs text-white/70 font-medium">
-                          <CheckCircle2 className={`w-4 h-4 shrink-0 ${theme.textClass}`} />
-                          <span className="pt-0.5">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  {/* Módulos do plano — calculados dos modules */}
+                  {(() => {
+                    const cardFeatures = buildCardFeatures(plan.modules || []);
+                    return (
+                      <ul className="space-y-2">
+                        {cardFeatures.map((f: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-2.5 text-xs text-white/70 font-medium">
+                            <CheckCircle2 className={`w-4 h-4 shrink-0 ${theme.textClass}`} />
+                            <span className="pt-0.5">{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  })()}
                 </div>
               </div>
 

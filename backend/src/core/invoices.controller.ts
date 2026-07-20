@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
 
@@ -30,5 +30,14 @@ export class InvoicesController {
         paidAt: new Date(),
       },
     });
+  }
+
+  @Delete(':id')
+  async deleteInvoice(@Param('id') id: string, @Request() req: any) {
+    if (req.user.role !== 'PLATFORM_OWNER') {
+      throw new UnauthorizedException('Acesso negado.');
+    }
+    await this.prisma.client.systemInvoice.delete({ where: { id } });
+    return { success: true };
   }
 }
