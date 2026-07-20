@@ -1,16 +1,45 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma.service';
 import { BillingService } from '../billing.service';
 
 @Injectable()
-export class BillingTask {
+export class BillingTask implements OnApplicationBootstrap {
   private readonly logger = new Logger(BillingTask.name);
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly billing: BillingService,
   ) {}
+
+  async onApplicationBootstrap() {
+    this.logger.log('=== BillingTask: Executando tarefas no boot ===');
+    try {
+      const now = new Date();
+      const isMonthStart = now.getDate() <= 2;
+
+      if (isMonthStart) {
+        const count = await this.billing.generateAllInvoices();
+        this.logger.log(`${count} faturas geradas no boot.`);
+      }
+
+      const charged = await this.billing.chargePendingInvoices();
+      this.logger.log(`${charged} faturas cobradas no boot.`);
+
+      const confirmed = await this.billing.syncPendingPayments();
+      this.logger.log(`${confirmed} pagamentos sincronizados no boot.`);
+
+      const suspended = await this.billing.suspendOverdueHotels(5);
+      if (suspended > 0) this.logger.warn(`${suspended} hotéis suspensos no boot.`);
+
+      if (isMonthStart) {
+        const downgrades = await this.billing.applyScheduledDowngrades();
+        this.logger.log(`${downgrades} downgrades aplicados no boot.`);
+      }
+    } catch (err) {
+      this.logger.error('Erro no billing boot:', err);
+    }
+  }
 
   // Roda todo dia 1º do mês às 02:00 — Gera faturas
   @Cron('0 2 1 * *')
@@ -24,30 +53,8 @@ export class BillingTask {
   @Cron('0 3 * * *')
   async chargePendingInvoices() {
     this.logger.log('Iniciando cobrança de faturas pendentes...');
-
-    const pendingInvoices = await this.prisma.client.systemInvoice.findMany({
-      where: {
-        status: 'PENDENTE',
-        attemptCount: { lt: 5 }, // Máx 5 tentativas
-      },
-      orderBy: { dueDate: 'asc' },
-      take: 100,
-    });
-
-    let charged = 0;
-    for (const inv of pendingInvoices) {
-      try {
-        const result = await this.billing.processInvoicePayment(inv.id);
-        if (result.status === 'approved' || result.status === 'in_process') {
-          charged++;
-        }
-      } catch (err) {
-        this.logger.warn(`Erro ao cobrar fatura ${inv.id}:`, err);
-        continue;
-      }
-    }
-
-    this.logger.log(`Cobranças processadas: ${charged}/${pendingInvoices.length}`);
+    const charged = await this.billing.chargePendingInvoices();
+    this.logger.log(`Cobranças processadas: ${charged}`);
   }
 
   // Roda todo dia às 04:00 — Sincroniza pagamentos pendentes no gateway
@@ -77,5 +84,4 @@ export class BillingTask {
     const count = await this.billing.applyScheduledDowngrades();
     this.logger.log(`${count} downgrades aplicados.`);
   }
-
 }
