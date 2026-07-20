@@ -15,13 +15,8 @@ export class BillingTask implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     this.logger.log('=== BillingTask: Executando tarefas no boot ===');
     try {
-      const now = new Date();
-      const isMonthStart = now.getDate() <= 2;
-
-      if (isMonthStart) {
-        const count = await this.billing.generateAllInvoices();
-        this.logger.log(`${count} faturas geradas no boot.`);
-      }
+      const count = await this.billing.generateAllInvoices();
+      this.logger.log(`${count} faturas geradas no boot.`);
 
       const charged = await this.billing.chargePendingInvoices();
       this.logger.log(`${charged} faturas cobradas no boot.`);
@@ -32,19 +27,17 @@ export class BillingTask implements OnApplicationBootstrap {
       const suspended = await this.billing.suspendOverdueHotels(5);
       if (suspended > 0) this.logger.warn(`${suspended} hotéis suspensos no boot.`);
 
-      if (isMonthStart) {
-        const downgrades = await this.billing.applyScheduledDowngrades();
-        this.logger.log(`${downgrades} downgrades aplicados no boot.`);
-      }
+      const downgrades = await this.billing.applyScheduledDowngrades();
+      this.logger.log(`${downgrades} downgrades aplicados no boot.`);
     } catch (err) {
       this.logger.error('Erro no billing boot:', err);
     }
   }
 
-  // Roda todo dia 1º do mês às 02:00 — Gera faturas
-  @Cron('0 2 1 * *')
+  // Roda todo dia às 02:00 — Gera faturas para hotéis com nextBillingDate vencido
+  @Cron('0 2 * * *')
   async generateMonthlyInvoices() {
-    this.logger.log('Iniciando geração de faturas do mês...');
+    this.logger.log('Iniciando geração de faturas...');
     const count = await this.billing.generateAllInvoices();
     this.logger.log(`Geração concluída: ${count} faturas criadas.`);
   }
@@ -77,8 +70,8 @@ export class BillingTask implements OnApplicationBootstrap {
     }
   }
 
-  // Roda todo dia 1º de cada mês às 06:00 — Aplica downgrades agendados
-  @Cron('0 6 1 * *')
+  // Roda todo dia às 06:00 — Aplica downgrades agendados
+  @Cron('0 6 * * *')
   async applyDowngrades() {
     this.logger.log('Aplicando downgrades agendados...');
     const count = await this.billing.applyScheduledDowngrades();

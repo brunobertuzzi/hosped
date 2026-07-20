@@ -79,8 +79,13 @@ export class BillingService {
       },
     });
 
-    // Atualizar nextBillingDate e lastInvoiceId no hotel
-    const nextBilling = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    // Atualizar nextBillingDate para o mesmo dia do mês seguinte
+    const nextBilling = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    // Se o dia não existir no mês seguinte (ex: 31 → fevereiro), usa o último dia
+    if (nextBilling.getDate() !== now.getDate()) {
+      nextBilling.setDate(0); // último dia do mês anterior = fim do mês atual
+      nextBilling.setMonth(nextBilling.getMonth() + 1);
+    }
     await this.prisma.client.hotel.update({
       where: { id: hotelId },
       data: {
