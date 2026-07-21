@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   Wrench, CheckCircle, AlertTriangle, User,
-  BedDouble, Clock, Search, Filter, Layers
+  BedDouble, Clock, Search, Filter, Layers, Plus, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
@@ -14,6 +14,9 @@ export default function ManutencaoPage() {
   const { maintenance, rooms, completeMaintenanceOrder, user } = useActiveBranchData();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ABERTA' | 'CONCLUIDA'>('ALL');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newMaintRoomId, setNewMaintRoomId] = useState('');
+  const [newMaintDesc, setNewMaintDesc] = useState('');
 
   const filteredOrders = useMemo(() => {
     return maintenance.filter(order => {
@@ -68,6 +71,20 @@ export default function ManutencaoPage() {
     }
   };
 
+  const handleCreateMaintenance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMaintRoomId || !newMaintDesc) return;
+    try {
+      await api.createMaintenance(newMaintRoomId, newMaintDesc);
+      setShowCreateModal(false);
+      setNewMaintRoomId('');
+      setNewMaintDesc('');
+      alerts.success('Chamado de manutenção aberto!');
+    } catch (err: any) {
+      alerts.error('Erro ao abrir chamado', err.message);
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-8 pb-20">
 
@@ -79,6 +96,12 @@ export default function ManutencaoPage() {
           </h1>
           <p className="text-[13px] text-white/40 mt-1 font-medium">Acompanhe reparos, manutenções e bloqueios de quartos.</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" /> Novo Chamado
+        </button>
       </div>
 
       {/* Grid de Estatísticas */}
@@ -190,6 +213,36 @@ export default function ManutencaoPage() {
         </div>
 
       </div>
+
+      {/* Modal Novo Chamado */}
+      <AnimatePresence>
+        {showCreateModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowCreateModal(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-zinc-900 border border-white/10 rounded-[24px] p-8 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-white">Abrir Chamado de Manutenção</h2>
+                <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors"><X className="w-5 h-5 text-white/50" /></button>
+              </div>
+              <form onSubmit={handleCreateMaintenance} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Quarto</label>
+                  <select required value={newMaintRoomId} onChange={e => setNewMaintRoomId(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand">
+                    <option value="">Selecione um quarto...</option>
+                    {rooms.filter(r => r.status !== 'BLOQUEADO').map(room => (
+                      <option key={room.id} value={room.id}>Quarto {room.numero} - {room.status}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Descrição do Problema</label>
+                  <textarea required value={newMaintDesc} onChange={e => setNewMaintDesc(e.target.value)} rows={3} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand resize-none" placeholder="Descreva o problema..." />
+                </div>
+                <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all">Abrir Chamado</button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </motion.div>
   );

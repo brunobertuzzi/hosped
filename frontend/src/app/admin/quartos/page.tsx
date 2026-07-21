@@ -39,7 +39,7 @@ export default function QuartosPage() {
       setEditingCatId(cat.id);
       setCatName(cat.nome);
       setCatPrice(cat.valorBase.toString());
-      setCatCap(cat.capacidade.toString());
+      setCatCap(cat.capacidadeMaxima.toString());
     } else {
       setEditingCatId(null);
       setCatName('');
@@ -71,7 +71,7 @@ export default function QuartosPage() {
         await api.updateRoomCategory(editingCatId, {
           nome: catName,
           valorBase: parseFloat(catPrice),
-          capacidade: parseInt(catCap),
+          capacidadeMaxima: parseInt(catCap),
           comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
         });
 
@@ -88,7 +88,7 @@ export default function QuartosPage() {
         await api.createRoomCategory({
           nome: catName,
           valorBase: parseFloat(catPrice),
-          capacidade: parseInt(catCap),
+          capacidadeMaxima: parseInt(catCap),
           comodidades: ['Ar-condicionado', 'Wi-Fi', 'TV']
         });
 
@@ -281,7 +281,7 @@ export default function QuartosPage() {
 
                     <h3 className="text-xl font-bold text-white mb-1">{cat.nome}</h3>
                     <div className="flex items-center gap-2 text-white/40 text-[12px] font-medium mb-6">
-                      <Zap className="w-3.5 h-3.5" /> Capacidade: {cat.capacidade} Pessoas
+                      <Zap className="w-3.5 h-3.5" /> Capacidade: {cat.capacidadeMaxima} Pessoas
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-6">

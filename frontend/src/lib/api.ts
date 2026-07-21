@@ -126,8 +126,12 @@ export const api = {
    */
   async getAudits() {
     const res = await request('/audit');
-    useTenantStore.setState({ audits: res });
-    return res;
+    // AuditLog não tem branchId; usar hotelId para compatibilidade
+    const mapped = (res || []).map((a: any) => ({
+      ...a,
+    }));
+    useTenantStore.setState({ audits: mapped });
+    return mapped;
   },
 
   /**
@@ -135,8 +139,22 @@ export const api = {
    */
   async getMaintenanceOrders() {
     const res = await request('/maintenance');
-    useTenantStore.setState({ maintenance: res });
-    return res;
+    // Mapeia campos pois MaintenanceOrder não tem roomNumero/branchId diretamente
+    const mapped = (res || []).map((o: any) => ({
+      id: o.id,
+      roomId: o.roomId,
+      descricao: o.descricao,
+      status: o.status,
+      responsavelId: o.responsavelId,
+      observacoes: o.observacoes,
+      createdAt: o.createdAt,
+      roomNumero: o.room?.numero,
+      branchId: o.room?.branchId,
+      room: o.room,
+      responsavel: o.responsavel,
+    }));
+    useTenantStore.setState({ maintenance: mapped });
+    return mapped;
   },
 
   /**
@@ -220,6 +238,7 @@ export const api = {
       body: JSON.stringify({ roomId, descricao }),
     });
 
+    await this.getMaintenanceOrders();
     await this.getRooms();
     return res;
   },
@@ -233,6 +252,7 @@ export const api = {
       body: JSON.stringify({ observacoes }),
     });
 
+    await this.getMaintenanceOrders();
     await this.getRooms();
     return res;
   },
@@ -708,7 +728,7 @@ export const api = {
       category: e.categoria,
       provider: e.fornecedor,
       paymentDate: e.dataPagamento,
-      branchId: e.branchId,
+      hotelId: e.hotelId,
     }));
     useTenantStore.setState({ expenses: mapped });
     return mapped;

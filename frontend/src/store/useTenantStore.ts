@@ -121,7 +121,7 @@ export const useTenantStore = create<TenantState>((set) => ({
     guests: state.guests.map(g => g.id === guestId ? { ...g, ...data } : g)
   })),
 
-  addRoomCategory: (cat) => set((state) => ({ roomCategories: [...state.roomCategories, { ...cat, fotos: cat.fotos || [], branchId: state.selectedBranchId }] })),
+  addRoomCategory: (cat) => set((state) => ({ roomCategories: [...state.roomCategories, { ...cat, fotos: cat.fotos || [] }] })),
   updateRoomCategoryPhotos: (catId, fotos) => set((state) => ({
     roomCategories: state.roomCategories.map((c) => c.id === catId ? { ...c, fotos } : c)
   })),
@@ -198,21 +198,27 @@ export const useTenantStore = create<TenantState>((set) => ({
   })),
 
   addAuditLog: (log) => set((state) => ({
-    audits: [{ ...log, branchId: state.selectedBranchId }, ...state.audits]
+    audits: [log, ...state.audits]
   })),
 
-  addMaintenanceOrder: (order) => set((state) => ({
-    maintenance: [...state.maintenance, { ...order, branchId: state.selectedBranchId }],
-    rooms: state.rooms.map((r) => r.numero === order.roomNumero && r.branchId === state.selectedBranchId ? { ...r, status: 'MANUTENCAO' } : r)
-  })),
+  addMaintenanceOrder: (order) => set((state) => {
+    const roomNumero = order.roomNumero || order.room?.numero;
+    return {
+      maintenance: [...state.maintenance, { ...order }],
+      rooms: state.rooms.map((r) => r.numero === roomNumero && r.branchId === state.selectedBranchId ? { ...r, status: 'MANUTENCAO' } : r)
+    };
+  }),
 
   completeMaintenanceOrder: (maintId) => set((state) => {
     const order = state.maintenance.find((m) => m.id === maintId);
     if (!order) return {};
 
+    const roomNumero = order.roomNumero || order.room?.numero;
+    const branchId = order.branchId || order.room?.branchId;
+
     return {
       maintenance: state.maintenance.filter((m) => m.id !== maintId),
-      rooms: state.rooms.map((r) => r.numero === order.roomNumero && r.branchId === order.branchId ? { ...r, status: 'LIMPEZA' } : r)
+      rooms: state.rooms.map((r) => r.numero === roomNumero && r.branchId === branchId ? { ...r, status: 'LIMPEZA' } : r)
     };
   }),
 
@@ -221,7 +227,7 @@ export const useTenantStore = create<TenantState>((set) => ({
     cleaningTasks: state.cleaningTasks.map((t) => t.id === taskId ? { ...t, status } : t)
   })),
 
-  addExpense: (exp) => set((state) => ({ expenses: [...state.expenses, { ...exp, branchId: state.selectedBranchId }] })),
+  addExpense: (exp) => set((state) => ({ expenses: [...state.expenses, exp] })),
   updateExpenseStatus: (id, status) => set((state) => ({
     expenses: state.expenses.map(e => e.id === id ? { ...e, status } : e)
   }))
@@ -236,14 +242,14 @@ export const useActiveBranchData = () => {
   return {
     ...store,
     users: store.users.filter(u => u.branchId === bid || u.role === 'HOTEL_OWNER'), // Dono vê tudo
-    roomCategories: store.roomCategories.filter(c => c.branchId === bid),
+    roomCategories: store.roomCategories, // Categorias são globais ao hotel (não têm branchId)
     rooms: store.rooms.filter(r => r.branchId === bid),
     reservations: store.reservations.filter(r => r.branchId === bid),
     inventory: store.inventory.filter(i => i.branchId === bid),
-    audits: store.audits.filter(a => a.branchId === bid),
-    maintenance: store.maintenance.filter(m => m.branchId === bid),
+    audits: store.audits, // AuditLog não tem branchId (global ao hotel)
+    maintenance: store.maintenance.filter(m => m.branchId === bid), // branchId extraído de room.branchId no mapping
     cleaningTasks: store.cleaningTasks.filter(ct => ct.branchId === bid),
-    expenses: store.expenses.filter(e => e.branchId === bid),
+    expenses: store.expenses, // Expense não tem branchId (global ao hotel)
     // guests are shared globally, so we don't filter them
     guests: store.guests
   };

@@ -50,13 +50,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (user) {
-      api.getRooms().catch(() => {});
-      api.getRoomCategories().catch(() => {});
-      api.getReservations().catch(() => {});
-      api.getGuests().catch(() => {});
-      api.getMaintenanceOrders().catch(() => {});
-      api.getAudits().catch(() => {});
-      api.getInventory().catch(() => {});
+      const loadAll = async () => {
+        try {
+          await Promise.all([
+            api.getRooms(),
+            api.getRoomCategories(),
+            api.getReservations(),
+            api.getGuests(),
+            api.getMaintenanceOrders(),
+            api.getAudits(),
+            api.getInventory(),
+          ]);
+        } catch {
+          useTenantStore.setState({ isOffline: true });
+        }
+      };
+      loadAll();
     }
   }, [user]);
 

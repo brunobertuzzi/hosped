@@ -387,7 +387,7 @@ function BookingEngineContent() {
                   <div className="text-center py-20 text-white/40 glass-panel rounded-[24px]">Nenhum quarto disponível nesta unidade.</div>
                 ) : (
                   activeRoomCategories.map(cat => {
-                    const isCapacityFit = cat.capacidade >= hospedesCount;
+                    const isCapacityFit = cat.capacidadeMaxima >= hospedesCount;
                     const fotos = cat.fotos || [];
                     const mainImage = fotos.length > 0 ? fotos[0] : '/placeholder-hotel.svg';
 

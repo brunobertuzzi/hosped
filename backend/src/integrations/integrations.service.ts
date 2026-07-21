@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../core/prisma.service';
 
 @Injectable()
 export class IntegrationsService {
+  private readonly logger = new Logger(IntegrationsService.name);
   constructor(private readonly prisma: PrismaService) {}
 
   async getHotelIntegration(hotelId: string) {
@@ -92,9 +93,10 @@ export class IntegrationsService {
     }
 
     try {
-      const axios = require('axios');
-      const response = await axios.default.get(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${integration.googlePlaceId}&fields=reviews&language=pt-BR&key=${apiKey}`
+      const { default: axios } = await import('axios');
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${integration.googlePlaceId}&fields=reviews&language=pt-BR&key=${apiKey}`,
+        { timeout: 10000 }
       );
 
       if (response.data.status === 'OK' && response.data.result && response.data.result.reviews) {
@@ -102,7 +104,7 @@ export class IntegrationsService {
       }
       return [];
     } catch (error) {
-      console.error('Erro ao buscar reviews do Google:', error);
+      this.logger.error('Erro ao buscar reviews do Google:', error);
       return [];
     }
   }

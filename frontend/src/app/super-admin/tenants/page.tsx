@@ -123,7 +123,7 @@ export default function SuperAdminTenants() {
 
   React.useEffect(() => {
     fetchClients();
-    api.getSystemPlans().then(setSystemPlans).catch(() => {});
+    api.getSystemPlans().then(setSystemPlans).catch(() => { /* erro ignorado - fallback para lista vazia */ });
   }, [fetchClients]);
 
   // Modals

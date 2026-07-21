@@ -136,9 +136,6 @@ export class TenantsController {
     this.checkSuperAdmin(req);
     // Gerar senha aleatória se não fornecida
     const tempPassword = body.password || crypto.randomBytes(6).toString('hex');
-    if (!body.password && process.env.NODE_ENV !== 'production') {
-      console.log(`[DEV] Tenant "${body.email}" criado com senha temporária: ${tempPassword}`);
-    }
     // Reutilizar a logica de registro do AuthService, mas forçando plano e MRR
     const res = await this.authService.register({
       companyName: body.name,

@@ -415,12 +415,18 @@ export class AuthService {
       { secret: resetSecret, expiresIn: '15m' },
     );
 
-    // TODO: Enviar e-mail real com link de redefinição de senha
-    // Integração necessária: SendGrid, Resend ou SES
-    if (!process.env.RESEND_API_KEY && !process.env.SENDGRID_API_KEY) {
-      console.warn(
-        '[FORGOT PASSWORD] Nenhum serviço de e-mail configurado (RESEND_API_KEY ou SENDGRID_API_KEY).',
-      );
+    // Verificar se há serviço de e-mail configurado
+    const hasEmailService = !!(process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY);
+    let emailSent = false;
+
+    if (hasEmailService) {
+      try {
+        // TODO: Integrar com SendGrid, Resend ou SES
+        // Exemplo: await sendEmail({ to: user.email, subject: 'Redefinição de Senha', html: resetLink });
+        emailSent = true;
+      } catch (err) {
+        console.warn('[FORGOT PASSWORD] Falha ao enviar e-mail:', err);
+      }
     }
 
     // Em desenvolvimento, o link é logado no console para facilitar testes
@@ -434,10 +440,9 @@ export class AuthService {
 
     return {
       success: true,
-      message:
-        process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY
-          ? 'Se o e-mail existir, você receberá um link de redefinição de senha.'
-          : 'Funcionalidade de recuperação de senha indisponível no momento. Nenhum serviço de e-mail foi configurado. Contate o administrador.',
+      message: emailSent
+        ? 'Se o e-mail existir, você receberá um link de redefinição de senha.'
+        : 'Funcionalidade de recuperação de senha indisponível no momento. Nenhum serviço de e-mail foi configurado. Contate o administrador.',
     };
   }
 

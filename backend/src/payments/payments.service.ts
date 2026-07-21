@@ -53,7 +53,7 @@ export class PaymentsService {
       let pointOfInteraction;
 
       if (!token || provider !== 'MERCADO_PAGO') {
-        throw new Error('O Hotel não possui um Gateway de Pagamento configurado (Mercado Pago). Vá em Integrações para configurar.');
+        throw new BadRequestException('O Hotel não possui um Gateway de Pagamento configurado (Mercado Pago). Vá em Integrações para configurar.');
       } else if (provider === 'MERCADO_PAGO') {
         const client = this.getMpClient(token);
         const payment = new MercadoPagoPayment(client);
@@ -69,7 +69,7 @@ export class PaymentsService {
       }
 
       if (!resultId) {
-        throw new Error('Falha ao gerar o ID do pagamento PIX');
+        throw new BadRequestException('Falha ao gerar o ID do pagamento PIX');
       }
 
       // Salvar no banco vinculado à reserva (explicit hotelId defensive)
@@ -111,7 +111,7 @@ export class PaymentsService {
     let isApproved = false;
 
     if (!token || provider !== 'MERCADO_PAGO') {
-      throw new Error('Gateway de pagamento não configurado para o hotel.');
+      throw new BadRequestException('Gateway de pagamento não configurado para o hotel.');
     } else if (provider === 'MERCADO_PAGO') {
       try {
         const client = this.getMpClient(token);
@@ -120,7 +120,7 @@ export class PaymentsService {
         isApproved = result.status === 'approved';
       } catch (error) {
         this.logger.error(`Error checking payment ${id}:`, error);
-        throw new Error('Falha ao consultar status no gateway do hotel');
+        throw new BadRequestException('Falha ao consultar status no gateway do hotel');
       }
     }
 

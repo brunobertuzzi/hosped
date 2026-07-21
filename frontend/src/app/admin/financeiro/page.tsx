@@ -1,29 +1,51 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   TrendingUp, TrendingDown, DollarSign,
   CreditCard, ArrowUpRight, ArrowDownRight,
-  Calendar, Building2, Receipt
+  Calendar, Building2, Receipt, Plus, X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
 import { api } from '../../../lib/api';
+import { toast } from 'sonner';
 
 export default function FinanceiroPage() {
   const { reservations, hotel, expenses, guests } = useActiveBranchData();
   const { updateExpenseStatus } = useTenantStore();
-  const [activeTab, setActiveTab] = React.useState('GERAL'); // GERAL, RECEBER, PAGAR
+  const [activeTab, setActiveTab] = React.useState('GERAL');
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({ descricao: '', valor: '', dataVencimento: '', categoria: 'FIXA', fornecedor: '' });
 
   const primaryColor = hotel.cores?.primary || '#3b82f6';
 
   useEffect(() => {
-    api.getExpenses().catch(() => {});
+    api.getExpenses().catch(() => useTenantStore.setState({ isOffline: true }));
   }, []);
+
+  const handleCreateExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!expenseForm.descricao || !expenseForm.valor || !expenseForm.dataVencimento) return;
+    try {
+      await api.createExpense({
+        descricao: expenseForm.descricao,
+        valor: parseFloat(expenseForm.valor),
+        dataVencimento: expenseForm.dataVencimento,
+        categoria: expenseForm.categoria,
+        fornecedor: expenseForm.fornecedor || undefined,
+      });
+      setShowExpenseModal(false);
+      setExpenseForm({ descricao: '', valor: '', dataVencimento: '', categoria: 'FIXA', fornecedor: '' });
+      toast.success('Despesa criada!');
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   // Processamento de Dados Financeiros
   const financialData = useMemo(() => {
@@ -224,6 +246,12 @@ export default function FinanceiroPage() {
             <h3 className="text-sm font-bold uppercase tracking-widest text-white/80 flex items-center gap-2">
               <TrendingDown className="w-4 h-4 text-amber-500" /> Contas a Pagar (Despesas)
             </h3>
+            <button
+              onClick={() => setShowExpenseModal(true)}
+              className="px-4 py-2 bg-white hover:bg-white/90 text-black font-bold text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2"
+            >
+              <Plus className="w-3.5 h-3.5" /> Nova Despesa
+            </button>
           </div>
           <div className="space-y-4">
             {expenses.map(exp => (
@@ -294,6 +322,51 @@ export default function FinanceiroPage() {
           </div>
         </div>
       )}
+
+      {/* Modal Nova Despesa */}
+      <AnimatePresence>
+        {showExpenseModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowExpenseModal(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-zinc-900 border border-white/10 rounded-[24px] p-8 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-white">Nova Despesa</h2>
+                <button onClick={() => setShowExpenseModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors"><X className="w-5 h-5 text-white/50" /></button>
+              </div>
+              <form onSubmit={handleCreateExpense} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Descrição</label>
+                  <input required value={expenseForm.descricao} onChange={e => setExpenseForm(f => ({ ...f, descricao: e.target.value }))} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" placeholder="Ex: Conta de luz" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Valor (R$)</label>
+                    <input required type="number" step="0.01" min="0.01" value={expenseForm.valor} onChange={e => setExpenseForm(f => ({ ...f, valor: e.target.value }))} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" placeholder="0,00" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vencimento</label>
+                    <input required type="date" value={expenseForm.dataVencimento} onChange={e => setExpenseForm(f => ({ ...f, dataVencimento: e.target.value }))} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Categoria</label>
+                    <select value={expenseForm.categoria} onChange={e => setExpenseForm(f => ({ ...f, categoria: e.target.value }))} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand">
+                      <option value="FIXA">Fixa</option>
+                      <option value="VARIAVEL">Variável</option>
+                      <option value="IMPOSTO">Imposto</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Fornecedor</label>
+                    <input value={expenseForm.fornecedor} onChange={e => setExpenseForm(f => ({ ...f, fornecedor: e.target.value }))} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand" placeholder="Opcional" />
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-3 bg-brand hover:brightness-110 text-black font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all mt-2">Criar Despesa</button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </motion.div>
   );

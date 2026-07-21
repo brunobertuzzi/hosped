@@ -21,7 +21,7 @@ export default function GovernancaPage() {
 
   useEffect(() => {
     setMounted(true);
-    api.getCleaningTasks().catch(() => {}).finally(() => setLoading(false));
+    api.getCleaningTasks().finally(() => setLoading(false));
   }, []);
 
   const onDragEnd = async (result: DropResult) => {

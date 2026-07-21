@@ -76,10 +76,8 @@ function OnboardingContent() {
   const handleRealPayment = async (paymentData: any) => {
     setLoading(true);
     try {
-      console.log('Dados do MP processados: ', paymentData);
       await finishTenantCreation(getSelectedPlanPrice(), 'REAL_CARD', paymentData);
     } catch (error) {
-      console.error(error);
       toast.error('Erro ao se comunicar com o Mercado Pago.');
       setLoading(false);
     }
@@ -88,8 +86,7 @@ function OnboardingContent() {
   const handleMockPayment = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Implementar integração real com gateway de pagamento
-    // Atualmente simula o pagamento para permitir fluxo de teste
+    // Modo de teste: simula o pagamento para permitir fluxo de demonstração
     setTimeout(() => {
       finishTenantCreation(getSelectedPlanPrice(), cardNumber.slice(-4) || '1234');
     }, 2500);
