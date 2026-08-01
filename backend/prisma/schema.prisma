@@ -102,11 +102,11 @@ enum AnnouncementType {
 }
 
 model Hotel {
-  id                   String    @id @default(uuid())
+  id                   String   @id @default(uuid())
   nome                 String
   razaoSocial          String
-  documentoFiscal      String    @unique
-  email                String    @unique
+  documentoFiscal      String   @unique
+  email                String   @unique
   telefone             String
   logo                 String?
   cores                Json? // Cores customizadas: { primary, secondary, text }
@@ -116,28 +116,28 @@ model Hotel {
   slogan               String?
   descricaoPublica     String?
   diferenciais         String[]
-  slug                 String?   @unique
+  slug                 String?  @unique
 
-  plan                 String    @default("STARTUP")
-  billingCycle         BillingCycle @default(MONTHLY)
-  status               String    @default("ACTIVE")
-  mrr                  Float     @default(150.0)
-  nextBillingDate      DateTime?
-  trialEndsAt          DateTime?
-  downgradeToPlan      String?   // Plano para downgrade automático se não pagar
-  lastInvoiceId        String?   // Última fatura gerada
+  plan            String       @default("STARTUP")
+  billingCycle    BillingCycle @default(MONTHLY)
+  status          String       @default("ACTIVE")
+  mrr             Float        @default(150.0)
+  nextBillingDate DateTime?
+  trialEndsAt     DateTime?
+  downgradeToPlan String? // Plano para downgrade automático se não pagar
+  lastInvoiceId   String? // Última fatura gerada
 
-  storageUsedMB        Float     @default(0)
-  storageLimitMB       Float     @default(1024)
-  apiRequestsCount     Int       @default(0)
-  apiRequestsLimit     Int       @default(10000)
-  enabledModules       String[]  @default([])
-  layout               Json?    // Configurações de layout: { font, heroVariant }
-  webhooks             Json?    // URLs de webhook: { onReservationComplete, onCheckIn }
-  localInfos           Json?    // Informações locais: { checkInTime, checkOutTime, timezone }
+  storageUsedMB    Float    @default(0)
+  storageLimitMB   Float    @default(1024)
+  apiRequestsCount Int      @default(0)
+  apiRequestsLimit Int      @default(10000)
+  enabledModules   String[] @default([])
+  layout           Json? // Configurações de layout: { font, heroVariant }
+  webhooks         Json? // URLs de webhook: { onReservationComplete, onCheckIn }
+  localInfos       Json? // Informações locais: { checkInTime, checkOutTime, timezone }
 
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relacionamentos
   branches           Branch[]
@@ -146,6 +146,7 @@ model Hotel {
   rooms              Room[]
   reservations       Reservation[]
   guests             Guest[]
+  promoCodes         PromoCode[]
   inventoryItems     InventoryItem[]
   inventoryMovements InventoryMovement[]
   consumptions       Consumption[]
@@ -161,7 +162,6 @@ model Hotel {
   expenses       Expense[]
   cleaningTasks  CleaningTask[]
   webhookEvents  WebhookEvent[]
-  icalSyncs      IcalSync[]
   systemInvoices SystemInvoice[]
   hotelAddons    HotelAddon[]
   billingLogs    BillingLog[]
@@ -232,7 +232,6 @@ model RoomCategory {
   rooms        Room[]
   reservations Reservation[]
   tariffs      Tariff[]
-  icalSyncs    IcalSync[]
 
   @@index([hotelId])
 }
@@ -255,7 +254,6 @@ model Room {
   reservations      Reservation[]
   maintenanceOrders MaintenanceOrder[]
   cleaningTasks     CleaningTask[]
-  icalSyncs         IcalSync[]
 
   @@index([hotelId])
   @@index([branchId])
@@ -293,19 +291,23 @@ model Reservation {
   status           ReservationStatus @default(PENDENTE)
   origem           String // "ONLINE", "RECEPCAO", "OTA_AIRBNB", "OTA_BOOKING", etc.
   documentoCheckIn String? // Documento apresentado no check-in
+  promoCodeId      String?           @map("promo_code_id")
+  valorDesconto    Decimal?          @db.Decimal(10, 2)
   checkInAt        DateTime?
   checkOutAt       DateTime?
   otaReservationId String? // ID da reserva na OTA (ex: Booking, Airbnb) para evitar duplicatas
-  guestToken       String? @unique // Token único para acesso do hóspede ao painel público
+  guestToken       String?           @unique // Token único para acesso do hóspede ao painel público
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
   // Relacionamentos
-  hotel        Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  branch       Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  guest        Guest         @relation(fields: [guestId], references: [id])
-  category     RoomCategory  @relation(fields: [categoryId], references: [id])
-  room         Room?         @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  hotel     Hotel        @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  branch    Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  guest     Guest        @relation(fields: [guestId], references: [id], onDelete: Restrict)
+  category  RoomCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  room      Room?        @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  promoCode PromoCode?   @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+
   consumptions Consumption[]
   payments     Payment[]
 
@@ -559,30 +561,6 @@ model WebhookEvent {
   @@index([hotelId])
 }
 
-model IcalSync {
-  id         String  @id @default(uuid())
-  hotelId    String  @map("hotel_id")
-  roomId     String? @map("room_id")
-  categoryId String? @map("category_id")
-
-  // URLs to fetch from OTAs
-  importUrls String[] // Array of iCal URLs from Airbnb, Booking, etc.
-
-  // URL to expose to OTAs (auto-generated token)
-  exportToken String @unique @default(uuid())
-
-  lastSyncAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  hotel    Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  room     Room?         @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  category RoomCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@index([hotelId])
-}
-
 model SystemPlan {
   id          String   @id @default(uuid())
   name        String   @unique // ex: STARTUP, PRO, ENTERPRISE
@@ -607,9 +585,9 @@ model SystemInvoice {
   paidAt           DateTime?
   periodStart      DateTime?
   periodEnd        DateTime?
-  paymentMethod    String?       // "PIX", "CREDIT_CARD", "BOLETO"
-  gatewayPaymentId String?       // ID no gateway (Mercado Pago, Stripe, Asaas)
-  paymentLink      String?       // Link de pagamento (boleto/PIX)
+  paymentMethod    String? // "PIX", "CREDIT_CARD", "BOLETO"
+  gatewayPaymentId String? // ID no gateway (Mercado Pago, Stripe, Asaas)
+  paymentLink      String? // Link de pagamento (boleto/PIX)
   attemptCount     Int           @default(0) // Tentativas de cobrança
   lastAttemptAt    DateTime?
   createdAt        DateTime      @default(now())
@@ -653,19 +631,19 @@ model GlobalSettings {
 
 /// Cupom de desconto para assinatura
 model Coupon {
-  id          String   @id @default(uuid())
-  code        String   @unique
-  description String?
-  discountPercent Int  @default(0) // 0-100
-  discountFixed Decimal? @db.Decimal(10, 2) // Valor fixo, se aplicável
-  maxUses     Int      @default(0) // 0 = ilimitado
-  usedCount   Int      @default(0)
-  validFrom   DateTime @default(now())
-  validUntil  DateTime?
-  isActive    Boolean  @default(true)
-  targetPlans String[] // Vazio = todos os planos
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String    @id @default(uuid())
+  code            String    @unique
+  description     String?
+  discountPercent Int       @default(0) // 0-100
+  discountFixed   Decimal?  @db.Decimal(10, 2) // Valor fixo, se aplicável
+  maxUses         Int       @default(0) // 0 = ilimitado
+  usedCount       Int       @default(0)
+  validFrom       DateTime  @default(now())
+  validUntil      DateTime?
+  isActive        Boolean   @default(true)
+  targetPlans     String[] // Vazio = todos os planos
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 /// Add-on pago avulso (ex: "Channel Manager", "IA Assistant")
@@ -684,13 +662,13 @@ model Addon {
 
 /// Add-ons contratados por um hotel específico
 model HotelAddon {
-  id          String   @id @default(uuid())
-  hotelId     String   @map("hotel_id")
-  addonId     String   @map("addon_id")
-  price       Decimal  @db.Decimal(10, 2) // Preço contratado (pode ser diferente do atual)
-  isActive    Boolean  @default(true)
-  addedAt     DateTime @default(now())
-  removedAt   DateTime?
+  id        String    @id @default(uuid())
+  hotelId   String    @map("hotel_id")
+  addonId   String    @map("addon_id")
+  price     Decimal   @db.Decimal(10, 2) // Preço contratado (pode ser diferente do atual)
+  isActive  Boolean   @default(true)
+  addedAt   DateTime  @default(now())
+  removedAt DateTime?
 
   hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   addon Addon @relation(fields: [addonId], references: [id])
@@ -703,7 +681,7 @@ model HotelAddon {
 model BillingLog {
   id        String   @id @default(uuid())
   hotelId   String   @map("hotel_id")
-  event     String   // "INVOICE_CREATED", "PAYMENT_ATTEMPT", "PAYMENT_SUCCESS", "PAYMENT_FAILED", "SUSPENDED", "REACTIVATED", "UPGRADED", "DOWNGRADED", "TRIAL_STARTED", "TRIAL_ENDED"
+  event     String // "INVOICE_CREATED", "PAYMENT_ATTEMPT", "PAYMENT_SUCCESS", "PAYMENT_FAILED", "SUSPENDED", "REACTIVATED", "UPGRADED", "DOWNGRADED", "TRIAL_STARTED", "TRIAL_ENDED"
   detail    String?
   metadata  Json?
   createdAt DateTime @default(now())
@@ -714,3 +692,23 @@ model BillingLog {
   @@index([createdAt])
 }
 
+model PromoCode {
+  id              String    @id @default(uuid())
+  hotelId         String    @map("hotel_id")
+  codigo          String // ex: VERAO20
+  descricao       String?
+  tipoDesconto    String // PERCENTUAL ou FIXO
+  valorDesconto   Decimal   @db.Decimal(10, 2)
+  quantidadeTotal Int? // Limite de usos (nulo = ilimitado)
+  usos            Int       @default(0)
+  validade        DateTime?
+  ativo           Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  hotel        Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  @@unique([hotelId, codigo])
+  @@index([hotelId])
+}

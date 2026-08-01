@@ -5,7 +5,6 @@ import { Redis } from 'ioredis';
 import * as os from 'os';
 
 @Controller('core/health')
-@UseGuards(AuthGuard)
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -24,6 +23,7 @@ export class HealthController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   async getHealth(@Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Somente Super Admin pode ver a saúde do servidor.');

@@ -33,7 +33,8 @@ export default function ConfiguracoesPage() {
   const [backgroundColor, setBackgroundColor] = useState(hotel.cores?.secondary || '#000000');
   const [fontFamily, setFontFamily] = useState(hotel.layout?.font || 'sans');
   const [heroVariant, setHeroVariant] = useState(hotel.layout?.heroVariant || 'standard');
-  const [logoUrl, setLogoUrl] = useState(hotel.logo);
+  const [logoUrl, setLogoUrl] = useState(hotel.logo || '');
+  const [bannerUrl, setBannerUrl] = useState(hotel.banner || '');
   const [hotelName, setHotelName] = useState(hotel.nome);
   const [slogan, setSlogan] = useState(hotel.slogan || '');
   const [descricaoPublica, setDescricaoPublica] = useState(hotel.descricaoPublica || '');
@@ -73,6 +74,7 @@ export default function ConfiguracoesPage() {
         descricaoPublica,
         diferenciais,
         slug,
+        banner: bannerUrl,
         webhooks,
         localInfos
       });
@@ -182,6 +184,33 @@ export default function ConfiguracoesPage() {
                 ) : (
                   <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 italic">
                     Logotipo customizado disponível no plano Enterprise.
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 flex items-center gap-2">URL do Banner de Capa {!canUseWhiteLabel && <Lock className="w-3 h-3 text-brand" />}</label>
+                {canUseWhiteLabel ? (
+                  <div className="space-y-3">
+                    <div className="w-full h-32 rounded-xl bg-white/[0.02] border border-white/10 flex items-center justify-center overflow-hidden">
+                      <img 
+                        src={bannerUrl || '/placeholder-hotel.svg'} 
+                        alt="Banner preview" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => (e.currentTarget.src = '/placeholder-hotel.svg')}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={bannerUrl}
+                      onChange={e => setBannerUrl(e.target.value)}
+                      placeholder="https://exemplo.com/banner.jpg"
+                      className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white/40 italic">
+                    Banner customizado disponível no plano Enterprise.
                   </div>
                 )}
               </div>
@@ -479,7 +508,7 @@ export default function ConfiguracoesPage() {
                   {heroVariant === 'standard' ? (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-transparent z-10" style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), ${backgroundColor})` }} />
-                      <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: "url('/placeholder-hotel.svg')" }} />
+                      <div className="absolute inset-0 opacity-40 bg-cover bg-center transform scale-105" style={{ backgroundImage: bannerUrl ? `url('${bannerUrl}')` : "url('/placeholder-hotel.svg')" }} />
 
                       <div className="relative z-20 p-6 flex flex-col items-center">
                         <h4 className="text-white font-bold text-2xl mb-2 tracking-tight drop-shadow-xl">{hotelName || 'Nome do Hotel'}</h4>
@@ -509,7 +538,7 @@ export default function ConfiguracoesPage() {
                         </button>
                       </div>
                       <div className="w-1/2 relative">
-                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/placeholder-hotel.svg')" }} />
+                        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: bannerUrl ? `url('${bannerUrl}')` : "url('/placeholder-hotel.svg')" }} />
                         {/* Gradient fade para o background selecionado */}
                         <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${backgroundColor} 0%, transparent 100%)` }} />
                       </div>

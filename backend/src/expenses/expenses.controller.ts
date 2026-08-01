@@ -30,7 +30,7 @@ export class ExpensesController {
   @Permissions('financial.manage')
   @Post()
   create(@Body() data: { descricao: string; valor: number; dataVencimento: string; categoria: string; fornecedor?: string }, @Request() req: any) {
-    return this.expensesService.create(data, req.user?.sub);
+    return this.expensesService.create(data, req.user?.hotelId, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)

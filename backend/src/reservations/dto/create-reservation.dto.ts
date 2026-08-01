@@ -46,4 +46,8 @@ export class CreateReservationDto {
   @IsString()
   @IsNotEmpty()
   origem!: string;
+
+  @IsOptional()
+  @IsString()
+  promoCode?: string;
 }

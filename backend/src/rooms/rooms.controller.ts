@@ -32,6 +32,7 @@ export class RoomsController {
     return this.roomsService.createRoom(
       data,
       req.user?.branchId,
+      req.user?.hotelId,
       req.user?.sub,
     );
   }
@@ -47,7 +48,7 @@ export class RoomsController {
   @Permissions('rooms.manage')
   @Post('categories')
   async createCategory(@Body() data: any, @Request() req: any) {
-    return this.roomsService.createCategory(data, req.user?.sub);
+    return this.roomsService.createCategory(data, req.user?.hotelId, req.user?.sub);
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)

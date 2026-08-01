@@ -28,6 +28,7 @@ export class InventoryController {
     return this.inventoryService.create(
       data,
       req.user?.branchId,
+      req.user?.hotelId,
       req.user?.sub,
     );
   }

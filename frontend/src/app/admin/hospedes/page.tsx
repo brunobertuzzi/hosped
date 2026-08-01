@@ -111,7 +111,7 @@ export default function HospedesPage() {
         </div>
       </div>
       <div className="flex gap-4">
-        <button onClick={() => handleOpenModal()} className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_15px_-3px_var(--brand-primary)]">
+        <button onClick={() => handleOpenModal()} className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2">
           <Plus className="w-4 h-4" /> Novo Hóspede
         </button>
       </div>
@@ -315,7 +315,7 @@ export default function HospedesPage() {
 
               <div className="p-6 border-t border-white/5 bg-black/40 flex gap-4">
                 <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
-                <button onClick={handleSave} className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all shadow-[0_0_15px_-3px_var(--brand-primary)] flex items-center justify-center gap-2">
+                <button onClick={handleSave} className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2">
                   <Save className="w-4 h-4" /> Salvar
                 </button>
               </div>

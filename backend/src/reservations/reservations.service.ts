@@ -166,6 +166,40 @@ export class ReservationsService {
           );
         }
 
+        let finalValorTotal = calculatedValorTotal;
+        let appliedPromoCodeId: string | null = null;
+        let appliedValorDesconto: any = null;
+
+        if (dto.promoCode) {
+          const promo = await tx.promoCode.findUnique({
+            where: {
+              hotelId_codigo: { hotelId: hotelIdForTx, codigo: dto.promoCode.toUpperCase() }
+            }
+          });
+
+          if (promo && promo.ativo && (!promo.validade || new Date(promo.validade) >= new Date()) && (!promo.quantidadeTotal || promo.usos < promo.quantidadeTotal)) {
+            let discountValue = new Prisma.Decimal(0);
+            if (promo.tipoDesconto === 'PERCENTUAL') {
+              discountValue = calculatedValorTotal.mul(promo.valorDesconto).div(100);
+            } else if (promo.tipoDesconto === 'FIXO') {
+              discountValue = promo.valorDesconto;
+            }
+
+            if (discountValue.gt(calculatedValorTotal)) {
+              discountValue = calculatedValorTotal;
+            }
+
+            finalValorTotal = calculatedValorTotal.sub(discountValue);
+            appliedPromoCodeId = promo.id;
+            appliedValorDesconto = discountValue;
+
+            await tx.promoCode.update({
+              where: { id: promo.id },
+              data: { usos: { increment: 1 } }
+            });
+          }
+        }
+
         // 7. Criar a reserva (explicit hotelId defensive + extension)
         const reservation = await tx.reservation.create({
           data: {
@@ -175,10 +209,12 @@ export class ReservationsService {
             categoryId,
             dataCheckIn: checkInDate,
             dataCheckOut: checkOutDate,
-            valorTotal: calculatedValorTotal,
+            valorTotal: finalValorTotal,
             status: ReservationStatus.PENDENTE,
             origem,
             guestToken: uuidv4(),
+            promoCodeId: appliedPromoCodeId,
+            valorDesconto: appliedValorDesconto,
           },
           include: { guest: true, category: true },
         });

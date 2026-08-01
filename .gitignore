@@ -29,7 +29,8 @@ dist_seed/
 build/
 .next/
 out/
-
+.agents
+graphify-out
 # ==============================
 # Prisma
 # ==============================

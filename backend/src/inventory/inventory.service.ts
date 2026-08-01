@@ -19,10 +19,11 @@ export class InventoryService {
     });
   }
 
-  async create(data: any, branchId: string, userId?: string) {
+  async create(data: any, branchId: string, hotelId: string, userId?: string) {
     const created = await this.prisma.client.inventoryItem.create({
       data: {
         ...data,
+        hotelId,
         branchId,
       },
     });

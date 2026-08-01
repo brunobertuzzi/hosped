@@ -22,9 +22,10 @@ export class ExpensesService {
     dataVencimento: string;
     categoria: string;
     fornecedor?: string;
-  }, userId?: string) {
+  }, hotelId: string, userId?: string) {
     const created = await this.prisma.client.expense.create({
       data: {
+        hotelId,
         descricao: data.descricao,
         valor: data.valor,
         dataVencimento: new Date(data.dataVencimento),

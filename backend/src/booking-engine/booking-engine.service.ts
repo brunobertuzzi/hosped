@@ -83,41 +83,52 @@ export class BookingEngineService {
       where: { hotelId },
     });
 
-    const availabilityResult = [];
 
-    for (const category of categories) {
-      // 1. Total de quartos físicos ativos para a categoria
-      const totalRooms = await this.prisma.client.room.count({
-        where: {
-          branchId,
-          categoryId: category.id,
-          status: { notIn: [RoomStatus.BLOQUEADO] },
+    // 1. Total de quartos físicos ativos por categoria usando groupBy
+    const totalRoomsAgg = await this.prisma.client.room.groupBy({
+      by: ['categoryId'],
+      where: {
+        branchId,
+        status: { notIn: [RoomStatus.BLOQUEADO] },
+        categoryId: { in: categories.map((c: any) => c.id) },
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    // 2. Conta reservas conflitantes no período por categoria
+    const conflictingReservationsAgg = await this.prisma.client.reservation.groupBy({
+      by: ['categoryId'],
+      where: {
+        branchId,
+        categoryId: { in: categories.map((c: any) => c.id) },
+        status: {
+          notIn: [ReservationStatus.CANCELADA, ReservationStatus.NO_SHOW],
         },
-      });
+        dataCheckIn: { lte: checkOutDate },
+        dataCheckOut: { gte: checkInDate },
+      },
+      _count: {
+        id: true,
+      },
+    });
 
-      // 2. Conta reservas conflitantes no período
-      const conflictingReservationsCount =
-        await this.prisma.client.reservation.count({
-          where: {
-            branchId,
-            categoryId: category.id,
-            status: {
-              notIn: [ReservationStatus.CANCELADA, ReservationStatus.NO_SHOW],
-            },
-            dataCheckIn: { lte: checkOutDate },
-            dataCheckOut: { gte: checkInDate },
-          },
-        });
+    const totalRoomsMap = new Map<string, number>(totalRoomsAgg.map((item: any) => [item.categoryId, item._count.id]));
+    const conflictingMap = new Map<string, number>(conflictingReservationsAgg.map((item: any) => [item.categoryId, item._count.id]));
 
-      const availableCount = totalRooms - conflictingReservationsCount;
+    const availabilityResult = categories.map((category: any) => {
+      const totalRooms = totalRoomsMap.get(category.id) || 0;
+      const conflictingCount = conflictingMap.get(category.id) || 0;
+      const availableCount = totalRooms - conflictingCount;
 
-      availabilityResult.push({
+      return {
         category,
         availableRooms: availableCount > 0 ? availableCount : 0,
         isAvailable: availableCount > 0,
         pricePerNight: category.valorBase,
-      });
-    }
+      };
+    });
 
     await this.cacheManager.set(cacheKey, availabilityResult, 60000); // Cache por 1 minuto
 

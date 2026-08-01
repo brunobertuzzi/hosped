@@ -7,7 +7,7 @@ import {
   Building2, Activity, Calendar, Package, ShieldCheck, LogOut, MapPin,
   ChevronRight, AlertTriangle, Moon, Palette, CheckCircle2, CloudLightning,
   Users, Wrench, Settings, DollarSign, LayoutDashboard, CalendarDays, Landmark, Sparkles, Menu, X, Lock,
-  CreditCard
+  CreditCard, Tag
 } from 'lucide-react';
 import { useTenantStore } from '../../store/useTenantStore';
 import { api } from '../../lib/api';
@@ -220,6 +220,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   {hasAccess('page.financeiro') && (
                     <Link href="/admin/financeiro" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/financeiro' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
                       <DollarSign className="w-4 h-4" /> Financeiro
+                    </Link>
+                  )}
+                  {hasAccess('page.marketing') && (
+                    <Link href="/admin/marketing/cupons" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname.startsWith('/admin/marketing') ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
+                      <Tag className="w-4 h-4" /> Marketing & Cupons
                     </Link>
                   )}
                   {hasAccess('page.integracoes') && canUseWebhooks ? (

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../core/prisma.service';
+import { EmailService } from '../core/email.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
@@ -14,6 +15,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -415,27 +417,13 @@ export class AuthService {
       { secret: resetSecret, expiresIn: '15m' },
     );
 
-    // Verificar se há serviço de e-mail configurado
-    const hasEmailService = !!(process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY);
+    // Verificar se há serviço de e-mail configurado e tentar enviar
+    const frontendUrl = process.env.FRONTEND_URL;
     let emailSent = false;
 
-    if (hasEmailService) {
-      try {
-        // TODO: Integrar com SendGrid, Resend ou SES
-        // Exemplo: await sendEmail({ to: user.email, subject: 'Redefinição de Senha', html: resetLink });
-        emailSent = true;
-      } catch (err) {
-        console.warn('[FORGOT PASSWORD] Falha ao enviar e-mail:', err);
-      }
-    }
-
-    // Em desenvolvimento, o link é logado no console para facilitar testes
-    const frontendUrl = process.env.FRONTEND_URL;
     if (frontendUrl) {
       const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-      console.log(
-        `\n\n[DEV] Password reset link for ${user.email}: \n${resetLink}\n\n`,
-      );
+      emailSent = await this.emailService.sendPasswordReset(user.email, resetLink);
     }
 
     return {

@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
@@ -24,10 +25,16 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ExpensesModule } from './expenses/expenses.module';
 import { HousekeepingModule } from './housekeeping/housekeeping.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
-import { IcalModule } from './ical/ical.module';
+import { MarketingModule } from './marketing/marketing.module';
+
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: envValidationSchema,
+    }),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     CacheModule.register({
@@ -78,7 +85,7 @@ import { IcalModule } from './ical/ical.module';
     ExpensesModule,
     HousekeepingModule,
     WebhooksModule,
-    IcalModule,
+    MarketingModule,
   ],
   controllers: [AppController],
   providers: [

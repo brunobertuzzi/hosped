@@ -27,6 +27,7 @@ export class HousekeepingService {
     const created = await this.prisma.client.cleaningTask.create({
       data: {
         roomId: data.roomId,
+        hotelId: room.hotelId,
         tipoLimpeza: data.tipoLimpeza,
         observacoes: data.observacoes,
         responsavelId: data.responsavelId,

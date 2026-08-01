@@ -60,6 +60,11 @@ function BookingEngineContent() {
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix');
   const [isCopied, setIsCopied] = useState(false);
 
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<any>(null);
+  const [validatingPromo, setValidatingPromo] = useState(false);
+  const [promoError, setPromoError] = useState('');
+
   // Mercado Pago states
   const [isWaitingPayment, setIsWaitingPayment] = useState(false);
   const [qrCodeData, setQrCodeData] = useState<{ id: string, qr_code: string, qr_code_base64: string } | null>(null);
@@ -150,6 +155,37 @@ function BookingEngineContent() {
   const selectedCategoryData = useMemo(() => activeRoomCategories.find(c => c.id === selectedCatId), [selectedCatId, activeRoomCategories]);
   const totalReservationPrice = useMemo(() => selectedCategoryData ? Number(selectedCategoryData.valorBase) * totalDiarias : 0, [selectedCategoryData, totalDiarias]);
 
+  const discountValue = useMemo(() => {
+    if (!appliedPromo) return 0;
+    if (appliedPromo.tipoDesconto === 'PERCENTUAL') {
+      return totalReservationPrice * (appliedPromo.valorDesconto / 100);
+    }
+    return Math.min(appliedPromo.valorDesconto, totalReservationPrice);
+  }, [appliedPromo, totalReservationPrice]);
+
+  const finalPrice = useMemo(() => Math.max(0, totalReservationPrice - discountValue), [totalReservationPrice, discountValue]);
+
+  const handleValidatePromo = async () => {
+    if (!promoCodeInput) return;
+    setValidatingPromo(true);
+    setPromoError('');
+    try {
+      const res = await fetch(`${API_BASE}/promo-codes/validate/${tenantSlug}/${promoCodeInput}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Cupom inválido');
+      }
+      const data = await res.json();
+      setAppliedPromo(data);
+      toast.success('Cupom aplicado com sucesso!');
+    } catch (err: any) {
+      setPromoError(err.message || 'Cupom inválido');
+      setAppliedPromo(null);
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
+
   // When branch changes, reset room selection (async to avoid sync setState in effect)
   useEffect(() => {
     const t = setTimeout(() => setSelectedCatId(null), 0);
@@ -183,6 +219,7 @@ function BookingEngineContent() {
       dataCheckIn: checkInDate,
       dataCheckOut: checkOutDate,
       origem: 'ONLINE',
+      promoCode: appliedPromo?.codigo,
       // valorTotal is recalculated server-side
     };
     const res = await fetch(`${API_BASE}/reservations?hotelId=${tenantSlug}&branchId=${activeBranch.id}`, {
@@ -240,7 +277,7 @@ function BookingEngineContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             reservationId: createdRes.id,
-            amount: createdRes.valorTotal || totalReservationPrice,
+            amount: createdRes.valorTotal || finalPrice,
             email: guestEmail,
             description: `Reserva ${activeBranch.nome} - ${selectedCategoryData?.nome}`,
           }),
@@ -547,6 +584,40 @@ function BookingEngineContent() {
               <div className="space-y-6">
                 <div className="glass-panel p-8 rounded-[24px] space-y-6 border border-white/5">
                   <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 border-b border-white/5 pb-4">Resumo da Reserva</h3>
+                  
+                  <div className="space-y-3 pb-4 border-b border-white/5">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Cupom de Desconto</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={promoCodeInput}
+                        onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                        disabled={isWaitingPayment || !!appliedPromo}
+                        placeholder="Ex: VERAO20" 
+                        className="flex-1 bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2.5 text-[13px] text-white outline-none focus:border-brand font-mono disabled:opacity-50" 
+                      />
+                      {appliedPromo ? (
+                        <button 
+                          onClick={() => { setAppliedPromo(null); setPromoCodeInput(''); setPromoError(''); }}
+                          disabled={isWaitingPayment}
+                          className="px-4 py-2 border border-red-500/50 text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-[12px] font-bold transition-colors disabled:opacity-50"
+                        >
+                          Remover
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={handleValidatePromo}
+                          disabled={!promoCodeInput || isWaitingPayment || validatingPromo}
+                          className="px-4 py-2 border border-white/10 text-white bg-white/5 hover:bg-white/10 rounded-xl text-[12px] font-bold transition-colors disabled:opacity-50"
+                        >
+                          {validatingPromo ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Aplicar'}
+                        </button>
+                      )}
+                    </div>
+                    {promoError && <p className="text-red-400 text-xs mt-1">{promoError}</p>}
+                    {appliedPromo && <p className="text-green-400 text-xs mt-1">Desconto aplicado: {appliedPromo.descricao || appliedPromo.codigo}</p>}
+                  </div>
+
                   <div className="space-y-4">
                     <div>
                       <span className="text-[10px] text-white/40 uppercase font-bold tracking-widest block mb-1">Destino</span>
@@ -571,9 +642,15 @@ function BookingEngineContent() {
                         <span>Valor total das diárias</span>
                         <span className="font-mono text-white/80">R$ {totalReservationPrice.toFixed(2)}</span>
                       </div>
+                      {appliedPromo && (
+                        <div className="flex justify-between text-green-400 text-[13px]">
+                          <span>Desconto ({appliedPromo.codigo})</span>
+                          <span className="font-mono">- R$ {discountValue.toFixed(2)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-bold border-t border-white/5 pt-4 text-[15px]">
                         <span className="text-white">Total a Pagar</span>
-                        <span className="text-brand font-mono text-xl tracking-tight">R$ {totalReservationPrice.toFixed(2)}</span>
+                        <span className="text-brand font-mono text-xl tracking-tight">R$ {finalPrice.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

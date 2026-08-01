@@ -354,25 +354,7 @@ export default function IntegracoesPage() {
           </div>
         </div>
 
-        {/* Channel Manager Card */}
-        <Link href="/admin/integracoes/channel-manager" className="glass-card border border-white/10 rounded-2xl p-6 relative overflow-hidden group hover:border-brand/50 transition-colors md:col-span-2">
-          <div className="absolute top-2 right-2 bg-brand/20 text-brand px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">
-            Novo
-          </div>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <Settings2 className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-white/90">Channel Manager (Booking, Airbnb)</h2>
-              <p className="text-xs text-white/50">Sincronização bidirecional de calendário via iCal</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-white/50">Gerencie links de importação e exportação de calendários (.ics).</p>
-            <span className="text-brand text-sm font-medium">Configurar &rarr;</span>
-          </div>
-        </Link>
+
 
       </div>
     </div>

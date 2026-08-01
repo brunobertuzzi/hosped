@@ -10,7 +10,7 @@ const featuresList = [
   {
     icon: Building2,
     title: 'Várias Unidades, Um só Painel',
-    desc: 'Gerencie dezenas de filiais no mesmo painel. Controle de acesso por unidade e visão consolidada.',
+    desc: 'Gerencie dezenas de filiais no mesmo painel. Controle de acesso por unidade e visão geral de todos os negócios na mesma tela.',
     longDesc: 'Se você tem mais de uma pousada ou hotel, acesse todas as unidades usando apenas uma senha. Visualize facilmente quanto cada unidade faturou e controle o que seus gerentes podem ver.'
   },
   {
@@ -22,7 +22,7 @@ const featuresList = [
   {
     icon: Calendar,
     title: 'Painel Visual de Reservas',
-    desc: 'Gerencie as reservas em um mapa visual intuitivo com suporte a arrastar e soltar.',
+    desc: 'Gerencie as reservas em um mapa visual intuitivo onde basta clicar e arrastar com o mouse para fazer mudanças.',
     longDesc: 'Esqueça cadernos e tabelas complicadas. Veja todos os seus quartos em uma tela visual super simples. Troque um hóspede de quarto ou aumente os dias da estadia apenas clicando e arrastando o mouse.'
   },
   {
@@ -35,20 +35,15 @@ const featuresList = [
     icon: CreditCard,
     title: 'Recebimentos Descomplicados',
     desc: 'Receba via Pix e cartão de crédito direto no sistema. Pagamentos e parcelamentos processados de forma automática e segura.',
-    longDesc: 'Integração bancária e de cartão que dá baixa automática no sistema. Sem conciliação manual. Ao pagar pelo Pix, a reserva já muda de status instantaneamente. Parcele as vendas e emita notas fiscais direto pela plataforma.'
+    longDesc: 'Integração bancária e de cartão que dá baixa automática no sistema. Sem precisar dar baixa manual em boletos ou conferir extratos. Ao pagar pelo Pix, a reserva já muda de status instantaneamente. Parcele as vendas e emita notas fiscais direto pela plataforma.'
   },
   {
     icon: Shield,
     title: 'Controle de Acesso da Equipe',
     desc: 'Saiba exatamente o que cada funcionário fez. Você escolhe as telas que a recepção, a limpeza e o financeiro podem acessar.',
-    longDesc: 'Evite fraudes e desorganização. Toda pequena alteração (excluir reserva, aplicar desconto, mudar quarto) gera um log detalhado apontando o e-mail, horário e o dado exato que foi modificado. Durma tranquilo sabendo que a operação está blindada.'
+    longDesc: 'Evite fraudes e desorganização. Toda pequena alteração (excluir reserva, aplicar desconto, mudar quarto) gera um histórico detalhado (auditoria) apontando quem fez, o horário e o dado exato que foi modificado. Durma tranquilo sabendo que a operação está blindada.'
   },
-  {
-    icon: RefreshCcw,
-    title: 'Conexão com Sites de Reserva',
-    desc: 'Atualize suas vagas no Booking, Airbnb e Expedia. Se um quarto é alugado em um site, bloqueia nos outros na mesma hora.',
-    longDesc: 'Evite reservas duplicadas de uma vez por todas. Toda vez que uma reserva entra pelo Booking ou pelo seu site, a disponibilidade é atualizada automaticamente em todos os outros canais em questão de segundos. Gestão de tarifas unificada.'
-  },
+
   {
     icon: Package,
     title: 'Consumo e Fechamento de Conta',
@@ -151,7 +146,7 @@ export default function SaasLandingPage() {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
             </div>
             {/* Mockup Body */}
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-[400px]">
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[400px] md:h-[400px]">
               <div className="col-span-1 border-r border-white/5 pr-4 space-y-4">
                 <div className="h-10 bg-white/5 rounded-xl animate-pulse" style={{ animationDelay: '0ms' }} />
                 <div className="h-10 bg-indigo-500/20 rounded-xl relative overflow-hidden">
@@ -393,40 +388,7 @@ export default function SaasLandingPage() {
                 </div>
               </div>
             </motion.div>
-            {/* Bento Item 5 - Channel Manager (Span 2) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="md:col-span-2 bg-gradient-to-bl from-white/[0.03] to-transparent border border-white/5 rounded-3xl p-8 relative overflow-hidden group flex flex-col md:flex-row items-center"
-            >
-              <div className="w-full md:w-1/2 relative z-10 pr-6 mb-8 md:mb-0">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400">
-                  <RefreshCcw className="w-5 h-5" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Integração com Booking e Airbnb</h3>
-                <p className="text-white/40 text-sm leading-relaxed">Esqueça o medo de reservas duplicadas (Overbooking). O sistema atualiza a disponibilidade em todos os sites da internet automaticamente na mesma hora.</p>
-              </div>
-              <div className="w-full md:w-1/2 flex items-center justify-center relative">
-                {/* Visual Connection Map */}
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center z-10 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
-                  <Hexagon className="w-8 h-8 text-indigo-400" />
-                </div>
-                <div className="absolute w-full h-full flex items-center justify-center animate-spin-slow opacity-60">
-                  <div className="w-32 h-32 rounded-full border border-white/10 absolute" />
-                  <div className="absolute w-8 h-8 rounded-full bg-blue-600/30 flex items-center justify-center top-0 -translate-y-1/2 shadow-lg backdrop-blur-md">
-                     <div className="w-2 h-2 rounded-full bg-blue-400" />
-                  </div>
-                  <div className="absolute w-8 h-8 rounded-full bg-pink-600/30 flex items-center justify-center bottom-0 translate-y-1/2 shadow-lg backdrop-blur-md">
-                     <div className="w-2 h-2 rounded-full bg-pink-400" />
-                  </div>
-                  <div className="absolute w-8 h-8 rounded-full bg-amber-600/30 flex items-center justify-center right-0 translate-x-1/2 shadow-lg backdrop-blur-md">
-                     <div className="w-2 h-2 rounded-full bg-amber-400" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+
 
             {/* Bento Item 6 - Analytics */}
             <motion.div

@@ -896,4 +896,34 @@ export const api = {
       body: JSON.stringify({ addonId }),
     });
   },
+
+  // ================= MARKETING / PROMO CODES =================
+
+  async getPromoCodes() {
+    return await request('/promo-codes');
+  },
+
+  async createPromoCode(data: any) {
+    return await request('/promo-codes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updatePromoCode(id: string, data: any) {
+    return await request(`/promo-codes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deletePromoCode(id: string) {
+    return await request(`/promo-codes/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async validatePromoCodePublic(hotelId: string, code: string) {
+    return await request(`/promo-codes/validate/${hotelId}/${code}`);
+  },
 };

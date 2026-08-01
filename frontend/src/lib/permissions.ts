@@ -119,6 +119,14 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
     category: 'business',
     defaultFor: ['HOTEL_OWNER'],
   },
+  {
+    key: 'page.marketing',
+    label: 'Marketing & Cupons',
+    description: 'Criação de promoções e cupons de desconto.',
+    icon: 'Tag',
+    category: 'business',
+    defaultFor: ['HOTEL_OWNER', 'MANAGER'],
+  },
 
   // ── SETUP & GESTÃO ───────────────────────────────────────
   {

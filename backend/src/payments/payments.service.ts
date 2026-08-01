@@ -16,7 +16,10 @@ export class PaymentsService {
     const sistemaToken = process.env.SISTEMA_PAYMENT_TOKEN || '';
     if (!sistemaToken) {
       this.logger.warn(
-        'SISTEMA_PAYMENT_TOKEN NOT FOUND. Sistema Monthly Billing may fail or run in mock mode.',
+        '[PaymentsService] SISTEMA_PAYMENT_TOKEN não configurado. ' +
+        'As faturas mensais dos hotéis SERÃO GERADAS no banco de dados, ' +
+        'mas o débito automático via Mercado Pago NÃO será executado. ' +
+        'Configure esta variável no Railway para ativar a cobrança automática das assinaturas.',
       );
     }
   }

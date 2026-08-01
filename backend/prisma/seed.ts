@@ -58,7 +58,7 @@ const SYSTEM_PLANS = [
     maxBranches: -1,
     maxRooms: -1,
     maxUsers: -1,
-    features: ['Tudo do PRO', 'Filiais ilimitadas', 'iCal / OTA', 'Webhooks', 'Suporte prioritário'],
+    features: ['Tudo do PRO', 'Filiais ilimitadas', 'Webhooks', 'Suporte prioritário'],
     isActive: true,
   },
 ];

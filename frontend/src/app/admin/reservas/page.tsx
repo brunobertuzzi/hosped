@@ -9,6 +9,7 @@ import { useActiveBranchData } from '../../../store/useTenantStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
+import Link from 'next/link';
 
 export default function AdminReservasPage() {
   const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
@@ -181,7 +182,7 @@ export default function AdminReservasPage() {
           <p className="text-[13px] text-white/50">Gerencie e crie reservas do balcão e telefone.</p>
         </div>
 
-        <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2 shadow-[0_0_15px_-3px_var(--brand-primary)]">
+        <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2">
           <Plus className="w-4 h-4" /> Nova Reserva
         </button>
       </div>
@@ -325,7 +326,12 @@ export default function AdminReservasPage() {
                         <option value="" className="bg-black">-- Selecione um Hóspede --</option>
                         {guests.map(g => <option key={g.id} value={g.id} className="bg-black">{g.nome} ({g.documento})</option>)}
                       </select>
-                      <p className="text-[10px] text-brand mt-2">* Para hóspedes novos, feche e cadastre na aba Hóspedes primeiro, ou selecione um existente.</p>
+                      <div className="flex items-center justify-between mt-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                        <span className="text-[10px] text-white/50">O hóspede não tem cadastro?</span>
+                        <Link href="/admin/hospedes" className="text-[10px] font-bold uppercase tracking-widest text-brand hover:text-white transition-colors flex items-center gap-1">
+                          Cadastrar Hóspede <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
                     <div className="flex gap-4">
                       <button onClick={() => setStep(1)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Voltar</button>
@@ -365,7 +371,7 @@ export default function AdminReservasPage() {
 
                     <div className="flex gap-4 pt-4 border-t border-white/5">
                       <button onClick={() => setStep(2)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Voltar</button>
-                      <button onClick={handleSave} disabled={!newRes.categoryId} className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all shadow-[0_0_15px_-3px_var(--brand-primary)] flex items-center justify-center gap-2">
+                      <button onClick={handleSave} disabled={!newRes.categoryId} className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2">
                         <Save className="w-4 h-4" /> Criar Reserva
                       </button>
                     </div>
@@ -412,7 +418,7 @@ export default function AdminReservasPage() {
 
                 <div className="pt-4 flex gap-3 border-t border-white/5">
                   <button type="button" onClick={() => setIsPosModalOpen(false)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Cancelar</button>
-                  <button type="submit" className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all shadow-[0_0_15px_-3px_var(--brand-primary)] flex items-center justify-center gap-2">
+                  <button type="submit" className="flex-1 py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2">
                     <ShoppingBag className="w-4 h-4" /> Lançar na Conta
                   </button>
                 </div>

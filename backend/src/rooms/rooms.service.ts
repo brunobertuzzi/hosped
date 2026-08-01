@@ -26,7 +26,7 @@ export class RoomsService {
     });
   }
 
-  async createRoom(data: any, branchId: string, userId?: string) {
+  async createRoom(data: any, branchId: string, hotelId: string, userId?: string) {
     const context = this.tenantService.getContext();
     if (context && context.hotelId) {
       const hotel = await this.prisma.client.hotel.findUnique({
@@ -51,6 +51,7 @@ export class RoomsService {
     const created = await this.prisma.client.room.create({
       data: {
         ...data,
+        hotelId,
         branchId,
       },
     });
@@ -67,9 +68,12 @@ export class RoomsService {
     });
   }
 
-  async createCategory(data: any, userId?: string) {
+  async createCategory(data: any, hotelId: string, userId?: string) {
     const created = await this.prisma.client.roomCategory.create({
-      data,
+      data: {
+        ...data,
+        hotelId,
+      },
     });
     await this.audit.log(
       userId,
@@ -130,6 +134,7 @@ export class RoomsService {
       const maintenanceOrder = await tx.maintenanceOrder.create({
         data: {
           roomId,
+          hotelId: room.hotelId,
           descricao,
           status: MaintenanceStatus.ABERTA,
         },
