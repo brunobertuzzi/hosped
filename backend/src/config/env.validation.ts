@@ -18,7 +18,7 @@ export const envValidationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('7d'),
 
   // --- Frontend (necessário para links de e-mail) ---
-  FRONTEND_URL: Joi.string().uri().optional(),
+  FRONTEND_URL: Joi.string().optional(),
 
   // --- E-mail transacional (opcional - sem ele, links são logados no console) ---
   RESEND_API_KEY: Joi.string().optional(),
