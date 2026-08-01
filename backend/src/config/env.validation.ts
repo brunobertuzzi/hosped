@@ -10,8 +10,8 @@ export const envValidationSchema = Joi.object({
   // --- Banco de dados (OBRIGATÓRIO) ---
   DATABASE_URL: Joi.string().required(),
 
-  // --- Cache / Filas (OBRIGATÓRIO) ---
-  REDIS_URL: Joi.string().required(),
+  // --- Cache / Filas (OPCIONAL) ---
+  REDIS_URL: Joi.string().optional(),
 
   // --- Autenticação (OBRIGATÓRIO) ---
   JWT_SECRET: Joi.string().required(),

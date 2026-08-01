@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../core/prisma.service';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+
 import axios from 'axios';
 
 @Injectable()
@@ -10,17 +9,15 @@ export class WhatsappService {
 
   constructor(
     private readonly prisma: PrismaService,
-    @InjectQueue('whatsapp-queue') private readonly whatsappQueue: Queue,
   ) {}
 
   /**
    * Enfileira uma mensagem para envio via WhatsApp para o hóspede.
    */
   async sendMessage(hotelId: string, toPhone: string, message: string) {
-    await this.whatsappQueue.add('send-message', {
-      hotelId,
-      toPhone,
-      message,
+    // Dispara de forma síncrona/background sem bloquear o response principal
+    this.sendMessageSync(hotelId, toPhone, message).catch((err) => {
+      this.logger.error(`Erro no background sendMessageSync: ${err.message}`);
     });
     return true;
   }
