@@ -300,6 +300,12 @@ export const api = {
     return res;
   },
 
+  async createGuest(data: any) {
+    const res = await request('/guests', { method: 'POST', body: JSON.stringify(data) });
+    await this.getGuests();
+    return res;
+  },
+
   async updateGuest(id: string, data: any) {
     const res = await request(`/guests/${id}`, { method: 'PUT', body: JSON.stringify(data) });
     await this.getGuests();

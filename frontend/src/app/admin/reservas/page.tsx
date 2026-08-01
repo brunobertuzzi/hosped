@@ -37,6 +37,12 @@ export default function AdminReservasPage() {
   const [posItemId, setPosItemId] = useState('');
   const [posQty, setPosQty] = useState('1');
 
+  // Inline Guest Creation
+  const [guestSearch, setGuestSearch] = useState('');
+  const [showNewGuestForm, setShowNewGuestForm] = useState(false);
+  const [newGuestData, setNewGuestData] = useState({ nome: '', documento: '', email: '', telefone: '' });
+  const [isCreatingGuest, setIsCreatingGuest] = useState(false);
+
   React.useEffect(() => {
     api.getInventory().catch(err => console.error(err));
   }, []);
@@ -46,7 +52,16 @@ export default function AdminReservasPage() {
     return reservations.filter(res => {
       const guest = guests.find(g => g.id === res.guestId);
       const matchesSearch = guest?.nome.toLowerCase().includes(searchTerm.toLowerCase()) || res.id.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'ALL' || res.status === statusFilter;
+      
+      let matchesStatus = false;
+      const today = new Date().toISOString().split('T')[0];
+
+      if (statusFilter === 'ALL') matchesStatus = true;
+      else if (statusFilter === 'CHECKIN_HOJE') matchesStatus = res.dataCheckIn === today;
+      else if (statusFilter === 'CHECKOUT_HOJE') matchesStatus = res.dataCheckOut === today;
+      else if (statusFilter === 'HOSPEDADO') matchesStatus = res.status === 'HOSPEDADO';
+      else matchesStatus = res.status === statusFilter;
+
       return matchesSearch && matchesStatus;
     }).sort((a, b) => new Date(b.dataCheckIn).getTime() - new Date(a.dataCheckIn).getTime());
   }, [reservations, guests, searchTerm, statusFilter]);
@@ -68,6 +83,26 @@ export default function AdminReservasPage() {
     }
 
     const finalValue = newRes.valorPersonalizado ? Number(newRes.valorPersonalizado) : valorCalculado;
+
+  const handleCreateGuest = async () => {
+    if (!newGuestData.nome || !newGuestData.documento) {
+      alerts.error('Atenção', 'Nome e Documento são obrigatórios');
+      return;
+    }
+    setIsCreatingGuest(true);
+    try {
+      const res = await api.createGuest(newGuestData);
+      alerts.success('Sucesso', 'Hóspede cadastrado!');
+      setNewRes({ ...newRes, guestId: res.id });
+      setShowNewGuestForm(false);
+      setNewGuestData({ nome: '', documento: '', email: '', telefone: '' });
+      setGuestSearch('');
+    } catch (err: any) {
+      alerts.error('Erro', err.message || 'Falha ao cadastrar hóspede');
+    } finally {
+      setIsCreatingGuest(false);
+    }
+  };
 
     try {
       const guest = guests.find(g => g.id === newRes.guestId);
@@ -107,6 +142,24 @@ export default function AdminReservasPage() {
       alerts.success('Reserva criada com sucesso!');
     } catch (err: any) {
       alerts.error('Erro ao criar reserva', err.message);
+    }
+  };
+
+  const handleCreateGuest = async () => {
+    if (!newGuestData.nome || !newGuestData.documento) return;
+    try {
+      setIsCreatingGuest(true);
+      const createdGuest = await api.createGuest(newGuestData);
+      await api.getGuests();
+      setNewRes({ ...newRes, guestId: createdGuest.id });
+      setGuestSearch(createdGuest.nome);
+      setShowNewGuestForm(false);
+      setNewGuestData({ nome: '', documento: '', email: '', telefone: '' });
+      alerts.success('Hóspede cadastrado com sucesso!');
+    } catch (err: any) {
+      alerts.error('Erro ao cadastrar hóspede', err.message);
+    } finally {
+      setIsCreatingGuest(false);
     }
   };
 
@@ -197,9 +250,16 @@ export default function AdminReservasPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-            {['ALL', 'CONFIRMADA', 'HOSPEDADO', 'CANCELADA'].map(status => (
-              <button key={status} onClick={() => setStatusFilter(status)} className={`px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap transition-all border ${statusFilter === status ? 'bg-brand/10 border-brand/30 text-brand' : 'bg-transparent border-white/10 text-white/50 hover:bg-white/5'}`}>
-                {status === 'ALL' ? 'Todas' : status}
+            {[
+              { id: 'ALL', label: 'Todas' },
+              { id: 'CHECKIN_HOJE', label: 'Check-ins de Hoje' },
+              { id: 'CHECKOUT_HOJE', label: 'Check-outs de Hoje' },
+              { id: 'HOSPEDADO', label: 'Hóspedes na Casa' },
+              { id: 'CONFIRMADA', label: 'Confirmadas' },
+              { id: 'CANCELADA', label: 'Canceladas' }
+            ].map(status => (
+              <button key={status.id} onClick={() => setStatusFilter(status.id)} className={`px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase whitespace-nowrap transition-all border ${statusFilter === status.id ? 'bg-brand/10 border-brand/30 text-brand shadow-[0_0_15px_-3px_rgba(99,102,241,0.2)]' : 'bg-transparent border-white/10 text-white/50 hover:bg-white/5'}`}>
+                {status.label}
               </button>
             ))}
           </div>
@@ -320,19 +380,62 @@ export default function AdminReservasPage() {
                 {step === 2 && (
                   <div className="space-y-6">
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 2: Hóspede (CRM)</h3>
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Buscar Hóspede Cadastrado</label>
-                      <select value={newRes.guestId} onChange={e => setNewRes({...newRes, guestId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
-                        <option value="" className="bg-black">-- Selecione um Hóspede --</option>
-                        {guests.map(g => <option key={g.id} value={g.id} className="bg-black">{g.nome} ({g.documento})</option>)}
-                      </select>
-                      <div className="flex items-center justify-between mt-3 bg-white/5 p-3 rounded-lg border border-white/10">
-                        <span className="text-[10px] text-white/50">O hóspede não tem cadastro?</span>
-                        <Link href="/admin/hospedes" className="text-[10px] font-bold uppercase tracking-widest text-brand hover:text-white transition-colors flex items-center gap-1">
-                          Cadastrar Hóspede <ArrowRight className="w-3 h-3" />
-                        </Link>
+                    
+                    {!showNewGuestForm ? (
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Buscar Hóspede Cadastrado</label>
+                        <div className="relative mb-3">
+                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                          <input 
+                            type="text"
+                            placeholder="Buscar por nome ou documento..."
+                            value={guestSearch}
+                            onChange={(e) => setGuestSearch(e.target.value)}
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner"
+                          />
+                        </div>
+                        <select size={5} value={newRes.guestId} onChange={e => setNewRes({...newRes, guestId: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl px-2 py-2 text-[13px] text-white outline-none focus:border-brand cursor-pointer no-scrollbar">
+                          {guests.filter(g => g.nome.toLowerCase().includes(guestSearch.toLowerCase()) || g.documento.includes(guestSearch)).map(g => (
+                            <option key={g.id} value={g.id} className="p-2 hover:bg-white/10 rounded-lg">{g.nome} ({g.documento})</option>
+                          ))}
+                        </select>
+                        <div className="flex items-center justify-between mt-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                          <span className="text-[10px] text-white/50">O hóspede não tem cadastro?</span>
+                          <button onClick={() => setShowNewGuestForm(true)} className="text-[10px] font-bold uppercase tracking-widest text-brand hover:text-white transition-colors flex items-center gap-1">
+                            Cadastrar Hóspede <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="glass-panel p-4 rounded-xl border border-white/10 space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="text-[12px] font-bold text-white flex items-center gap-2"><User className="w-4 h-4 text-brand"/> Novo Hóspede</h4>
+                          <button onClick={() => setShowNewGuestForm(false)} className="text-[10px] text-white/40 hover:text-white uppercase tracking-widest font-bold">Cancelar</button>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Nome Completo *</label>
+                            <input type="text" value={newGuestData.nome} onChange={e => setNewGuestData({...newGuestData, nome: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white outline-none focus:border-brand" />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Documento (CPF/Passaporte) *</label>
+                            <input type="text" value={newGuestData.documento} onChange={e => setNewGuestData({...newGuestData, documento: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white outline-none focus:border-brand" />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">E-mail</label>
+                            <input type="email" value={newGuestData.email} onChange={e => setNewGuestData({...newGuestData, email: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white outline-none focus:border-brand" />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Telefone</label>
+                            <input type="text" value={newGuestData.telefone} onChange={e => setNewGuestData({...newGuestData, telefone: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white outline-none focus:border-brand" />
+                          </div>
+                        </div>
+                        <button onClick={handleCreateGuest} disabled={isCreatingGuest || !newGuestData.nome || !newGuestData.documento} className="w-full py-2 bg-brand hover:bg-brand/80 text-white text-[12px] font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2">
+                          {isCreatingGuest ? 'Salvando...' : <><Save className="w-4 h-4"/> Salvar e Selecionar Hóspede</>}
+                        </button>
+                      </div>
+                    )}
+
                     <div className="flex gap-4">
                       <button onClick={() => setStep(1)} className="flex-1 py-3 border border-white/10 hover:bg-white/5 text-white/70 text-[13px] font-bold rounded-xl transition-all">Voltar</button>
                       <button onClick={() => setStep(3)} disabled={!newRes.guestId} className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white text-[13px] font-bold rounded-xl transition-all disabled:opacity-50">Continuar</button>

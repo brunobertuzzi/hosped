@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings, PaintBucket, Palette, Store,
-  Save, LayoutTemplate, Shield, Webhook, Clock, Lock
+  Save, LayoutTemplate, Shield, Clock, Lock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTenantStore, useActiveBranchData } from '../../../store/useTenantStore';
@@ -40,7 +40,6 @@ export default function ConfiguracoesPage() {
   const [descricaoPublica, setDescricaoPublica] = useState(hotel.descricaoPublica || '');
   const [diferenciais, setDiferenciais] = useState(hotel.diferenciais || []);
   const [slug, setSlug] = useState(hotel.slug || '');
-  const [webhooks, setWebhooks] = useState(hotel.webhooks || { onReservationComplete: '', onCheckIn: '' });
   const [localInfos, setLocalInfos] = useState(hotel.localInfos || { checkInTime: '14:00', checkOutTime: '12:00', timezone: 'America/Sao_Paulo' });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -75,7 +74,6 @@ export default function ConfiguracoesPage() {
         diferenciais,
         slug,
         banner: bannerUrl,
-        webhooks,
         localInfos
       });
 
@@ -307,37 +305,6 @@ export default function ConfiguracoesPage() {
                   <option value="America/New_York" className="bg-black text-white">América/Nova Iorque (EST)</option>
                   <option value="Europe/Lisbon" className="bg-black text-white">Europa/Lisboa (WET)</option>
                 </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-panel p-8 rounded-[24px] border border-white/5 space-y-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-2 border-b border-white/5 pb-4">
-              <Webhook className="w-4 h-4 text-brand" /> Webhooks & Integrações (BETA)
-            </h3>
-            <p className="text-[13px] text-white/50 leading-relaxed">
-              Dispare notificações ou sincronize dados com sistemas externos (Zapier, Make, etc) sempre que eventos-chave ocorrerem.
-            </p>
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Nova Reserva Criada (POST)</label>
-                <input
-                  type="url"
-                  placeholder="https://hooks.zapier.com/hooks/catch/..."
-                  value={webhooks.onReservationComplete}
-                  onChange={e => setWebhooks({ ...webhooks, onReservationComplete: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in Realizado (POST)</label>
-                <input
-                  type="url"
-                  placeholder="https://hooks.zapier.com/hooks/catch/..."
-                  value={webhooks.onCheckIn}
-                  onChange={e => setWebhooks({ ...webhooks, onCheckIn: e.target.value })}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand"
-                />
               </div>
             </div>
           </div>

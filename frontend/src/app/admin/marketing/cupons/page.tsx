@@ -100,64 +100,64 @@ export default function PromoCodesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Tag className="w-6 h-6 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Tag className="w-6 h-6 text-brand" />
             Cupons de Desconto
           </h1>
-          <p className="text-gray-500">Crie códigos promocionais para aumentar suas reservas diretas.</p>
+          <p className="text-white/60 text-sm">Crie códigos promocionais para aumentar suas reservas diretas.</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-brand text-white rounded-xl font-bold hover:bg-brand/80 transition-colors flex items-center gap-2 text-sm"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           Novo Cupom
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="glass-panel overflow-hidden border border-white/5">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="py-4 px-6 font-semibold text-gray-900">Código</th>
-                <th className="py-4 px-6 font-semibold text-gray-900">Desconto</th>
-                <th className="py-4 px-6 font-semibold text-gray-900">Usos</th>
-                <th className="py-4 px-6 font-semibold text-gray-900">Validade</th>
-                <th className="py-4 px-6 font-semibold text-gray-900">Status</th>
-                <th className="py-4 px-6 font-semibold text-gray-900 text-right">Ações</th>
+              <tr className="bg-white/5 border-b border-white/5">
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Código</th>
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Desconto</th>
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Usos</th>
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Validade</th>
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Status</th>
+                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-white/5">
               {promoCodes.map((promo) => (
-                <tr key={promo.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={promo.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="py-4 px-6">
-                    <div className="font-medium text-gray-900 font-mono bg-gray-100 inline-block px-2 py-1 rounded">
+                    <div className="font-medium text-white font-mono bg-white/10 border border-white/10 inline-block px-2 py-1 rounded">
                       {promo.codigo}
                     </div>
-                    {promo.descricao && <div className="text-sm text-gray-500 mt-1">{promo.descricao}</div>}
+                    {promo.descricao && <div className="text-xs text-white/50 mt-1">{promo.descricao}</div>}
                   </td>
                   <td className="py-4 px-6">
                     {promo.tipoDesconto === 'PERCENTUAL' ? (
-                      <span className="text-green-600 font-medium">{promo.valorDesconto}% OFF</span>
+                      <span className="text-green-400 font-medium">{promo.valorDesconto}% OFF</span>
                     ) : (
-                      <span className="text-green-600 font-medium">R$ {promo.valorDesconto} OFF</span>
+                      <span className="text-green-400 font-medium">R$ {promo.valorDesconto} OFF</span>
                     )}
                   </td>
                   <td className="py-4 px-6">
-                    <span className="text-gray-600">
+                    <span className="text-white/70 text-sm">
                       {promo.usos} {promo.quantidadeTotal ? `/ ${promo.quantidadeTotal}` : 'usos'}
                     </span>
                   </td>
-                  <td className="py-4 px-6 text-gray-600">
+                  <td className="py-4 px-6 text-white/70 text-sm">
                     {promo.validade ? new Date(promo.validade).toLocaleDateString('pt-BR') : 'Sem validade'}
                   </td>
                   <td className="py-4 px-6">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
                         promo.ativo
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
                       }`}
                     >
                       {promo.ativo ? 'Ativo' : 'Inativo'}
@@ -167,14 +167,14 @@ export default function PromoCodesPage() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => handleOpenModal(promo)}
-                        className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"
+                        className="p-2 text-white/40 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
                         title="Editar"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(promo.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        className="p-2 text-white/40 hover:text-red-400 transition-colors hover:bg-red-500/10 rounded-lg"
                         title="Excluir"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -185,7 +185,7 @@ export default function PromoCodesPage() {
               ))}
               {promoCodes.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                  <td colSpan={6} className="py-8 text-center text-white/40 text-sm">
                     Nenhum cupom cadastrado.
                   </td>
                 </tr>
@@ -203,22 +203,22 @@ export default function PromoCodesPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg glass-panel bg-[#111]/90 rounded-[24px] overflow-hidden border border-white/10 shadow-2xl"
             >
-              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h3 className="text-lg font-semibold text-gray-900">
+              <div className="px-6 py-5 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-white/80">
                   {editingId ? 'Editar Cupom' : 'Novo Cupom'}
                 </h3>
               </div>
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                     Código Promocional
                   </label>
                   <input
@@ -227,12 +227,12 @@ export default function PromoCodesPage() {
                     value={codigo}
                     onChange={(e) => setCodigo(e.target.value.toUpperCase())}
                     placeholder="Ex: VERAO20"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono uppercase"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand font-mono uppercase text-white text-[13px] outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                     Descrição (Opcional)
                   </label>
                   <input
@@ -240,26 +240,26 @@ export default function PromoCodesPage() {
                     value={descricao}
                     onChange={(e) => setDescricao(e.target.value)}
                     placeholder="Ex: Promoção de fim de ano"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand text-white text-[13px] outline-none transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                       Tipo de Desconto
                     </label>
                     <select
                       value={tipoDesconto}
                       onChange={(e) => setTipoDesconto(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                      className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand text-white text-[13px] outline-none transition-all cursor-pointer"
                     >
-                      <option value="PERCENTUAL">Percentual (%)</option>
-                      <option value="FIXO">Valor Fixo (R$)</option>
+                      <option value="PERCENTUAL" className="bg-black">Percentual (%)</option>
+                      <option value="FIXO" className="bg-black">Valor Fixo (R$)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                       Valor
                     </label>
                     <input
@@ -270,14 +270,14 @@ export default function PromoCodesPage() {
                       value={valorDesconto}
                       onChange={(e) => setValorDesconto(e.target.value)}
                       placeholder={tipoDesconto === 'PERCENTUAL' ? '20' : '100.00'}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand text-white text-[13px] outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                       Limite de Usos (Opcional)
                     </label>
                     <input
@@ -286,46 +286,46 @@ export default function PromoCodesPage() {
                       value={quantidadeTotal}
                       onChange={(e) => setQuantidadeTotal(e.target.value)}
                       placeholder="Ilimitado"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand text-white text-[13px] outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">
                       Validade (Opcional)
                     </label>
                     <input
                       type="date"
                       value={validade}
                       onChange={(e) => setValidade(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl focus:ring-2 focus:ring-brand/50 focus:border-brand text-white text-[13px] outline-none transition-all font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
+                <div className="flex items-center gap-3 pt-2 p-3 bg-white/[0.02] rounded-xl border border-white/5">
                   <input
                     type="checkbox"
                     id="ativo"
                     checked={ativo}
                     onChange={(e) => setAtivo(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                    className="w-4 h-4 text-brand rounded bg-black/50 border-white/10 focus:ring-brand/50 focus:ring-offset-0"
                   />
-                  <label htmlFor="ativo" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="ativo" className="text-[12px] font-bold text-white/80 cursor-pointer">
                     Cupom Ativo
                   </label>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-4 border-t border-white/5">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-4 py-3 border border-white/10 text-white/70 rounded-xl text-[12px] font-bold hover:bg-white/5 hover:text-white transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors"
+                    className="flex-1 px-4 py-3 bg-brand text-white rounded-xl text-[12px] font-bold hover:bg-brand/80 transition-colors shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)]"
                   >
                     Salvar Cupom
                   </button>
