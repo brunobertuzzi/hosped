@@ -506,7 +506,7 @@ export class ReservationsService {
         });
         const updatedRoom = await tx.room.update({
           where: { id: reservation.roomId },
-          data: { status: RoomStatus.LIMPEZA },
+          data: { status: RoomStatus.DISPONIVEL },
         });
 
         // Auditar liberação do quarto
