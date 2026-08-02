@@ -149,7 +149,7 @@ export default function AdminReservasPage() {
 
       setIsModalOpen(false);
       setStep(1);
-      setNewRes({ guestId: '', categoryId: '', checkIn: '', checkOut: '', valorPersonalizado: '', origem: 'BALCAO' });
+      setNewRes({ guestId: '', categoryId: '', checkIn: '', checkOut: '', branchId: '', valorPersonalizado: '', origem: 'BALCAO' });
       alerts.success('Reserva criada com sucesso!');
     } catch (err: any) {
       alerts.error('Erro ao criar reserva', err.message);
