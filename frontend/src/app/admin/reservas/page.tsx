@@ -461,7 +461,7 @@ export default function AdminReservasPage() {
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Categoria de Quarto</label>
                       <select value={newRes.categoryId} onChange={e => setNewRes({...newRes, categoryId: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner cursor-pointer">
                         <option value="" className="bg-black">-- Selecione a Acomodação --</option>
-                        {roomCategories.map(c => <option key={c.id} value={c.id} className="bg-black">{c.nome} - R$ {c.valorBase.toFixed(2)}/dia</option>)}
+                        {roomCategories.map(c => <option key={c.id} value={c.id} className="bg-black">{c.nome} - R$ {parseFloat(c.valorBase).toFixed(2)}/dia</option>)}
                       </select>
                     </div>
 

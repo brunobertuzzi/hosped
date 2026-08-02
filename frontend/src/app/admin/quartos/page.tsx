@@ -297,7 +297,7 @@ export default function QuartosPage() {
                   <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                     <div>
                       <span className="block text-[9px] uppercase tracking-widest text-white/40 mb-1">Diária Base</span>
-                      <span className="text-lg font-bold text-emerald-400 font-mono">R$ {cat.valorBase.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-emerald-400 font-mono">R$ {parseFloat(cat.valorBase).toFixed(2)}</span>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => handleOpenCatModal(cat)} className="px-3 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
@@ -491,7 +491,7 @@ export default function QuartosPage() {
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Vincular a Categoria</label>
                     <select required value={roomCatId} onChange={e => setRoomCatId(e.target.value)} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner">
                       <option value="" disabled>Selecione uma Categoria...</option>
-                      {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {c.valorBase.toFixed(2)})</option>)}
+                      {roomCategories.map(c => <option key={c.id} value={c.id}>{c.nome} (R$ {parseFloat(c.valorBase).toFixed(2)})</option>)}
                     </select>
                   </div>
                 </div>
