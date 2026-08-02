@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 export default function AdminReservasPage() {
-  const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
+  const { reservations, guests, rooms, roomCategories, branches, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -27,6 +27,7 @@ export default function AdminReservasPage() {
     categoryId: '',
     checkIn: '',
     checkOut: '',
+    branchId: '',
     valorPersonalizado: '',
     origem: 'BALCAO'
   });
@@ -126,7 +127,7 @@ export default function AdminReservasPage() {
           guestDocument: guest.documento,
           guestEmail: guest.email,
           guestTelefone: guest.telefone,
-          branchId: selectedBranchId,
+          branchId: newRes.branchId || selectedBranchId,
           categoryId: newRes.categoryId,
           dataCheckIn: newRes.checkIn,
           dataCheckOut: newRes.checkOut,
@@ -425,7 +426,27 @@ export default function AdminReservasPage() {
 
                 {step === 1 && (
                   <div className="space-y-6">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 1: Datas</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50 border-b border-white/5 pb-2">Passo 1: Unidade & Datas</h3>
+                    
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Unidade / Filial</label>
+                      <select
+                        value={newRes.branchId || selectedBranchId}
+                        onChange={e => setNewRes({ ...newRes, branchId: e.target.value })}
+                        className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner"
+                      >
+                        {branches && branches.length > 0 ? (
+                          branches.map((b: any) => (
+                            <option key={b.id} value={b.id} className="bg-black">
+                              {b.nome} {b.cidade ? `(${b.cidade})` : ''}
+                            </option>
+                          ))
+                        ) : (
+                          <option value={selectedBranchId} className="bg-black">Unidade Principal</option>
+                        )}
+                      </select>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in</label>
