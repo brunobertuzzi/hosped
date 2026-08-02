@@ -86,9 +86,9 @@ export default function HospedesPage() {
 
   const filteredGuests = useMemo(() => {
     return guestsWithMetrics.filter(g =>
-      g.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.documento.includes(searchTerm) ||
-      g.email.toLowerCase().includes(searchTerm.toLowerCase())
+      (g.nome || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+      (g.documento || '').includes(searchTerm) ||
+      (g.email || '').toLowerCase().includes((searchTerm || '').toLowerCase())
     );
   }, [guestsWithMetrics, searchTerm]);
 

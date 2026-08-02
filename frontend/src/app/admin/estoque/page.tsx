@@ -37,7 +37,7 @@ export default function EstoquePage() {
 
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => {
-      const matchSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch = (item.nome || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       const matchCategory = selectedCategory === 'ALL' || item.categoria === selectedCategory;
       return matchSearch && matchCategory;
     });

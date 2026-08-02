@@ -20,7 +20,7 @@ export default function ManutencaoPage() {
 
   const filteredOrders = useMemo(() => {
     return maintenance.filter(order => {
-      const matchSearch = order.roomNumero.includes(searchTerm) || order.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch = (order.roomNumero || '').includes(searchTerm) || (order.descricao || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       const matchStatus = statusFilter === 'ALL' || order.status === statusFilter;
       return matchSearch && matchStatus;
     }).sort((a, b) => {

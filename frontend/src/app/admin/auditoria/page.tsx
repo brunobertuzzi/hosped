@@ -20,7 +20,7 @@ export default function AuditoriaPage() {
 
   const filteredAudits = useMemo(() => {
     return audits.filter(log => {
-      const matchSearch = log.usuario.toLowerCase().includes(searchTerm.toLowerCase()) || log.detalhes.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSearch = (log.usuario || '').toLowerCase().includes((searchTerm || '').toLowerCase()) || (log.detalhes || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       const matchAction = selectedAction === 'ALL' || log.acao === selectedAction;
       const matchEntity = selectedEntity === 'ALL' || log.entidade === selectedEntity;
       return matchSearch && matchAction && matchEntity;

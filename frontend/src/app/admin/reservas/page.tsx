@@ -51,7 +51,7 @@ export default function AdminReservasPage() {
   const filteredReservations = useMemo(() => {
     return reservations.filter(res => {
       const guest = guests.find(g => g.id === res.guestId);
-      const matchesSearch = guest?.nome.toLowerCase().includes(searchTerm.toLowerCase()) || res.id.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (guest?.nome || '').toLowerCase().includes((searchTerm || '').toLowerCase()) || (res.id || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       
       let matchesStatus = false;
       const today = new Date().toISOString().split('T')[0];
@@ -394,7 +394,7 @@ export default function AdminReservasPage() {
                           />
                         </div>
                         <div className="w-full max-h-48 overflow-y-auto bg-black/40 border border-white/10 rounded-xl p-1 no-scrollbar flex flex-col gap-1">
-                          {guests.filter(g => g.nome.toLowerCase().includes(guestSearch.toLowerCase()) || g.documento.includes(guestSearch)).map(g => (
+                          {guests.filter(g => (g?.nome || '').toLowerCase().includes((guestSearch || '').toLowerCase()) || (g?.documento || '').includes(guestSearch)).map(g => (
                             <div 
                               key={g.id} 
                               onClick={() => setNewRes({...newRes, guestId: g.id})}
@@ -404,7 +404,7 @@ export default function AdminReservasPage() {
                               <div className="text-[11px] text-white/40 mt-0.5 opacity-80">{g.documento}</div>
                             </div>
                           ))}
-                          {guests.filter(g => g.nome.toLowerCase().includes(guestSearch.toLowerCase()) || g.documento.includes(guestSearch)).length === 0 && (
+                          {guests.filter(g => (g?.nome || '').toLowerCase().includes((guestSearch || '').toLowerCase()) || (g?.documento || '').includes(guestSearch)).length === 0 && (
                             <div className="p-4 text-center text-white/30 text-[12px] italic">Nenhum hóspede encontrado.</div>
                           )}
                         </div>
