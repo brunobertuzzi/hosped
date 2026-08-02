@@ -97,7 +97,6 @@ export default function PromoCodesPage() {
   };
 
   return (
-  return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
