@@ -120,7 +120,6 @@ export default function AdminReservasPage() {
           dataCheckIn: newRes.checkIn,
           dataCheckOut: newRes.checkOut,
           valorTotal: finalValue,
-          status: 'CONFIRMADA',
           origem: 'BALCAO'
         })
       });
