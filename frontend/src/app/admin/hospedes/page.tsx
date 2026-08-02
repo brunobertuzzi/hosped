@@ -10,6 +10,7 @@ import { useTenantStore, useActiveBranchData } from '../../../store/useTenantSto
 import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
 import { formatDocument, formatPhone } from '../../../lib/masks';
+import Link from 'next/link';
 
 export default function HospedesPage() {
   const { guests, reservations, hotel, addGuest, updateGuest } = useActiveBranchData();
