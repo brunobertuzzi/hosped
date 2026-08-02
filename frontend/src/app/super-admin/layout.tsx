@@ -116,10 +116,10 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         <div className="p-6 border-t border-white/5">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10 mb-4">
             <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-xs text-white">
-              {user.nome[0]}
+              {(user?.nome || 'Admin').charAt(0)}
             </div>
             <div className="overflow-hidden">
-              <div className="text-xs font-bold text-white/90">{user.nome}</div>
+              <div className="text-xs font-bold text-white/90">{user?.nome || 'Super Admin'}</div>
               <span className="text-[9px] uppercase font-bold text-indigo-400 tracking-widest">Plataforma Owner</span>
             </div>
           </div>

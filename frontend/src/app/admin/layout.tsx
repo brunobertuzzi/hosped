@@ -265,11 +265,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="relative z-10 space-y-3">
             <div className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-xs text-white">
-                {user.nome[0]}
+                {(user?.nome || 'Admin').charAt(0)}
               </div>
               <div className="overflow-hidden">
-                <div className="text-xs font-medium text-white/90 truncate">{user.nome}</div>
-                <span className="text-[9px] uppercase font-bold text-white/40 tracking-widest">{user.role}</span>
+                <div className="text-xs font-medium text-white/90 truncate">{user?.nome || 'Administrador'}</div>
+                <span className="text-[9px] uppercase font-bold text-white/40 tracking-widest">{user?.role || 'ADMIN'}</span>
               </div>
             </div>
 
