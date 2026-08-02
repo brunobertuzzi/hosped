@@ -283,6 +283,12 @@ export const api = {
     return res;
   },
 
+  async deleteRoomCategory(id: string) {
+    const res = await request(`/rooms/categories/${id}`, { method: 'DELETE' });
+    await this.getRoomCategories();
+    return res;
+  },
+
   async createRoom(data: any) {
     const res = await request('/rooms', { method: 'POST', body: JSON.stringify(data) });
     await this.getRooms();

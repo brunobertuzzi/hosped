@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api, request } from '../../../lib/api';
 import { alerts } from '../../../lib/alerts';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export default function AdminReservasPage() {
   const { reservations, guests, rooms, roomCategories, addReservation, addAuditLog, user, selectedBranchId } = useActiveBranchData();
@@ -46,6 +47,16 @@ export default function AdminReservasPage() {
   React.useEffect(() => {
     api.getInventory().catch(err => console.error(err));
   }, []);
+
+  const searchParams = useSearchParams();
+  const paramGuestId = searchParams.get('guestId');
+
+  React.useEffect(() => {
+    if (paramGuestId) {
+      setNewRes(prev => ({ ...prev, guestId: paramGuestId }));
+      setIsModalOpen(true);
+    }
+  }, [paramGuestId]);
 
   // Filter Data
   const filteredReservations = useMemo(() => {
@@ -186,6 +197,26 @@ export default function AdminReservasPage() {
     }
   };
 
+  const handleManualPayment = async (resId: string) => {
+    const val = await alerts.prompt('Registrar Pagamento', 'Informe o valor do pagamento em R$:', '100.00');
+    if (val && !isNaN(parseFloat(val))) {
+      try {
+        await request(`/reservations/${resId}/manual-payment`, {
+          method: 'POST',
+          body: JSON.stringify({
+            valor: parseFloat(val),
+            formaPagamento: 'PIX',
+            observacao: 'Pagamento manual balcão'
+          })
+        });
+        alerts.success('Pagamento registrado com sucesso!');
+        await api.getReservations();
+      } catch (err: any) {
+        alerts.error('Erro ao registrar pagamento', err.message);
+      }
+    }
+  };
+
   const openPosModal = (id: string) => {
     setPosResId(id);
     setPosItemId('');
@@ -312,15 +343,24 @@ export default function AdminReservasPage() {
                     <td className="p-4">
                       {getStatusBadge(res.status)}
                     </td>
-                    <td className="p-4 text-right flex items-center justify-end gap-3">
-                      <span className="font-mono font-bold text-white whitespace-nowrap">R$ {Number(res.valorTotal).toFixed(2)}</span>
+                    <td className="p-4 text-right flex items-center justify-end gap-2">
+                      <span className="font-mono font-bold text-white whitespace-nowrap mr-2">R$ {Number(res.valorTotal).toFixed(2)}</span>
                       {(res.status === 'HOSPEDADO' || res.status === 'CONFIRMADA') && (
-                        <button onClick={() => openPosModal(res.id)} className="text-[10px] text-white/40 hover:text-emerald-400 uppercase font-bold tracking-widest flex items-center gap-1" title="Lançar Consumo/PDV">
-                          <ShoppingBag className="w-4 h-4" />
-                        </button>
+                        <>
+                          <button onClick={() => openPosModal(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all bg-white/5" title="Lançar Consumo / PDV">
+                            <ShoppingBag className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleManualPayment(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-blue-400 hover:border-blue-500/30 transition-all bg-white/5" title="Registrar Pagamento">
+                            <CreditCard className="w-4 h-4" />
+                          </button>
+                        </>
                       )}
-                      <button onClick={() => handleEditStatus(res.id, res.status)} className="text-[10px] text-white/40 hover:text-brand uppercase font-bold tracking-widest">Status</button>
-                      <button onClick={() => handleDelete(res.id)} className="text-white/40 hover:text-red-400"><XCircle className="w-4 h-4" /></button>
+                      <button onClick={() => handleEditStatus(res.id, res.status)} className="px-2.5 py-1.5 rounded-lg border border-white/10 text-[10px] text-white/60 hover:text-white hover:border-brand/30 transition-all bg-white/5 font-bold uppercase tracking-widest">
+                        Status
+                      </button>
+                      <button onClick={() => handleDelete(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-red-400 hover:border-red-500/30 transition-all bg-white/5" title="Cancelar Reserva">
+                        <XCircle className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
                 );

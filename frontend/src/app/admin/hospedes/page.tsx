@@ -197,6 +197,13 @@ export default function HospedesPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Link
+                      href={`/admin/reservas?guestId=${selectedGuest.id}`}
+                      className="px-3 py-1.5 bg-brand hover:brightness-110 text-black text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-lg"
+                      title="Criar Reserva para este Hóspede"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Nova Reserva
+                    </Link>
                     <button onClick={() => handleOpenModal(selectedGuest)} className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-colors" title="Editar Hóspede">
                       <Edit className="w-4 h-4" />
                     </button>

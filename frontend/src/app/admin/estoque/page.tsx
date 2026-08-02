@@ -124,15 +124,24 @@ export default function EstoquePage() {
   };
 
   const handleDeleteItem = async (id: string) => {
-    const isConfirmed = await alerts.confirm('Excluir Item', 'Tem certeza que deseja excluir este item do estoque?');
+    const isConfirmed = await alerts.confirm('Excluir Item', 'Deseja realmente remover este item do estoque?');
     if (isConfirmed) {
       try {
         await api.deleteInventoryItem(id);
-        await api.getInventory();
         alerts.success('Item excluído!');
       } catch (err: any) {
         alerts.error('Erro ao excluir', err.message);
       }
+    }
+  };
+
+  const handleQuickStockAdjustment = async (item: any, delta: number) => {
+    const newQty = Math.max(0, item.quantidade + delta);
+    try {
+      await api.updateInventoryItem(item.id, { quantidade: newQty });
+      alerts.success(`Estoque de "${item.nome}" atualizado: ${newQty}`);
+    } catch (err: any) {
+      alerts.error('Erro ao ajustar estoque', err.message);
     }
   };
 
@@ -231,9 +240,17 @@ export default function EstoquePage() {
                         : isLowStock ? <span className="px-2 py-1 rounded bg-amber-500/10 text-amber-500 text-[9px] font-bold uppercase tracking-widest">Baixo</span>
                         : <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold uppercase tracking-widest">Regular</span>}
                     </td>
-                    <td className="py-4 px-4 text-right flex items-center justify-end gap-3">
-                      <button onClick={() => handleEditItem(item.id, item.valorVenda, item.quantidade)} className="text-[10px] text-white/40 hover:text-brand uppercase font-bold tracking-widest">Editar</button>
-                      <button onClick={() => handleDeleteItem(item.id)} className="text-white/40 hover:text-red-400"><Minus className="w-4 h-4" /></button>
+                    <td className="py-4 px-4 text-right flex items-center justify-end gap-2">
+                      <div className="flex items-center border border-white/10 rounded-lg overflow-hidden bg-white/5 mr-2">
+                        <button onClick={() => handleQuickStockAdjustment(item, -1)} className="w-7 h-7 flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-white/10 transition-all" title="Dar Saída (-1)">
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleQuickStockAdjustment(item, 1)} className="w-7 h-7 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:bg-white/10 transition-all border-l border-white/10" title="Dar Entrada (+1)">
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <button onClick={() => handleEditItem(item.id, item.valorVenda, item.quantidade)} className="px-2.5 py-1 rounded-lg border border-white/10 text-[10px] text-white/60 hover:text-white hover:border-brand/30 transition-all bg-white/5 font-bold uppercase tracking-widest">Editar</button>
+                      <button onClick={() => handleDeleteItem(item.id)} className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 transition-all bg-white/5" title="Excluir"><Minus className="w-3.5 h-3.5" /></button>
                     </td>
                   </tr>
                 );

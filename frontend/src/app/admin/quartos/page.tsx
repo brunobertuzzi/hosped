@@ -213,6 +213,18 @@ export default function QuartosPage() {
     }
   };
 
+  const handleDeleteCategory = async (id: string) => {
+    const isConfirmed = await alerts.confirm('Excluir Categoria', 'Tem certeza que deseja excluir esta categoria de quarto?');
+    if (isConfirmed) {
+      try {
+        await api.deleteRoomCategory(id);
+        alerts.success('Categoria excluída!');
+      } catch (err: any) {
+        alerts.error('Erro ao excluir categoria', err.message);
+      }
+    }
+  };
+
   const handleEditRoom = async (id: string, currentStatus: string) => {
     const status = await alerts.prompt('Editar Status', currentStatus, 'DISPONIVEL, OCUPADO, LIMPEZA, MANUTENCAO');
     if (status) {
@@ -300,11 +312,14 @@ export default function QuartosPage() {
                       <span className="text-lg font-bold text-emerald-400 font-mono">R$ {parseFloat(cat.valorBase).toFixed(2)}</span>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleOpenCatModal(cat)} className="px-3 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
+                      <button onClick={() => handleOpenCatModal(cat)} className="px-3 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest" title="Editar Categoria">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => openEditCat(cat)} className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest">
+                      <button onClick={() => openEditCat(cat)} className="px-4 py-2 flex items-center gap-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors text-[10px] uppercase font-bold tracking-widest" title="Fotos">
                         <ImageIcon className="w-3.5 h-3.5" /> Fotos
+                      </button>
+                      <button onClick={() => handleDeleteCategory(cat.id)} className="px-3 py-2 flex items-center gap-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors text-[10px] uppercase font-bold tracking-widest" title="Excluir Categoria">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
