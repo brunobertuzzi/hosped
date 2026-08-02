@@ -139,11 +139,11 @@ export default function AuditoriaPage() {
 
                 <div className="flex items-center gap-3 shrink-0 pt-2 md:pt-0 border-t border-white/[0.04] md:border-none">
                   <div className="text-right">
-                    <span className="text-[11px] font-bold text-white/80 block font-sans">{log.usuario}</span>
+                    <span className="text-[11px] font-bold text-white/80 block font-sans">{log.usuario || 'Sistema'}</span>
                     <span className="text-[9px] text-white/30 uppercase tracking-widest">{log.id}</span>
                   </div>
                   <div className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/60 font-bold text-xs">
-                    {log.usuario[0]}
+                    {(log.usuario || 'S').charAt(0)}
                   </div>
                 </div>
               </div>
