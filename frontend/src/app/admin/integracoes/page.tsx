@@ -151,63 +151,67 @@ export default function IntegracoesPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header>
-        <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-          Integrações
-        </h1>
-        <p className="text-white/60 text-sm max-w-2xl mt-2">
-          Conecte seu hotel com Google, WhatsApp, pagamentos e sites de reserva.
-        </p>
-      </header>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+            <CloudLightning className="w-6 h-6 text-brand" />
+            Integrações
+          </h1>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">
+            Conecte seu hotel com Google, WhatsApp, pagamentos e sistemas parceiros.
+          </p>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Google Reviews Card */}
-        <div className="glass-card border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Star className="w-24 h-24 text-white" />
+        <div className="bg-black border border-white/[0.04] rounded-[24px] p-6 shadow-2xl relative overflow-hidden group space-y-6">
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+            <Star className="w-32 h-32 text-white" />
           </div>
 
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <Globe className="w-6 h-6 text-emerald-400" />
+          <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+              <Globe className="w-6 h-6 text-amber-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white/90">Google Reviews</h2>
-              <p className="text-xs text-white/50">Mostre as melhores avaliações no site</p>
+              <h2 className="text-lg font-bold text-white tracking-tight">Google Reviews</h2>
+              <p className="text-[12px] text-white/40 font-medium">Exiba as melhores avaliações do Google no seu site</p>
             </div>
           </div>
 
-          <div className="space-y-4 relative z-10">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70 flex items-center gap-2">
-                <MapPin className="w-3 h-3" /> Place ID do Google Meu Negócio
+          <div className="space-y-5 relative z-10">
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-brand" /> Place ID do Google Meu Negócio
               </label>
               <input
                 type="text"
                 placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4"
                 value={googlePlaceId}
                 onChange={(e) => setGooglePlaceId(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
-              <p className="text-[10px] text-white/40">
+              <p className="text-[11px] text-white/40 mt-1.5">
                 O Place ID pode ser encontrado na ferramenta do Google Maps Platform.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70 flex items-center gap-2">
-                <Settings2 className="w-3 h-3" /> Google Places API Key
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 flex items-center gap-2">
+                <Settings2 className="w-3.5 h-3.5 text-brand" /> Google Places API Key
               </label>
               <input
                 type="text"
                 placeholder="Ex: AIzaSyB..."
                 value={googleApiKey}
                 onChange={(e) => setGoogleApiKey(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
-              <p className="text-[10px] text-white/40">
+              <p className="text-[11px] text-white/40 mt-1.5">
                 Sua chave de API do Google Cloud para habilitar a busca das avaliações.
               </p>
             </div>
@@ -215,13 +219,13 @@ export default function IntegracoesPage() {
             <button
               onClick={handleSaveGoogle}
               disabled={isSavingGoogle}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-sm py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSavingGoogle ? (
-                <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
               ) : (
                 <>
-                  <Check className="w-4 h-4" /> Salvar Configuração
+                  <Check className="w-4 h-4" /> Salvar Configuração do Google
                 </>
               )}
             </button>
@@ -229,61 +233,61 @@ export default function IntegracoesPage() {
         </div>
 
         {/* WhatsApp Card */}
-        <div className="glass-card border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-green-400" />
+        <div className="bg-black border border-white/[0.04] rounded-[24px] p-6 shadow-2xl relative overflow-hidden group space-y-6">
+          <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <MessageCircle className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white/90">WhatsApp API</h2>
-              <p className="text-xs text-white/50">Auto-atendimento e notificações (Evolution API)</p>
+              <h2 className="text-lg font-bold text-white tracking-tight">WhatsApp API</h2>
+              <p className="text-[12px] text-white/40 font-medium">Auto-atendimento e notificações (Evolution API)</p>
             </div>
           </div>
 
-          <div className="space-y-4 relative z-10">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">URL da API</label>
+          <div className="space-y-5 relative z-10">
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">URL da API</label>
               <input
                 type="text"
                 placeholder="https://sua-api.evolution.com/message/sendText/instancia"
                 value={whatsappApiUrl}
                 onChange={(e) => setWhatsappApiUrl(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">Global API Key</label>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Global API Key</label>
               <input
                 type="password"
                 placeholder="Token de acesso da API"
                 value={whatsappToken}
                 onChange={(e) => setWhatsappToken(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">Número Conectado (Opcional)</label>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Número Conectado (Opcional)</label>
               <input
                 type="text"
                 placeholder="Ex: 5511999999999"
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
             </div>
 
             <button
               onClick={handleSaveWhatsapp}
               disabled={isSavingWhatsapp}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-sm py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSavingWhatsapp ? (
-                <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
               ) : (
                 <>
-                  <Check className="w-4 h-4" /> Salvar Configuração
+                  <Check className="w-4 h-4" /> Salvar Configuração do WhatsApp
                 </>
               )}
             </button>
@@ -291,24 +295,24 @@ export default function IntegracoesPage() {
         </div>
 
         {/* Payment Gateway Card */}
-        <div className="glass-card border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+        <div className="bg-black border border-white/[0.04] rounded-[24px] p-6 shadow-2xl relative overflow-hidden group space-y-6 lg:col-span-2">
+          <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
               <CreditCard className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white/90">Gateway de Pagamento</h2>
-              <p className="text-xs text-white/50">Receba reservas direto na sua conta do hotel</p>
+              <h2 className="text-lg font-bold text-white tracking-tight">Gateway de Pagamento</h2>
+              <p className="text-[12px] text-white/40 font-medium">Receba pagamentos de reservas diretas na conta do hotel</p>
             </div>
           </div>
 
-          <div className="space-y-4 relative z-10">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">Provedor</label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Provedor</label>
               <select
                 value={paymentGatewayProvider}
                 onChange={(e) => setPaymentGatewayProvider(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all cursor-pointer shadow-inner"
               >
                 <option value="MERCADO_PAGO">Mercado Pago</option>
                 <option value="STRIPE">Stripe</option>
@@ -316,45 +320,43 @@ export default function IntegracoesPage() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">Token Secreto / Private Key</label>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Token Secreto / Private Key</label>
               <input
                 type="password"
                 placeholder="Ex: sk_test_..."
                 value={paymentGatewayToken}
                 onChange={(e) => setPaymentGatewayToken(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/70">Public Key (Se aplicável)</label>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Public Key (Se aplicável)</label>
               <input
                 type="text"
                 placeholder="Ex: pk_test_..."
                 value={paymentGatewayPubKey}
                 onChange={(e) => setPaymentGatewayPubKey(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand transition-colors"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono"
               />
             </div>
-
-            <button
-              onClick={handleSavePaymentGateway}
-              disabled={isSavingPaymentGateway}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-sm py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {isSavingPaymentGateway ? (
-                <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-              ) : (
-                <>
-                  <Check className="w-4 h-4" /> Salvar Configuração
-                </>
-              )}
-            </button>
           </div>
+
+          <button
+            onClick={handleSavePaymentGateway}
+            disabled={isSavingPaymentGateway}
+            className="w-full py-3 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isSavingPaymentGateway ? (
+              <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+            ) : (
+              <>
+                <Check className="w-4 h-4" /> Salvar Configuração do Gateway
+              </>
+            )}
+          </button>
         </div>
-
-
 
       </div>
     </div>
