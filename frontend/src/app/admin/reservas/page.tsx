@@ -173,14 +173,28 @@ export default function AdminReservasPage() {
     }
   };
 
-  const handleEditStatus = async (id: string, currentStatus: string) => {
-    const status = await alerts.prompt('Novo Status', currentStatus, 'CONFIRMADA, HOSPEDADO, CHECK_OUT_REALIZADO, CANCELADA');
-    if (status) {
+  const handleCheckIn = async (res: any) => {
+    const isConfirmed = await alerts.confirm('Confirmar Check-in', `Realizar Check-in para o hóspede?`);
+    if (isConfirmed) {
       try {
-        await api.updateReservation(id, { status: status.toUpperCase() });
-        alerts.success('Status atualizado!');
+        await request(`/reservations/${res.id}/check-in`, { method: 'POST', body: JSON.stringify({}) });
+        alerts.success('Check-in realizado com sucesso!');
+        await api.getReservations();
       } catch (err: any) {
-        alerts.error('Erro ao atualizar', err.message);
+        alerts.error('Erro ao realizar Check-in', err.message);
+      }
+    }
+  };
+
+  const handleCheckOut = async (res: any) => {
+    const isConfirmed = await alerts.confirm('Confirmar Check-out', `Finalizar hospedagem e realizar Check-out?`);
+    if (isConfirmed) {
+      try {
+        await request(`/reservations/${res.id}/check-out`, { method: 'POST' });
+        alerts.success('Check-out realizado com sucesso!');
+        await api.getReservations();
+      } catch (err: any) {
+        alerts.error('Erro ao realizar Check-out', err.message);
       }
     }
   };
@@ -345,7 +359,14 @@ export default function AdminReservasPage() {
                     </td>
                     <td className="p-4 text-right flex items-center justify-end gap-2">
                       <span className="font-mono font-bold text-white whitespace-nowrap mr-2">R$ {Number(res.valorTotal).toFixed(2)}</span>
-                      {(res.status === 'HOSPEDADO' || res.status === 'CONFIRMADA') && (
+                      
+                      {res.status === 'CONFIRMADA' && (
+                        <button onClick={() => handleCheckIn(res)} className="px-3 py-1.5 rounded-lg border border-emerald-500/30 text-[10px] text-emerald-400 hover:bg-emerald-500/10 transition-all bg-emerald-500/5 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                          <DoorOpen className="w-3.5 h-3.5" /> Check-in
+                        </button>
+                      )}
+
+                      {res.status === 'HOSPEDADO' && (
                         <>
                           <button onClick={() => openPosModal(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all bg-white/5" title="Lançar Consumo / PDV">
                             <ShoppingBag className="w-4 h-4" />
@@ -353,14 +374,17 @@ export default function AdminReservasPage() {
                           <button onClick={() => handleManualPayment(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-blue-400 hover:border-blue-500/30 transition-all bg-white/5" title="Registrar Pagamento">
                             <CreditCard className="w-4 h-4" />
                           </button>
+                          <button onClick={() => handleCheckOut(res)} className="px-3 py-1.5 rounded-lg border border-amber-500/30 text-[10px] text-amber-400 hover:bg-amber-500/10 transition-all bg-amber-500/5 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                            <CheckCircle className="w-3.5 h-3.5" /> Check-out
+                          </button>
                         </>
                       )}
-                      <button onClick={() => handleEditStatus(res.id, res.status)} className="px-2.5 py-1.5 rounded-lg border border-white/10 text-[10px] text-white/60 hover:text-white hover:border-brand/30 transition-all bg-white/5 font-bold uppercase tracking-widest">
-                        Status
-                      </button>
-                      <button onClick={() => handleDelete(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-red-400 hover:border-red-500/30 transition-all bg-white/5" title="Cancelar Reserva">
-                        <XCircle className="w-4 h-4" />
-                      </button>
+
+                      {res.status !== 'CANCELADA' && res.status !== 'CHECK_OUT_REALIZADO' && (
+                        <button onClick={() => handleDelete(res.id)} className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-red-400 hover:border-red-500/30 transition-all bg-white/5" title="Cancelar Reserva">
+                          <XCircle className="w-4 h-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
