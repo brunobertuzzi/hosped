@@ -29,7 +29,7 @@ export default function AuditoriaPage() {
 
   const metrics = useMemo(() => {
     const totalLogs = audits.length;
-    const criticalActions = audits.filter(log => log.acao === 'DELETAR' || log.detalhes.includes('bloqueado') || log.detalhes.includes('negado')).length;
+    const criticalActions = audits.filter(log => log.acao === 'DELETAR' || (log.detalhes || '').includes('bloqueado') || (log.detalhes || '').includes('negado')).length;
     const modificationsCount = audits.filter(log => log.acao === 'ATUALIZAR' || log.acao === 'MUDANCA_STATUS' || log.acao === 'CRIAR').length;
     const uniqueOperators = new Set(audits.map(log => log.usuario)).size;
     return { totalLogs, criticalActions, modificationsCount, uniqueOperators };
