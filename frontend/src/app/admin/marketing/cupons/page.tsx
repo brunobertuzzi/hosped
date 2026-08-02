@@ -97,59 +97,61 @@ export default function PromoCodesPage() {
   };
 
   return (
+  return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
             <Tag className="w-6 h-6 text-brand" />
             Cupons de Desconto
           </h1>
-          <p className="text-white/60 text-sm">Crie códigos promocionais para aumentar suas reservas diretas.</p>
+          <p className="text-[13px] text-white/40 mt-1 font-medium">Crie códigos promocionais para aumentar suas reservas diretas.</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-brand text-white rounded-xl font-bold hover:bg-brand/80 transition-colors flex items-center gap-2 text-sm"
+          className="px-4 py-2.5 bg-brand hover:brightness-110 text-black text-[13px] font-bold rounded-xl transition-all flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Novo Cupom
         </button>
       </div>
 
-      <div className="glass-panel overflow-hidden border border-white/5">
+      <div className="bg-black border border-white/[0.04] rounded-[24px] overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse text-[13px]">
             <thead>
-              <tr className="bg-white/5 border-b border-white/5">
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Código</th>
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Desconto</th>
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Usos</th>
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Validade</th>
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest">Status</th>
-                <th className="py-4 px-6 font-semibold text-white text-[13px] uppercase tracking-widest text-right">Ações</th>
+              <tr className="border-b border-white/[0.04] text-white/30 uppercase tracking-widest font-bold text-[10px]">
+                <th className="py-4 px-6">Código</th>
+                <th className="py-4 px-6">Desconto</th>
+                <th className="py-4 px-6">Usos</th>
+                <th className="py-4 px-6">Validade</th>
+                <th className="py-4 px-6">Status</th>
+                <th className="py-4 px-6 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-white/[0.02]">
               {promoCodes.map((promo) => (
                 <tr key={promo.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="py-4 px-6">
-                    <div className="font-medium text-white font-mono bg-white/10 border border-white/10 inline-block px-2 py-1 rounded">
+                    <div className="font-semibold text-white/90 font-mono bg-white/5 border border-white/10 inline-block px-2.5 py-1 rounded-lg">
                       {promo.codigo}
                     </div>
-                    {promo.descricao && <div className="text-xs text-white/50 mt-1">{promo.descricao}</div>}
+                    {promo.descricao && <div className="text-[11px] text-white/40 mt-1.5">{promo.descricao}</div>}
                   </td>
                   <td className="py-4 px-6">
                     {promo.tipoDesconto === 'PERCENTUAL' ? (
-                      <span className="text-green-400 font-medium">{promo.valorDesconto}% OFF</span>
+                      <span className="text-emerald-400 font-bold">{promo.valorDesconto}% OFF</span>
                     ) : (
-                      <span className="text-green-400 font-medium">R$ {promo.valorDesconto} OFF</span>
+                      <span className="text-emerald-400 font-bold">R$ {promo.valorDesconto} OFF</span>
                     )}
                   </td>
                   <td className="py-4 px-6">
-                    <span className="text-white/70 text-sm">
+                    <span className="text-white/60">
                       {promo.usos} {promo.quantidadeTotal ? `/ ${promo.quantidadeTotal}` : 'usos'}
                     </span>
                   </td>
-                  <td className="py-4 px-6 text-white/70 text-sm">
+                  <td className="py-4 px-6 text-white/60">
                     {promo.validade ? new Date(promo.validade).toLocaleDateString('pt-BR') : 'Sem validade'}
                   </td>
                   <td className="py-4 px-6">
@@ -164,18 +166,18 @@ export default function PromoCodesPage() {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleOpenModal(promo)}
-                        className="p-2 text-white/40 hover:text-white transition-colors hover:bg-white/5 rounded-lg"
-                        title="Editar"
+                        className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-brand hover:border-brand/30 transition-all bg-white/5"
+                        title="Editar Cupom"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(promo.id)}
-                        className="p-2 text-white/40 hover:text-red-400 transition-colors hover:bg-red-500/10 rounded-lg"
-                        title="Excluir"
+                        className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-white/50 hover:text-red-400 hover:border-red-500/30 transition-all bg-white/5"
+                        title="Excluir Cupom"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

@@ -366,11 +366,11 @@ export default function AdminReservasPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-in</label>
-                        <input type="date" value={newRes.checkIn} onChange={e => setNewRes({...newRes, checkIn: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
+                        <input type="date" value={newRes.checkIn} onChange={e => setNewRes({...newRes, checkIn: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono [color-scheme:dark] cursor-pointer" />
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Check-out</label>
-                        <input type="date" value={newRes.checkOut} onChange={e => setNewRes({...newRes, checkOut: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono" />
+                        <input type="date" value={newRes.checkOut} onChange={e => setNewRes({...newRes, checkOut: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner font-mono [color-scheme:dark] cursor-pointer" />
                       </div>
                     </div>
                     <button onClick={() => setStep(2)} disabled={!newRes.checkIn || !newRes.checkOut} className="w-full py-3 bg-white/10 hover:bg-white/20 text-white text-[13px] font-bold rounded-xl transition-all disabled:opacity-50">Continuar</button>
@@ -394,11 +394,21 @@ export default function AdminReservasPage() {
                             className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 py-3 text-[13px] text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/50 transition-all shadow-inner"
                           />
                         </div>
-                        <select size={5} value={newRes.guestId} onChange={e => setNewRes({...newRes, guestId: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl px-2 py-2 text-[13px] text-white outline-none focus:border-brand cursor-pointer no-scrollbar">
+                        <div className="w-full max-h-48 overflow-y-auto bg-black/40 border border-white/10 rounded-xl p-1 no-scrollbar flex flex-col gap-1">
                           {guests.filter(g => g.nome.toLowerCase().includes(guestSearch.toLowerCase()) || g.documento.includes(guestSearch)).map(g => (
-                            <option key={g.id} value={g.id} className="p-2 hover:bg-white/10 rounded-lg">{g.nome} ({g.documento})</option>
+                            <div 
+                              key={g.id} 
+                              onClick={() => setNewRes({...newRes, guestId: g.id})}
+                              className={`p-3 rounded-lg cursor-pointer transition-colors border ${newRes.guestId === g.id ? 'bg-brand/20 border-brand/50 text-white' : 'bg-transparent border-transparent hover:bg-white/10 text-white/70'}`}
+                            >
+                              <div className="font-bold text-[13px]">{g.nome}</div>
+                              <div className="text-[11px] text-white/40 mt-0.5 opacity-80">{g.documento}</div>
+                            </div>
                           ))}
-                        </select>
+                          {guests.filter(g => g.nome.toLowerCase().includes(guestSearch.toLowerCase()) || g.documento.includes(guestSearch)).length === 0 && (
+                            <div className="p-4 text-center text-white/30 text-[12px] italic">Nenhum hóspede encontrado.</div>
+                          )}
+                        </div>
                         <div className="flex items-center justify-between mt-3 bg-white/5 p-3 rounded-lg border border-white/10">
                           <span className="text-[10px] text-white/50">O hóspede não tem cadastro?</span>
                           <button onClick={() => setShowNewGuestForm(true)} className="text-[10px] font-bold uppercase tracking-widest text-brand hover:text-white transition-colors flex items-center gap-1">

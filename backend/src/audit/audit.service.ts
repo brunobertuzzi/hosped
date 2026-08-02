@@ -17,8 +17,16 @@ export class AuditService {
     dadosNovos?: any,
   ) {
     try {
+      const hotelId = dadosNovos?.hotelId || dadosAnteriores?.hotelId;
+      
+      if (!hotelId) {
+        console.warn(`AuditLog cancelado: hotelId ausente nos dados da entidade ${entidade}`);
+        return;
+      }
+
       await this.prisma.client.auditLog.create({
         data: {
+          hotelId,
           userId,
           acao,
           entidade,
