@@ -318,7 +318,6 @@ async function main() {
         nome: inv.nome,
         categoria: inv.categoria,
         valorVenda: inv.valorVenda,
-        valorCusto: inv.valorCusto,
         quantidade: inv.quantidade,
         estoqueMinimo: inv.estoqueMinimo,
         unidade: inv.unidade,
