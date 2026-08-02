@@ -48,7 +48,11 @@ export class RoomsController {
   @Permissions('rooms.manage')
   @Post('categories')
   async createCategory(@Body() data: any, @Request() req: any) {
-    return this.roomsService.createCategory(data, req.user?.hotelId, req.user?.sub);
+    return this.roomsService.createCategory(
+      data,
+      req.user?.hotelId,
+      req.user?.sub,
+    );
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)

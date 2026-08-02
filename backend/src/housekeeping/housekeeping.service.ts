@@ -20,8 +20,18 @@ export class HousekeepingService {
     });
   }
 
-  async create(data: { roomId: string; tipoLimpeza: string; observacoes?: string; responsavelId?: string }, userId?: string) {
-    const room = await this.prisma.client.room.findUnique({ where: { id: data.roomId } });
+  async create(
+    data: {
+      roomId: string;
+      tipoLimpeza: string;
+      observacoes?: string;
+      responsavelId?: string;
+    },
+    userId?: string,
+  ) {
+    const room = await this.prisma.client.room.findUnique({
+      where: { id: data.roomId },
+    });
     if (!room) throw new NotFoundException('Quarto não encontrado');
 
     const created = await this.prisma.client.cleaningTask.create({
@@ -39,12 +49,20 @@ export class HousekeepingService {
       },
     });
 
-    await this.audit.log(userId, AuditAction.CRIAR, 'CLEANING_TASK', null, created);
+    await this.audit.log(
+      userId,
+      AuditAction.CRIAR,
+      'CLEANING_TASK',
+      null,
+      created,
+    );
     return created;
   }
 
   async updateStatus(id: string, status: CleaningStatus, userId?: string) {
-    const task = await this.prisma.client.cleaningTask.findUnique({ where: { id } });
+    const task = await this.prisma.client.cleaningTask.findUnique({
+      where: { id },
+    });
     if (!task) throw new NotFoundException('Tarefa de limpeza não encontrada');
 
     const previous = { ...task };
@@ -66,11 +84,19 @@ export class HousekeepingService {
       },
     });
 
-    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'CLEANING_TASK', previous, updated);
+    await this.audit.log(
+      userId,
+      AuditAction.MUDANCA_STATUS,
+      'CLEANING_TASK',
+      previous,
+      updated,
+    );
 
     // Se a tarefa foi concluída e o quarto está em LIMPEZA, atualiza para DISPONIVEL
     if (status === CleaningStatus.CONCLUIDO) {
-      const room = await this.prisma.client.room.findUnique({ where: { id: task.roomId } });
+      const room = await this.prisma.client.room.findUnique({
+        where: { id: task.roomId },
+      });
       if (room && room.status === RoomStatus.LIMPEZA) {
         await this.prisma.client.room.update({
           where: { id: task.roomId },
@@ -83,11 +109,21 @@ export class HousekeepingService {
   }
 
   async remove(id: string, userId?: string) {
-    const task = await this.prisma.client.cleaningTask.findUnique({ where: { id } });
+    const task = await this.prisma.client.cleaningTask.findUnique({
+      where: { id },
+    });
     if (!task) throw new NotFoundException('Tarefa de limpeza não encontrada');
 
-    const deleted = await this.prisma.client.cleaningTask.delete({ where: { id } });
-    await this.audit.log(userId, AuditAction.DELETAR, 'CLEANING_TASK', task, deleted);
+    const deleted = await this.prisma.client.cleaningTask.delete({
+      where: { id },
+    });
+    await this.audit.log(
+      userId,
+      AuditAction.DELETAR,
+      'CLEANING_TASK',
+      task,
+      deleted,
+    );
     return deleted;
   }
 }

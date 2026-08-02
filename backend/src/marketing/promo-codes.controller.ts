@@ -36,7 +36,11 @@ export class PromoCodesController {
   @Permissions('marketing.manage')
   @Post()
   async create(@Body() data: any, @Request() req: any) {
-    return this.promoCodesService.create(data, req.user?.hotelId, req.user?.sub);
+    return this.promoCodesService.create(
+      data,
+      req.user?.hotelId,
+      req.user?.sub,
+    );
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
@@ -47,7 +51,12 @@ export class PromoCodesController {
     @Body() data: any,
     @Request() req: any,
   ) {
-    return this.promoCodesService.update(id, data, req.user?.hotelId, req.user?.sub);
+    return this.promoCodesService.update(
+      id,
+      data,
+      req.user?.hotelId,
+      req.user?.sub,
+    );
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)

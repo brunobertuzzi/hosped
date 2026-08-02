@@ -20,34 +20,10 @@ export class AuditInterceptor implements NestInterceptor {
     // Apenas intercepta ações de mutação
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
       return next.handle().pipe(
-        tap(async (data) => {
-          if (!user || !user.id || !user.hotelId) return;
-
-          let acao: AuditAction = AuditAction.ATUALIZAR;
-          if (method === 'POST') acao = AuditAction.CRIAR;
-          if (method === 'DELETE') acao = AuditAction.DELETAR;
-          
-          let entidade = 'DESCONHECIDA';
-          if (url.includes('reservations')) entidade = 'RESERVA';
-          if (url.includes('rooms')) entidade = 'QUARTO';
-          if (url.includes('payments')) entidade = 'PAGAMENTO';
-          if (url.includes('tenants') || url.includes('settings')) entidade = 'TENANT_SETTINGS';
-          if (url.includes('auth/login')) {
-            acao = AuditAction.LOGIN;
-            entidade = 'AUTH';
-          }
-
+        tap(() => {
           try {
-            await this.prisma.client.auditLog.create({
-              data: {
-                acao,
-                entidade,
-                dadosAnteriores: params || query || {},
-                dadosNovos: body || {},
-                userId: user.id,
-                hotelId: user.hotelId,
-              },
-            });
+            if (!user || !user.id || !user.hotelId) return;
+            void this.auditAction(user, method, url, body, params, query);
           } catch (e) {
             console.error('Falha ao registrar Audit Log:', e);
           }
@@ -56,5 +32,40 @@ export class AuditInterceptor implements NestInterceptor {
     }
 
     return next.handle();
+  }
+
+  private async auditAction(
+    user: any,
+    method: string,
+    url: string,
+    body: any,
+    params: any,
+    query: any,
+  ) {
+    let acao: AuditAction = AuditAction.ATUALIZAR;
+    if (method === 'POST') acao = AuditAction.CRIAR;
+    if (method === 'DELETE') acao = AuditAction.DELETAR;
+
+    let entidade = 'DESCONHECIDA';
+    if (url.includes('reservations')) entidade = 'RESERVA';
+    if (url.includes('rooms')) entidade = 'QUARTO';
+    if (url.includes('payments')) entidade = 'PAGAMENTO';
+    if (url.includes('tenants') || url.includes('settings'))
+      entidade = 'TENANT_SETTINGS';
+    if (url.includes('auth/login')) {
+      acao = AuditAction.LOGIN;
+      entidade = 'AUTH';
+    }
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        acao,
+        entidade,
+        dadosAnteriores: params || query || {},
+        dadosNovos: body || {},
+        userId: user.id,
+        hotelId: user.hotelId,
+      },
+    });
   }
 }

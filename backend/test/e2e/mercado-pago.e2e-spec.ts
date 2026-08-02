@@ -7,7 +7,7 @@ const hashedPassword = bcrypt.hashSync('password123', 10);
 
 async function cleanup(name: string) {
   const allHotels = await prisma.hotel.findMany();
-  const hotels = allHotels.filter(h => h.nome.startsWith(name));
+  const hotels = allHotels.filter((h) => h.nome.startsWith(name));
   for (const hotel of hotels) {
     const hotelId = hotel.id;
     await prisma.payment.deleteMany({ where: { hotelId } });
@@ -115,7 +115,7 @@ describe('Mercado Pago Payment Integration E2E Tests', () => {
   beforeEach(async () => {
     await prisma.payment.deleteMany({ where: { hotelId } });
     await prisma.reservation.deleteMany({ where: { hotelId } });
-    
+
     const res = await axios.post(
       `${API_URL}/reservations`,
       {

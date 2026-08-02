@@ -173,14 +173,24 @@ export class ReservationsService {
         if (dto.promoCode) {
           const promo = await tx.promoCode.findUnique({
             where: {
-              hotelId_codigo: { hotelId: hotelIdForTx, codigo: dto.promoCode.toUpperCase() }
-            }
+              hotelId_codigo: {
+                hotelId: hotelIdForTx,
+                codigo: dto.promoCode.toUpperCase(),
+              },
+            },
           });
 
-          if (promo && promo.ativo && (!promo.validade || new Date(promo.validade) >= new Date()) && (!promo.quantidadeTotal || promo.usos < promo.quantidadeTotal)) {
+          if (
+            promo &&
+            promo.ativo &&
+            (!promo.validade || new Date(promo.validade) >= new Date()) &&
+            (!promo.quantidadeTotal || promo.usos < promo.quantidadeTotal)
+          ) {
             let discountValue = new Prisma.Decimal(0);
             if (promo.tipoDesconto === 'PERCENTUAL') {
-              discountValue = calculatedValorTotal.mul(promo.valorDesconto).div(100);
+              discountValue = calculatedValorTotal
+                .mul(promo.valorDesconto)
+                .div(100);
             } else if (promo.tipoDesconto === 'FIXO') {
               discountValue = promo.valorDesconto;
             }
@@ -195,7 +205,7 @@ export class ReservationsService {
 
             await tx.promoCode.update({
               where: { id: promo.id },
-              data: { usos: { increment: 1 } }
+              data: { usos: { increment: 1 } },
             });
           }
         }
@@ -335,6 +345,8 @@ export class ReservationsService {
         previousReservation,
         updatedReservation,
       );
+
+      this.eventEmitter.emit('reservation.checked-in', updatedReservation);
 
       return updatedReservation;
     });
@@ -695,13 +707,17 @@ export class ReservationsService {
     }
 
     if (valor <= 0) {
-      throw new BadRequestException('O valor do pagamento deve ser maior que zero.');
+      throw new BadRequestException(
+        'O valor do pagamento deve ser maior que zero.',
+      );
     }
 
     const validMethods = ['PIX', 'CARTAO', 'DINHEIRO'];
     const normalizedMethod = (metodo || '').toUpperCase();
     if (!validMethods.includes(normalizedMethod)) {
-      throw new BadRequestException(`Método de pagamento inválido. Valores aceitos: ${validMethods.join(', ')}`);
+      throw new BadRequestException(
+        `Método de pagamento inválido. Valores aceitos: ${validMethods.join(', ')}`,
+      );
     }
 
     const payment = await this.prisma.client.payment.create({
@@ -747,20 +763,23 @@ export class ReservationsService {
     }
 
     if (!documentoCheckIn || documentoCheckIn.trim().length < 4) {
-      throw new BadRequestException('Documento de identificação é obrigatório.');
+      throw new BadRequestException(
+        'Documento de identificação é obrigatório.',
+      );
     }
 
     // Atualizar documento no guest e na reserva
-    const [updatedGuest, updatedReservation] = await this.prisma.client.$transaction([
-      this.prisma.client.guest.update({
-        where: { id: reservation.guestId },
-        data: { documento: documentoCheckIn },
-      }),
-      this.prisma.client.reservation.update({
-        where: { id: guestToken },
-        data: { documentoCheckIn },
-      }),
-    ]);
+    const [updatedGuest, updatedReservation] =
+      await this.prisma.client.$transaction([
+        this.prisma.client.guest.update({
+          where: { id: reservation.guestId },
+          data: { documento: documentoCheckIn },
+        }),
+        this.prisma.client.reservation.update({
+          where: { id: guestToken },
+          data: { documentoCheckIn },
+        }),
+      ]);
 
     return {
       success: true,

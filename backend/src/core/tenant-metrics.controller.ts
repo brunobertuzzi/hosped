@@ -21,20 +21,30 @@ export class TenantMetricsController {
       throw new UnauthorizedException('Acesso restrito ao Super Admin.');
     }
 
-    const [usersCount, roomsCount, reservationsCount, guestsCount, branchesCount, invoicesCount, paidInvoicesCount, pendingInvoicesAmount] =
-      await Promise.all([
-        this.prisma.client.user.count({ where: { hotelId } }),
-        this.prisma.client.room.count({ where: { hotelId } }),
-        this.prisma.client.reservation.count({ where: { hotelId } }),
-        this.prisma.client.guest.count({ where: { hotelId } }),
-        this.prisma.client.branch.count({ where: { hotelId } }),
-        this.prisma.client.systemInvoice.count({ where: { hotelId } }),
-        this.prisma.client.systemInvoice.count({ where: { hotelId, status: 'PAGO' } }),
-        this.prisma.client.systemInvoice.aggregate({
-          where: { hotelId, status: 'PENDENTE' },
-          _sum: { amount: true },
-        }),
-      ]);
+    const [
+      usersCount,
+      roomsCount,
+      reservationsCount,
+      guestsCount,
+      branchesCount,
+      invoicesCount,
+      paidInvoicesCount,
+      pendingInvoicesAmount,
+    ] = await Promise.all([
+      this.prisma.client.user.count({ where: { hotelId } }),
+      this.prisma.client.room.count({ where: { hotelId } }),
+      this.prisma.client.reservation.count({ where: { hotelId } }),
+      this.prisma.client.guest.count({ where: { hotelId } }),
+      this.prisma.client.branch.count({ where: { hotelId } }),
+      this.prisma.client.systemInvoice.count({ where: { hotelId } }),
+      this.prisma.client.systemInvoice.count({
+        where: { hotelId, status: 'PAGO' },
+      }),
+      this.prisma.client.systemInvoice.aggregate({
+        where: { hotelId, status: 'PENDENTE' },
+        _sum: { amount: true },
+      }),
+    ]);
 
     return {
       usersCount,

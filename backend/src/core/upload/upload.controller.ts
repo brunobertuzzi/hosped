@@ -24,7 +24,10 @@ export class UploadController {
   @Post()
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: any,
+  ) {
     if (!file) {
       throw new BadRequestException('Nenhum arquivo enviado.');
     }

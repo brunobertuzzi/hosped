@@ -25,7 +25,7 @@ async function loginWithRetry(email: string, password: string, retries = 5) {
 
 async function cleanup(name: string) {
   const allHotels = await prisma.hotel.findMany();
-  const hotels = allHotels.filter(h => h.nome.startsWith(name));
+  const hotels = allHotels.filter((h) => h.nome.startsWith(name));
   for (const hotel of hotels) {
     const hotelId = hotel.id;
     await prisma.payment.deleteMany({ where: { hotelId } });

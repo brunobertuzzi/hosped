@@ -65,13 +65,16 @@ export class IntegrationsService {
   }
 
   async fetchGoogleReviews(hotelIdOrSlug: string) {
-    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(hotelIdOrSlug);
+    const isUuid =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        hotelIdOrSlug,
+      );
     let hotelId = hotelIdOrSlug;
 
     if (!isUuid) {
       const hotel = await this.prisma.client.hotel.findUnique({
         where: { slug: hotelIdOrSlug },
-        select: { id: true }
+        select: { id: true },
       });
       if (hotel) hotelId = hotel.id;
     }
@@ -86,7 +89,8 @@ export class IntegrationsService {
       );
     }
 
-    const apiKey = integration.googleApiKey || process.env.GOOGLE_PLACES_API_KEY;
+    const apiKey =
+      integration.googleApiKey || process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
       // Sem chave de API, retornar array vazio
       return [];
@@ -96,10 +100,14 @@ export class IntegrationsService {
       const { default: axios } = await import('axios');
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${integration.googlePlaceId}&fields=reviews&language=pt-BR&key=${apiKey}`,
-        { timeout: 10000 }
+        { timeout: 10000 },
       );
 
-      if (response.data.status === 'OK' && response.data.result && response.data.result.reviews) {
+      if (
+        response.data.status === 'OK' &&
+        response.data.result &&
+        response.data.result.reviews
+      ) {
         return response.data.result.reviews;
       }
       return [];

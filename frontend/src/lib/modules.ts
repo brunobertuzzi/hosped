@@ -46,7 +46,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   },
   RESERVATIONS: {
     id: 'RESERVATIONS',
-    label: 'Controle de Reservas',
+    label: 'Reservas',
     description: 'Criação e gestão completa de reservas.',
     icon: 'CalendarDays',
     category: 'core',
@@ -55,7 +55,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   },
   GUESTS: {
     id: 'GUESTS',
-    label: 'Cadastro de Hóspedes',
+    label: 'Hóspedes',
     description: 'Gestão do perfil e histórico de hóspedes.',
     icon: 'Users',
     category: 'core',
@@ -64,7 +64,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   },
   ROOMS: {
     id: 'ROOMS',
-    label: 'Quartos & Categorias',
+    label: 'Quartos',
     description: 'Configuração de UHs, categorias e tarifas.',
     icon: 'Building2',
     category: 'core',
@@ -93,7 +93,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   },
   INVENTORY: {
     id: 'INVENTORY',
-    label: 'Estoque & Consumos',
+    label: 'Estoque',
     description: 'Controle de inventário e consumos de hóspedes.',
     icon: 'Package',
     category: 'operations',
@@ -113,7 +113,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   // ── COMMERCIAL (módulos pagos/premium) ────────────────────────────────────
   GANTT_CHART: {
     id: 'GANTT_CHART',
-    label: 'Mapa de Ocupação (Gantt)',
+    label: 'Mapa de Ocupação',
     description: 'Visualização interativa de ocupação em linha do tempo.',
     icon: 'Calendar',
     category: 'commercial',
@@ -157,7 +157,7 @@ export const SYSTEM_MODULES: Record<string, SystemModule> = {
   },
   AUDIT_LOG: {
     id: 'AUDIT_LOG',
-    label: 'Histórico de Ações (Auditoria)',
+    label: 'Auditoria',
     description: 'Log completo de todas as ações realizadas no sistema.',
     icon: 'ShieldCheck',
     category: 'advanced',

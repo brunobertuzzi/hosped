@@ -29,7 +29,17 @@ export class ExpensesController {
   @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('financial.manage')
   @Post()
-  create(@Body() data: { descricao: string; valor: number; dataVencimento: string; categoria: string; fornecedor?: string }, @Request() req: any) {
+  create(
+    @Body()
+    data: {
+      descricao: string;
+      valor: number;
+      dataVencimento: string;
+      categoria: string;
+      fornecedor?: string;
+    },
+    @Request() req: any,
+  ) {
     return this.expensesService.create(data, req.user?.hotelId, req.user?.sub);
   }
 
@@ -43,7 +53,11 @@ export class ExpensesController {
   @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('financial.manage')
   @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body() body: { status: ExpenseStatus }, @Request() req: any) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() body: { status: ExpenseStatus },
+    @Request() req: any,
+  ) {
     return this.expensesService.updateStatus(id, body.status, req.user?.sub);
   }
 

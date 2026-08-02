@@ -26,7 +26,12 @@ export class RoomsService {
     });
   }
 
-  async createRoom(data: any, branchId: string, hotelId: string, userId?: string) {
+  async createRoom(
+    data: any,
+    branchId: string,
+    hotelId: string,
+    userId?: string,
+  ) {
     const context = this.tenantService.getContext();
     if (context && context.hotelId) {
       const hotel = await this.prisma.client.hotel.findUnique({
@@ -86,10 +91,21 @@ export class RoomsService {
   }
 
   async updateCategory(id: string, data: any, userId?: string) {
-    const previous = await this.prisma.client.roomCategory.findUnique({ where: { id } });
+    const previous = await this.prisma.client.roomCategory.findUnique({
+      where: { id },
+    });
     if (!previous) throw new NotFoundException('Categoria não encontrada');
-    const updated = await this.prisma.client.roomCategory.update({ where: { id }, data });
-    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'ROOM_CATEGORY', previous, updated);
+    const updated = await this.prisma.client.roomCategory.update({
+      where: { id },
+      data,
+    });
+    await this.audit.log(
+      userId,
+      AuditAction.MUDANCA_STATUS,
+      'ROOM_CATEGORY',
+      previous,
+      updated,
+    );
     return updated;
   }
 

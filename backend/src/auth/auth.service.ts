@@ -62,7 +62,9 @@ export class AuthService {
         branchId: user.branchId,
         status: user.status,
         permissions: user.permissions,
-        hotel: user.hotel ? { ...user.hotel, enabledModules: user.hotel.enabledModules || [] } : null,
+        hotel: user.hotel
+          ? { ...user.hotel, enabledModules: user.hotel.enabledModules || [] }
+          : null,
         branch: user.branch || null,
       },
     };
@@ -278,7 +280,9 @@ export class AuthService {
         branchId: owner.branchId,
         status: owner.status,
         permissions: owner.permissions,
-        hotel: owner.hotel ? { ...owner.hotel, enabledModules: owner.hotel.enabledModules || [] } : null,
+        hotel: owner.hotel
+          ? { ...owner.hotel, enabledModules: owner.hotel.enabledModules || [] }
+          : null,
         branch: owner.branch || null,
       },
     };
@@ -423,7 +427,10 @@ export class AuthService {
 
     if (frontendUrl) {
       const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-      emailSent = await this.emailService.sendPasswordReset(user.email, resetLink);
+      emailSent = await this.emailService.sendPasswordReset(
+        user.email,
+        resetLink,
+      );
     }
 
     return {

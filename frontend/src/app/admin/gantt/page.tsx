@@ -17,6 +17,20 @@ export default function AdminGanttPage() {
   const canUseGantt = useModule('GANTT_CHART');
   const [selectedResForDetail, setSelectedResForDetail] = useState<any>(null);
 
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    today.setDate(today.getDate() - 6); // Hoje fica como o 7º dia (no meio)
+    return today;
+  });
+
+  const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
+  const [checkInDoc, setCheckInDoc] = useState('');
+  const [checkInRoomId, setCheckInRoomId] = useState('');
+
+  const [isConsumptionModalOpen, setIsConsumptionModalOpen] = useState(false);
+  const [consumptionItemId, setConsumptionItemId] = useState('');
+  const [consumptionQty, setConsumptionQty] = useState(1);
+
   // Guard: módulo não habilitado para este hotel
   if (!canUseGantt) {
     return (
@@ -31,20 +45,6 @@ export default function AdminGanttPage() {
       </div>
     );
   }
-
-  const [startDate, setStartDate] = useState(() => {
-    const today = new Date();
-    today.setDate(today.getDate() - 6); // Hoje fica como o 7º dia (no meio)
-    return today;
-  });
-
-  const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
-  const [checkInDoc, setCheckInDoc] = useState('');
-  const [checkInRoomId, setCheckInRoomId] = useState('');
-
-  const [isConsumptionModalOpen, setIsConsumptionModalOpen] = useState(false);
-  const [consumptionItemId, setConsumptionItemId] = useState('');
-  const [consumptionQty, setConsumptionQty] = useState(1);
 
   const formatDateISO = (d: Date) => {
     const year = d.getFullYear();

@@ -34,7 +34,8 @@ async function bootstrap() {
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization, x-hotel-id, x-branch-id, x-user-id, x-user-role',
+    allowedHeaders:
+      'Content-Type, Accept, Authorization, x-hotel-id, x-branch-id, x-user-id, x-user-role',
   });
 
   // Segurança HTTP básica

@@ -26,6 +26,8 @@ import { ExpensesModule } from './expenses/expenses.module';
 import { HousekeepingModule } from './housekeeping/housekeeping.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { MarketingModule } from './marketing/marketing.module';
+import { ReportsModule } from './reports/reports.module';
+import { CommunicationOrchestratorService } from './core/communication-orchestrator.service';
 
 import { envValidationSchema } from './config/env.validation';
 
@@ -62,10 +64,12 @@ import { envValidationSchema } from './config/env.validation';
     HousekeepingModule,
     WebhooksModule,
     MarketingModule,
-  ],
+        ReportsModule,
+      ],
   controllers: [AppController],
   providers: [
     AppService,
+    CommunicationOrchestratorService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

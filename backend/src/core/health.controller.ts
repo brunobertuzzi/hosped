@@ -1,4 +1,10 @@
-import { Controller, Get, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
 import { Redis } from 'ioredis';
@@ -26,7 +32,9 @@ export class HealthController {
   @UseGuards(AuthGuard)
   async getHealth(@Request() req: any) {
     if (req.user.role !== 'PLATFORM_OWNER') {
-      throw new UnauthorizedException('Somente Super Admin pode ver a saúde do servidor.');
+      throw new UnauthorizedException(
+        'Somente Super Admin pode ver a saúde do servidor.',
+      );
     }
 
     const totalMem = os.totalmem();
@@ -35,7 +43,7 @@ export class HealthController {
     const memUsage = (usedMem / totalMem) * 100;
 
     const cpus = os.cpus();
-    const loadAvg = os.loadavg()[0]; 
+    const loadAvg = os.loadavg()[0];
     const cpuUsage = Math.min((loadAvg / cpus.length) * 100, 100);
 
     let postgresStatus = 'OFFLINE';
@@ -51,14 +59,26 @@ export class HealthController {
     try {
       const redisUrl = process.env.REDIS_URL;
       if (redisUrl) {
-        redisClient = new Redis(redisUrl, { maxRetriesPerRequest: 1, connectTimeout: 1000 });
+        redisClient = new Redis(redisUrl, {
+          maxRetriesPerRequest: 1,
+          connectTimeout: 1000,
+        });
       } else {
-        const host = process.env.REDIS_HOST || process.env.REDISHOST || 'localhost';
-        const port = Number(process.env.REDIS_PORT || process.env.REDISPORT) || 6379;
-        const password = process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || undefined;
-        redisClient = new Redis({ host, port, password, maxRetriesPerRequest: 1, connectTimeout: 1000 });
+        const host =
+          process.env.REDIS_HOST || process.env.REDISHOST || 'localhost';
+        const port =
+          Number(process.env.REDIS_PORT || process.env.REDISPORT) || 6379;
+        const password =
+          process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || undefined;
+        redisClient = new Redis({
+          host,
+          port,
+          password,
+          maxRetriesPerRequest: 1,
+          connectTimeout: 1000,
+        });
       }
-      
+
       const ping = await redisClient.ping();
       if (ping === 'PONG') {
         redisStatus = 'ONLINE';
@@ -78,7 +98,7 @@ export class HealthController {
       memoryUsedGB: (usedMem / 1024 / 1024 / 1024).toFixed(2),
       memoryUsagePercentage: memUsage,
       postgresStatus,
-      redisStatus
+      redisStatus,
     };
   }
 }

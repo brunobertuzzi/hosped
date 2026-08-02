@@ -19,8 +19,11 @@ export class BookingEngineService {
   ) {}
 
   async getPublicHotelData(hotelId: string) {
-    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(hotelId);
-    
+    const isUuid =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        hotelId,
+      );
+
     const hotel = await this.prisma.client.hotel.findFirst({
       where: isUuid ? { id: hotelId } : { slug: hotelId },
       include: {
@@ -83,7 +86,6 @@ export class BookingEngineService {
       where: { hotelId },
     });
 
-
     // 1. Total de quartos físicos ativos por categoria usando groupBy
     const totalRoomsAgg = await this.prisma.client.room.groupBy({
       by: ['categoryId'],
@@ -98,24 +100,32 @@ export class BookingEngineService {
     });
 
     // 2. Conta reservas conflitantes no período por categoria
-    const conflictingReservationsAgg = await this.prisma.client.reservation.groupBy({
-      by: ['categoryId'],
-      where: {
-        branchId,
-        categoryId: { in: categories.map((c: any) => c.id) },
-        status: {
-          notIn: [ReservationStatus.CANCELADA, ReservationStatus.NO_SHOW],
+    const conflictingReservationsAgg =
+      await this.prisma.client.reservation.groupBy({
+        by: ['categoryId'],
+        where: {
+          branchId,
+          categoryId: { in: categories.map((c: any) => c.id) },
+          status: {
+            notIn: [ReservationStatus.CANCELADA, ReservationStatus.NO_SHOW],
+          },
+          dataCheckIn: { lte: checkOutDate },
+          dataCheckOut: { gte: checkInDate },
         },
-        dataCheckIn: { lte: checkOutDate },
-        dataCheckOut: { gte: checkInDate },
-      },
-      _count: {
-        id: true,
-      },
-    });
+        _count: {
+          id: true,
+        },
+      });
 
-    const totalRoomsMap = new Map<string, number>(totalRoomsAgg.map((item: any) => [item.categoryId, item._count.id]));
-    const conflictingMap = new Map<string, number>(conflictingReservationsAgg.map((item: any) => [item.categoryId, item._count.id]));
+    const totalRoomsMap = new Map<string, number>(
+      totalRoomsAgg.map((item: any) => [item.categoryId, item._count.id]),
+    );
+    const conflictingMap = new Map<string, number>(
+      conflictingReservationsAgg.map((item: any) => [
+        item.categoryId,
+        item._count.id,
+      ]),
+    );
 
     const availabilityResult = categories.map((category: any) => {
       const totalRooms = totalRoomsMap.get(category.id) || 0;

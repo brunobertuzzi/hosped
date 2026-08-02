@@ -25,7 +25,8 @@ export class BillingTask implements OnApplicationBootstrap {
       this.logger.log(`${confirmed} pagamentos sincronizados no boot.`);
 
       const suspended = await this.billing.suspendOverdueHotels(5);
-      if (suspended > 0) this.logger.warn(`${suspended} hotéis suspensos no boot.`);
+      if (suspended > 0)
+        this.logger.warn(`${suspended} hotéis suspensos no boot.`);
 
       const downgrades = await this.billing.applyScheduledDowngrades();
       this.logger.log(`${downgrades} downgrades aplicados no boot.`);
@@ -55,7 +56,9 @@ export class BillingTask implements OnApplicationBootstrap {
   async syncGatewayPayments() {
     this.logger.log('Sincronizando pagamentos com gateway...');
     const confirmed = await this.billing.syncPendingPayments();
-    this.logger.log(`Sincronização concluída: ${confirmed} pagamentos confirmados.`);
+    this.logger.log(
+      `Sincronização concluída: ${confirmed} pagamentos confirmados.`,
+    );
   }
 
   // Roda todo dia às 05:00 — Suspende hotéis inadimplentes (>5 dias)

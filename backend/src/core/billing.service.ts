@@ -40,12 +40,16 @@ export class BillingService {
   async generateInvoice(hotelId: string): Promise<any> {
     const hotel = await this.prisma.client.hotel.findUnique({
       where: { id: hotelId },
-      include: { hotelAddons: { where: { isActive: true }, include: { addon: true } } },
+      include: {
+        hotelAddons: { where: { isActive: true }, include: { addon: true } },
+      },
     });
 
     if (!hotel) throw new NotFoundException('Hotel não encontrado');
     if (hotel.status === 'SUSPENDED' || hotel.status === 'CHURNED') {
-      this.logger.warn(`Hotel ${hotel.nome} (${hotelId}) está ${hotel.status}. Pulando geração de fatura.`);
+      this.logger.warn(
+        `Hotel ${hotel.nome} (${hotelId}) está ${hotel.status}. Pulando geração de fatura.`,
+      );
       return null;
     }
 
@@ -64,7 +68,14 @@ export class BillingService {
     dueDate.setDate(dueDate.getDate() + 5); // Vence em 5 dias
 
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const periodEnd = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+    );
 
     // Gerar invoice
     const invoice = await this.prisma.client.systemInvoice.create({
@@ -80,7 +91,11 @@ export class BillingService {
     });
 
     // Atualizar nextBillingDate para o mesmo dia do mês seguinte
-    const nextBilling = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    const nextBilling = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      now.getDate(),
+    );
     // Se o dia não existir no mês seguinte (ex: 31 → fevereiro), usa o último dia
     if (nextBilling.getDate() !== now.getDate()) {
       nextBilling.setDate(0); // último dia do mês anterior = fim do mês atual
@@ -95,11 +110,16 @@ export class BillingService {
     });
 
     // Log
-    await this.createBillingLog(hotelId, 'INVOICE_CREATED', `Fatura ${invoice.id} gerada no valor de R$ ${totalAmount}`, {
-      invoiceId: invoice.id,
-      amount: totalAmount.toString(),
-      dueDate: dueDate.toISOString(),
-    });
+    await this.createBillingLog(
+      hotelId,
+      'INVOICE_CREATED',
+      `Fatura ${invoice.id} gerada no valor de R$ ${String(totalAmount)}`,
+      {
+        invoiceId: invoice.id,
+        amount: totalAmount.toString(),
+        dueDate: dueDate.toISOString(),
+      },
+    );
 
     this.eventEmitter.emit('billing.invoice.created', {
       hotelId,
@@ -108,7 +128,9 @@ export class BillingService {
       dueDate,
     });
 
-    this.logger.log(`Fatura ${invoice.id} gerada para ${hotel.nome} — R$ ${totalAmount}`);
+    this.logger.log(
+      `Fatura ${invoice.id} gerada para ${hotel.nome} — R$ ${String(totalAmount)}`,
+    );
 
     return invoice;
   }
@@ -121,10 +143,7 @@ export class BillingService {
     const hotels = await this.prisma.client.hotel.findMany({
       where: {
         status: 'ACTIVE',
-        OR: [
-          { nextBillingDate: { lte: now } },
-          { nextBillingDate: null },
-        ],
+        OR: [{ nextBillingDate: { lte: now } }, { nextBillingDate: null }],
       },
     });
 
@@ -132,15 +151,17 @@ export class BillingService {
     for (const hotel of hotels) {
       try {
         // Verificar se já não tem fatura pendente para este período
-        const pendingInvoice = await this.prisma.client.systemInvoice.findFirst({
-          where: {
-            hotelId: hotel.id,
-            status: 'PENDENTE',
-            periodStart: {
-              gte: new Date(now.getFullYear(), now.getMonth(), 1),
+        const pendingInvoice = await this.prisma.client.systemInvoice.findFirst(
+          {
+            where: {
+              hotelId: hotel.id,
+              status: 'PENDENTE',
+              periodStart: {
+                gte: new Date(now.getFullYear(), now.getMonth(), 1),
+              },
             },
           },
-        });
+        );
         if (pendingInvoice) continue;
 
         await this.generateInvoice(hotel.id);
@@ -168,7 +189,9 @@ export class BillingService {
 
     const client = this.getSistemaMpClient();
     if (!client) {
-      this.logger.warn('SISTEMA_PAYMENT_TOKEN não configurado. Pulando cobrança real.');
+      this.logger.warn(
+        'SISTEMA_PAYMENT_TOKEN não configurado. Pulando cobrança real.',
+      );
       return { status: 'no_gateway' };
     }
 
@@ -204,15 +227,24 @@ export class BillingService {
         },
       });
 
-      await this.createBillingLog(invoice.hotelId, 'PAYMENT_ATTEMPT', `Cobrança PIX gerada via gateway central`, {
-        invoiceId,
-        gatewayId: result.id?.toString(),
-        status: result.status,
-      });
+      await this.createBillingLog(
+        invoice.hotelId,
+        'PAYMENT_ATTEMPT',
+        `Cobrança PIX gerada via gateway central`,
+        {
+          invoiceId,
+          gatewayId: result.id?.toString(),
+          status: result.status,
+        },
+      );
 
       // Se já aprovou, marcar como pago
       if (result.status === 'approved') {
-        return await this.confirmPayment(invoiceId, result.id?.toString(), 'PIX');
+        return await this.confirmPayment(
+          invoiceId,
+          result.id?.toString(),
+          'PIX',
+        );
       }
 
       return {
@@ -223,10 +255,15 @@ export class BillingService {
     } catch (err: any) {
       this.logger.error(`Falha ao cobrar fatura ${invoiceId}:`, err.message);
 
-      await this.createBillingLog(invoice.hotelId, 'PAYMENT_FAILED', `Falha no gateway: ${err.message}`, {
-        invoiceId,
-        error: err.message,
-      });
+      await this.createBillingLog(
+        invoice.hotelId,
+        'PAYMENT_FAILED',
+        `Falha no gateway: ${err.message}`,
+        {
+          invoiceId,
+          error: err.message,
+        },
+      );
 
       return { status: 'failed', error: err.message };
     }
@@ -235,7 +272,11 @@ export class BillingService {
   /**
    * Confirma pagamento de uma fatura e reativa hotel se suspenso
    */
-  async confirmPayment(invoiceId: string, gatewayId?: string, method?: string): Promise<any> {
+  async confirmPayment(
+    invoiceId: string,
+    gatewayId?: string,
+    method?: string,
+  ): Promise<any> {
     const invoice = await this.prisma.client.systemInvoice.findUnique({
       where: { id: invoiceId },
     });
@@ -264,15 +305,25 @@ export class BillingService {
         data: { status: 'ACTIVE' },
       });
 
-      await this.createBillingLog(invoice.hotelId, 'REACTIVATED', 'Hotel reativado após pagamento', {
-        invoiceId,
-      });
+      await this.createBillingLog(
+        invoice.hotelId,
+        'REACTIVATED',
+        'Hotel reativado após pagamento',
+        {
+          invoiceId,
+        },
+      );
     }
 
-    await this.createBillingLog(invoice.hotelId, 'PAYMENT_SUCCESS', `Pagamento confirmado: R$ ${invoice.amount}`, {
-      invoiceId,
-      amount: invoice.amount.toString(),
-    });
+    await this.createBillingLog(
+      invoice.hotelId,
+      'PAYMENT_SUCCESS',
+      `Pagamento confirmado: R$ ${invoice.amount}`,
+      {
+        invoiceId,
+        amount: invoice.amount.toString(),
+      },
+    );
 
     this.eventEmitter.emit('billing.payment.confirmed', {
       hotelId: invoice.hotelId,
@@ -308,7 +359,7 @@ export class BillingService {
         const result = await payment.get({ id: inv.gatewayPaymentId! });
 
         if (result.status === 'approved') {
-          await this.confirmPayment(inv.id, inv.gatewayPaymentId!, 'PIX');
+          await this.confirmPayment(inv.id, inv.gatewayPaymentId, 'PIX');
           confirmed++;
         }
       } catch (err) {
@@ -338,7 +389,9 @@ export class BillingService {
     let suspended = 0;
 
     for (const hotelId of hotelIds) {
-      const hotel = overdueInvoices.find((i: any) => i.hotelId === hotelId)?.hotel;
+      const hotel = overdueInvoices.find(
+        (i: any) => i.hotelId === hotelId,
+      )?.hotel;
       if (!hotel || hotel.status !== 'ACTIVE') continue;
 
       await this.prisma.client.hotel.update({
@@ -346,16 +399,26 @@ export class BillingService {
         data: { status: 'SUSPENDED' },
       });
 
-      await this.createBillingLog(hotelId as string, 'SUSPENDED', `Hotel suspenso por inadimplência (> ${daysOverdue} dias)`, {
-        overdueInvoices: overdueInvoices.filter((i: any) => i.hotelId === hotelId).length,
-      });
+      await this.createBillingLog(
+        hotelId as string,
+        'SUSPENDED',
+        `Hotel suspenso por inadimplência (> ${daysOverdue} dias)`,
+        {
+          overdueInvoices: overdueInvoices.filter(
+            (i: any) => i.hotelId === hotelId,
+          ).length,
+        },
+      );
 
       this.eventEmitter.emit('billing.suspended', {
         hotelId,
         reason: `Faturamento atrasado por mais de ${daysOverdue} dias`,
       });
 
-      this.logger.warn(`Hotel ${hotel?.nome} (${hotelId}) suspenso por inadimplência.`);
+      const nomeHotel = hotel?.nome ?? 'desconhecido';
+      this.logger.warn(
+        `Hotel ${nomeHotel} (${String(hotelId)}) suspenso por inadimplência.`,
+      );
       suspended++;
     }
 
@@ -366,7 +429,11 @@ export class BillingService {
   //  UPGRADE / DOWNGRADE
   // ============================================================
 
-  async changePlan(hotelId: string, newPlan: string, userId?: string): Promise<any> {
+  async changePlan(
+    hotelId: string,
+    newPlan: string,
+    userId?: string,
+  ): Promise<any> {
     const hotel = await this.prisma.client.hotel.findUnique({
       where: { id: hotelId },
     });
@@ -375,8 +442,10 @@ export class BillingService {
     const planData = await this.prisma.client.systemPlan.findUnique({
       where: { name: newPlan },
     });
-    if (!planData) throw new BadRequestException(`Plano "${newPlan}" não encontrado`);
-    if (!planData.isActive) throw new BadRequestException('Plano não está ativo');
+    if (!planData)
+      throw new BadRequestException(`Plano "${newPlan}" não encontrado`);
+    if (!planData.isActive)
+      throw new BadRequestException('Plano não está ativo');
 
     const oldPlan = hotel.plan;
     const oldMrr = hotel.mrr;
@@ -385,7 +454,11 @@ export class BillingService {
 
     // Prorata: calcular crédito/débito dos dias restantes
     const now = new Date();
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysInMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+    ).getDate();
     const dayOfMonth = now.getDate();
     const remainingDays = daysInMonth - dayOfMonth + 1;
     const dailyRateOld = oldMrr / daysInMonth;
@@ -412,18 +485,35 @@ export class BillingService {
           status: 'PENDENTE' as InvoiceStatus,
           dueDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
           periodStart: now,
-          periodEnd: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59),
+          periodEnd: new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            0,
+            23,
+            59,
+            59,
+          ),
         },
       });
 
-      await this.createBillingLog(hotelId, 'UPGRADED', `Upgrade de ${oldPlan} para ${newPlan}. Diferença: R$ ${diffAmount.toFixed(2)}`, {
-        oldPlan,
-        newPlan,
-        diffAmount: diffAmount.toFixed(2),
-        invoiceId: invoice.id,
-      });
+      await this.createBillingLog(
+        hotelId,
+        'UPGRADED',
+        `Upgrade de ${oldPlan} para ${newPlan}. Diferença: R$ ${diffAmount.toFixed(2)}`,
+        {
+          oldPlan,
+          newPlan,
+          diffAmount: diffAmount.toFixed(2),
+          invoiceId: invoice.id,
+        },
+      );
 
-      return { success: true, plan: newPlan, mrr: newMrr, diffInvoice: invoice };
+      return {
+        success: true,
+        plan: newPlan,
+        mrr: newMrr,
+        diffInvoice: invoice,
+      };
     }
 
     // Se for downgrade, registrar plano para downgrade automático no fim do ciclo
@@ -433,19 +523,39 @@ export class BillingService {
         data: { downgradeToPlan: newPlan },
       });
 
-      await this.createBillingLog(hotelId, 'DOWNGRADED', `Downgrade agendado de ${oldPlan} para ${newPlan} (fim do ciclo)`, {
-        oldPlan,
-        newPlan,
-        scheduledFor: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(),
-      });
+      await this.createBillingLog(
+        hotelId,
+        'DOWNGRADED',
+        `Downgrade agendado de ${oldPlan} para ${newPlan} (fim do ciclo)`,
+        {
+          oldPlan,
+          newPlan,
+          scheduledFor: new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            1,
+          ).toISOString(),
+        },
+      );
 
-      return { success: true, plan: oldPlan, mrr: oldMrr, downgradeScheduled: true, effectiveDate: new Date(now.getFullYear(), now.getMonth() + 1, 1) };
+      return {
+        success: true,
+        plan: oldPlan,
+        mrr: oldMrr,
+        downgradeScheduled: true,
+        effectiveDate: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      };
     }
 
-    await this.createBillingLog(hotelId, 'UPGRADED', `Upgrade de ${oldPlan} para ${newPlan}`, {
-      oldPlan,
-      newPlan,
-    });
+    await this.createBillingLog(
+      hotelId,
+      'UPGRADED',
+      `Upgrade de ${oldPlan} para ${newPlan}`,
+      {
+        oldPlan,
+        newPlan,
+      },
+    );
 
     return { success: true, plan: newPlan, mrr: newMrr };
   }
@@ -460,7 +570,13 @@ export class BillingService {
 
     const monthEnd = new Date(monthStart);
     monthEnd.setHours(23, 59, 59, 999);
-    monthEnd.setDate(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate());
+    monthEnd.setDate(
+      new Date(
+        monthStart.getFullYear(),
+        monthStart.getMonth() + 1,
+        0,
+      ).getDate(),
+    );
 
     const hotels = await this.prisma.client.hotel.findMany({
       where: {
@@ -487,10 +603,15 @@ export class BillingService {
           },
         });
 
-        await this.createBillingLog(hotel.id, 'DOWNGRADED', `Downgrade automático aplicado para ${hotel.downgradeToPlan}`, {
-          oldPlan: hotel.plan,
-          newPlan: hotel.downgradeToPlan,
-        });
+        await this.createBillingLog(
+          hotel.id,
+          'DOWNGRADED',
+          `Downgrade automático aplicado para ${hotel.downgradeToPlan}`,
+          {
+            oldPlan: hotel.plan,
+            newPlan: hotel.downgradeToPlan,
+          },
+        );
 
         count++;
       } catch (err) {
@@ -519,7 +640,11 @@ export class BillingService {
     });
   }
 
-  async activateAddon(hotelId: string, addonId: string, userId?: string): Promise<any> {
+  async activateAddon(
+    hotelId: string,
+    addonId: string,
+    userId?: string,
+  ): Promise<any> {
     const addon = await this.prisma.client.addon.findUnique({
       where: { id: addonId },
     });
@@ -535,7 +660,8 @@ export class BillingService {
     const existing = await this.prisma.client.hotelAddon.findUnique({
       where: { hotelId_addonId: { hotelId, addonId } },
     });
-    if (existing?.isActive) throw new BadRequestException('Add-on já está ativo neste hotel');
+    if (existing?.isActive)
+      throw new BadRequestException('Add-on já está ativo neste hotel');
 
     // Upsert (reativar se foi removido antes)
     await this.prisma.client.hotelAddon.upsert({
@@ -563,16 +689,25 @@ export class BillingService {
       });
     }
 
-    await this.createBillingLog(hotelId, 'ADDON_ACTIVATED', `Add-on "${addon.name}" ativado (R$ ${addon.price})`, {
-      addonId,
-      addonName: addon.name,
-      price: addon.price.toString(),
-    });
+    await this.createBillingLog(
+      hotelId,
+      'ADDON_ACTIVATED',
+      `Add-on "${addon.name}" ativado (R$ ${addon.price})`,
+      {
+        addonId,
+        addonName: addon.name,
+        price: addon.price.toString(),
+      },
+    );
 
     return { success: true, addon, price: addon.price };
   }
 
-  async deactivateAddon(hotelId: string, addonId: string, userId?: string): Promise<any> {
+  async deactivateAddon(
+    hotelId: string,
+    addonId: string,
+    userId?: string,
+  ): Promise<any> {
     const addon = await this.prisma.client.addon.findUnique({
       where: { id: addonId },
     });
@@ -581,7 +716,8 @@ export class BillingService {
     const hotelAddon = await this.prisma.client.hotelAddon.findUnique({
       where: { hotelId_addonId: { hotelId, addonId } },
     });
-    if (!hotelAddon || !hotelAddon.isActive) throw new BadRequestException('Add-on não está ativo');
+    if (!hotelAddon || !hotelAddon.isActive)
+      throw new BadRequestException('Add-on não está ativo');
 
     await this.prisma.client.hotelAddon.update({
       where: { hotelId_addonId: { hotelId, addonId } },
@@ -593,17 +729,24 @@ export class BillingService {
       where: { id: hotelId },
     });
     if (hotel?.enabledModules?.includes(addon.moduleKey)) {
-      const modules = hotel.enabledModules.filter((m: string) => m !== addon.moduleKey);
+      const modules = hotel.enabledModules.filter(
+        (m: string) => m !== addon.moduleKey,
+      );
       await this.prisma.client.hotel.update({
         where: { id: hotelId },
         data: { enabledModules: modules },
       });
     }
 
-    await this.createBillingLog(hotelId, 'ADDON_DEACTIVATED', `Add-on "${addon.name}" desativado`, {
-      addonId,
-      addonName: addon.name,
-    });
+    await this.createBillingLog(
+      hotelId,
+      'ADDON_DEACTIVATED',
+      `Add-on "${addon.name}" desativado`,
+      {
+        addonId,
+        addonName: addon.name,
+      },
+    );
 
     return { success: true };
   }
@@ -644,7 +787,14 @@ export class BillingService {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    const lastMonthEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+    );
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     // MRR atual
@@ -655,7 +805,10 @@ export class BillingService {
       select: { mrr: true, plan: true, createdAt: true, nome: true },
     });
 
-    const totalMRR = activeHotels.reduce((sum: number, h: any) => sum + h.mrr, 0);
+    const totalMRR = activeHotels.reduce(
+      (sum: number, h: any) => sum + h.mrr,
+      0,
+    );
     const mrrByPlan: Record<string, number> = {};
     for (const h of activeHotels) {
       mrrByPlan[h.plan] = (mrrByPlan[h.plan] || 0) + h.mrr;
@@ -669,7 +822,10 @@ export class BillingService {
       },
       select: { mrr: true },
     });
-    const lastMonthMRR = lastMonthActive.reduce((sum: number, h: any) => sum + h.mrr, 0);
+    const lastMonthMRR = lastMonthActive.reduce(
+      (sum: number, h: any) => sum + h.mrr,
+      0,
+    );
 
     // Churn
     const churnedThisMonth = await this.prisma.client.hotel.count({
@@ -684,7 +840,8 @@ export class BillingService {
         status: { not: 'CHURNED' },
       },
     });
-    const churnRate = totalStartOfMonth > 0 ? (churnedThisMonth / totalStartOfMonth) * 100 : 0;
+    const churnRate =
+      totalStartOfMonth > 0 ? (churnedThisMonth / totalStartOfMonth) * 100 : 0;
 
     // Novos clientes no mês
     const newClients = await this.prisma.client.hotel.count({
@@ -702,13 +859,23 @@ export class BillingService {
       },
       select: { mrr: true },
     });
-    const lostMRR = canceledThisMonth.reduce((sum: number, h: any) => sum + h.mrr, 0);
+    const lostMRR = canceledThisMonth.reduce(
+      (sum: number, h: any) => sum + h.mrr,
+      0,
+    );
 
     // MRR por mês (últimos 6 meses)
     const mrrHistory = [];
     for (let i = 5; i >= 0; i--) {
       const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+      const end = new Date(
+        now.getFullYear(),
+        now.getMonth() - i + 1,
+        0,
+        23,
+        59,
+        59,
+      );
 
       const hotelsInMonth = await this.prisma.client.hotel.findMany({
         where: {
@@ -720,7 +887,10 @@ export class BillingService {
 
       const mrr = hotelsInMonth.reduce((sum: number, h: any) => sum + h.mrr, 0);
       mrrHistory.push({
-        month: start.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+        month: start.toLocaleDateString('pt-BR', {
+          month: 'short',
+          year: '2-digit',
+        }),
         mrr,
       });
     }
@@ -747,7 +917,10 @@ export class BillingService {
       mrr: {
         current: totalMRR,
         lastMonth: lastMonthMRR,
-        growth: lastMonthMRR > 0 ? ((totalMRR - lastMonthMRR) / lastMonthMRR) * 100 : 0,
+        growth:
+          lastMonthMRR > 0
+            ? ((totalMRR - lastMonthMRR) / lastMonthMRR) * 100
+            : 0,
         history: mrrHistory,
         byPlan: mrrByPlan,
       },
@@ -789,7 +962,11 @@ export class BillingService {
     if (coupon.validUntil && coupon.validUntil < new Date()) {
       throw new BadRequestException('Cupom expirado');
     }
-    if (plan && coupon.targetPlans.length > 0 && !coupon.targetPlans.includes(plan)) {
+    if (
+      plan &&
+      coupon.targetPlans.length > 0 &&
+      !coupon.targetPlans.includes(plan)
+    ) {
       throw new BadRequestException('Cupom não é válido para este plano');
     }
 
@@ -820,7 +997,12 @@ export class BillingService {
   //  BILLING LOGS
   // ============================================================
 
-  private async createBillingLog(hotelId: string, event: string, detail: string, metadata?: any) {
+  private async createBillingLog(
+    hotelId: string,
+    event: string,
+    detail: string,
+    metadata?: any,
+  ) {
     return this.prisma.client.billingLog.create({
       data: {
         hotelId,

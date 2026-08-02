@@ -14,7 +14,9 @@ export class BillingNotifications {
     invoiceId: string;
     amount: number;
   }) {
-    this.logger.log(`Notificação: Pagamento confirmado para hotel ${payload.hotelId}`);
+    this.logger.log(
+      `Notificação: Pagamento confirmado para hotel ${payload.hotelId}`,
+    );
 
     const hotel = await this.prisma.client.hotel.findUnique({
       where: { id: payload.hotelId },
@@ -46,10 +48,15 @@ export class BillingNotifications {
           },
         );
       } else {
-        this.logger.log(`WhatsApp não configurado para hotel ${payload.hotelId}. Notificação seria enviada.`);
+        this.logger.log(
+          `WhatsApp não configurado para hotel ${payload.hotelId}. Notificação seria enviada.`,
+        );
       }
     } catch (err) {
-      this.logger.warn(`Falha ao enviar notificação WhatsApp para ${payload.hotelId}:`, err);
+      this.logger.warn(
+        `Falha ao enviar notificação WhatsApp para ${payload.hotelId}:`,
+        err,
+      );
     }
 
     // Registrar log
@@ -82,7 +89,10 @@ export class BillingNotifications {
 
     // Notificar sobre nova fatura
     try {
-      if (hotel.integration?.whatsappApiUrl && hotel.integration?.whatsappToken) {
+      if (
+        hotel.integration?.whatsappApiUrl &&
+        hotel.integration?.whatsappToken
+      ) {
         const { default: axios } = await import('axios');
         await axios.post(
           hotel.integration.whatsappApiUrl,
@@ -108,7 +118,9 @@ export class BillingNotifications {
 
   @OnEvent('billing.suspended')
   async handleSuspended(payload: { hotelId: string; reason: string }) {
-    this.logger.warn(`Notificação: Hotel ${payload.hotelId} suspenso — ${payload.reason}`);
+    this.logger.warn(
+      `Notificação: Hotel ${payload.hotelId} suspenso — ${payload.reason}`,
+    );
 
     const hotel = await this.prisma.client.hotel.findUnique({
       where: { id: payload.hotelId },
@@ -117,7 +129,10 @@ export class BillingNotifications {
     if (!hotel) return;
 
     try {
-      if (hotel.integration?.whatsappApiUrl && hotel.integration?.whatsappToken) {
+      if (
+        hotel.integration?.whatsappApiUrl &&
+        hotel.integration?.whatsappToken
+      ) {
         const { default: axios } = await import('axios');
         await axios.post(
           hotel.integration.whatsappApiUrl,

@@ -30,10 +30,10 @@ export class ModulesGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredModules = this.reflector.getAllAndOverride<string[]>(MODULES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredModules = this.reflector.getAllAndOverride<string[]>(
+      MODULES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredModules || requiredModules.length === 0) {
       return true;
@@ -70,12 +70,12 @@ export class ModulesGuard implements CanActivate {
 
     // Checa se o hotel tem TODOS os módulos requeridos pela rota
     const hasAllRequiredModules = requiredModules.every(
-      (mod) => DEFAULT_MODULES.includes(mod) || enabledModules.includes(mod)
+      (mod) => DEFAULT_MODULES.includes(mod) || enabledModules.includes(mod),
     );
 
     if (!hasAllRequiredModules) {
       throw new ForbiddenException(
-        `Acesso negado. Seu plano atual não possui acesso aos módulos necessários: ${requiredModules.join(', ')}`
+        `Acesso negado. Seu plano atual não possui acesso aos módulos necessários: ${requiredModules.join(', ')}`,
       );
     }
 

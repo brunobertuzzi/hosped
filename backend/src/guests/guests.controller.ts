@@ -46,7 +46,12 @@ export class GuestsController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
-    return this.guestsService.update(id, data, req.user?.sub, req.user?.hotelId);
+    return this.guestsService.update(
+      id,
+      data,
+      req.user?.sub,
+      req.user?.hotelId,
+    );
   }
 
   @Delete(':id')

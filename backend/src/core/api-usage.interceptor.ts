@@ -23,9 +23,9 @@ export class ApiUsageInterceptor implements NestInterceptor {
     // Só conta requisições de hotéis autenticados
     if (hotelId) {
       return next.handle().pipe(
-        tap(async () => {
+        tap(() => {
           try {
-            await this.prisma.client.hotel.update({
+            void this.prisma.client.hotel.update({
               where: { id: hotelId },
               data: { apiRequestsCount: { increment: 1 } },
             });

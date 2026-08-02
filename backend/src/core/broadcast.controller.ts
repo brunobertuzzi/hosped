@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, UseGuards, Request, UnauthorizedException, Put, Param, Delete, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+  Put,
+  Param,
+  Delete,
+  NotFoundException,
+  Inject,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -7,10 +20,9 @@ import type { Cache } from 'cache-manager';
 @Controller('core/broadcast')
 @UseGuards(AuthGuard)
 export class BroadcastController {
-
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get('maintenance')
@@ -20,12 +32,19 @@ export class BroadcastController {
   }
 
   @Put('maintenance')
-  async setMaintenanceMode(@Body() body: { maintenanceMode: boolean }, @Request() req: any) {
+  async setMaintenanceMode(
+    @Body() body: { maintenanceMode: boolean },
+    @Request() req: any,
+  ) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
     }
     // Set with no expiration (0) if supported, or very long time
-    await this.cacheManager.set('maintenanceMode', String(body.maintenanceMode), 0);
+    await this.cacheManager.set(
+      'maintenanceMode',
+      String(body.maintenanceMode),
+      0,
+    );
     return { success: true, maintenanceMode: body.maintenanceMode };
   }
 
@@ -34,7 +53,7 @@ export class BroadcastController {
   @Get('announcements')
   async getAnnouncements(@Request() req: any) {
     return this.prisma.client.systemAnnouncement.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -50,12 +69,16 @@ export class BroadcastController {
         type: body.type || 'INFO',
         isActive: body.isActive ?? true,
         targetPlans: body.targetPlans || [],
-      }
+      },
     });
   }
 
   @Put('announcements/:id')
-  async updateAnnouncement(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+  async updateAnnouncement(
+    @Param('id') id: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
     }
@@ -67,7 +90,7 @@ export class BroadcastController {
         type: body.type,
         isActive: body.isActive,
         targetPlans: body.targetPlans,
-      }
+      },
     });
   }
 
@@ -77,8 +100,7 @@ export class BroadcastController {
       throw new UnauthorizedException('Acesso negado.');
     }
     return this.prisma.client.systemAnnouncement.delete({
-      where: { id }
+      where: { id },
     });
   }
 }
-

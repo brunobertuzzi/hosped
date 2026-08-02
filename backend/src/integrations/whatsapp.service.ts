@@ -7,9 +7,7 @@ import axios from 'axios';
 export class WhatsappService {
   private readonly logger = new Logger(WhatsappService.name);
 
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Enfileira uma mensagem para envio via WhatsApp para o hóspede.
@@ -42,33 +40,37 @@ export class WhatsappService {
     }
 
     // Executa a requisição apenas se tiver as chaves
-    if (!integration || !integration.whatsappApiUrl || !integration.whatsappToken) {
+    if (
+      !integration ||
+      !integration.whatsappApiUrl ||
+      !integration.whatsappToken
+    ) {
       return false; // Silenciosamente falha (ou lança erro dependendo da regra de negócio)
     }
 
     try {
-        await axios.post(
-          integration.whatsappApiUrl,
-          {
-            number: toPhone,
-            options: {
-              delay: 1200,
-              presence: 'composing',
-            },
-            textMessage: {
-              text: message,
-            },
+      await axios.post(
+        integration.whatsappApiUrl,
+        {
+          number: toPhone,
+          options: {
+            delay: 1200,
+            presence: 'composing',
           },
-          {
-            headers: {
-              apikey: integration.whatsappToken,
-              'Content-Type': 'application/json',
-            },
+          textMessage: {
+            text: message,
           },
-        );
-        this.logger.log(
-          `[WHATSAPP] Mensagem enviada com sucesso para ${toPhone} via API.`,
-        );
+        },
+        {
+          headers: {
+            apikey: integration.whatsappToken,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      this.logger.log(
+        `[WHATSAPP] Mensagem enviada com sucesso para ${toPhone} via API.`,
+      );
     } catch (error: any) {
       this.logger.error(
         `[WHATSAPP] Falha ao enviar para API ${integration.whatsappApiUrl}: ${error.message}`,

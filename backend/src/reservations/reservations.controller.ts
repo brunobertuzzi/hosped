@@ -136,6 +136,9 @@ export class ReservationsController {
     @Param('guestToken') guestToken: string,
     @Body() body: { documentoCheckIn: string },
   ) {
-    return this.reservationsService.preCheckIn(guestToken, body.documentoCheckIn);
+    return this.reservationsService.preCheckIn(
+      guestToken,
+      body.documentoCheckIn,
+    );
   }
 }

@@ -165,12 +165,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               {hasAccess('page.reservas') && (
                 <Link href="/admin/reservas" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/reservas' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <CalendarDays className="w-4 h-4" /> Controle de Reservas
+                  <CalendarDays className="w-4 h-4" /> Reservas
                 </Link>
               )}
               {hasAccess('page.hospedes') && (
                 <Link href="/admin/hospedes" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/hospedes' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <Users className="w-4 h-4" /> Cadastro de Hóspedes
+                  <Users className="w-4 h-4" /> Hóspedes
                 </Link>
               )}
               {hasAccess('page.gantt') && canUseGantt ? (
@@ -196,12 +196,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               {hasAccess('page.estoque') && (
                 <Link href="/admin/estoque" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/estoque' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <Package className="w-4 h-4" /> Estoque & Consumos
+                  <Package className="w-4 h-4" /> Estoque
                 </Link>
               )}
               {hasAccess('page.auditoria') && (
                 <Link href="/admin/auditoria" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/auditoria' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                  <ShieldCheck className="w-4 h-4" /> Histórico de Ações
+                  <ShieldCheck className="w-4 h-4" /> Auditoria
                 </Link>
               )}
               {(hasAccess('page.equipe') || hasAccess('page.quartos') || hasAccess('page.financeiro') || hasAccess('page.integracoes') || hasAccess('page.meu-plano') || hasAccess('page.configuracoes')) && (
@@ -209,12 +209,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <span className="block px-3 text-[10px] uppercase font-bold tracking-widest text-white/30 mb-2">Setup & Gestão</span>
                   {hasAccess('page.equipe') && (
                     <Link href="/admin/equipe" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/equipe' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                      <Users className="w-4 h-4" /> Equipe (RH)
+                      <Users className="w-4 h-4" /> Equipe
                     </Link>
                   )}
                   {hasAccess('page.quartos') && (
                     <Link href="/admin/quartos" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname === '/admin/quartos' ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                      <Building2 className="w-4 h-4" /> Quartos & Categorias
+                      <Building2 className="w-4 h-4" /> Quartos
                     </Link>
                   )}
                   {hasAccess('page.financeiro') && (
@@ -224,7 +224,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   )}
                   {hasAccess('page.marketing') && (
                     <Link href="/admin/marketing/cupons" className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${pathname.startsWith('/admin/marketing') ? 'active-tab shadow-sm' : 'text-white/50 hover:text-white/90 hover:bg-white/[0.03]'}`}>
-                      <Tag className="w-4 h-4" /> Marketing & Cupons
+                      <Tag className="w-4 h-4" /> Cupons
                     </Link>
                   )}
                   {hasAccess('page.integracoes') && canUseWebhooks ? (
@@ -254,7 +254,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {hasAccess('page.site-reservas') && (
                 <div className="pt-4 mt-4 border-t border-white/5">
                   <a href={`/${hotel.slug || hotel.id || '11111111-1111-1111-1111-111111111111'}`} target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium text-brand hover:bg-brand/10 transition-colors">
-                    <CloudLightning className="w-4 h-4" /> Ver Site de Reservas
+                    <CloudLightning className="w-4 h-4" /> Site Público
                   </a>
                 </div>
               )}
@@ -274,7 +274,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             <button onClick={handleLogout} className="w-full flex items-center gap-2 text-xs font-medium text-white/40 hover:text-red-400 px-2 py-1.5 rounded-lg transition-colors">
-              <LogOut className="w-3.5 h-3.5" /> Encerrar Sessão
+              <LogOut className="w-3.5 h-3.5" /> Sair
             </button>
             <button
               className="md:hidden absolute top-4 right-4 text-white/50 hover:text-white"

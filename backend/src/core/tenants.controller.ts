@@ -121,7 +121,10 @@ export class TenantsController {
 
     const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
     if (!superAdminEmail) {
-      return { success: false, error: 'SUPER_ADMIN_EMAIL não configurado nas variáveis de ambiente.' };
+      return {
+        success: false,
+        error: 'SUPER_ADMIN_EMAIL não configurado nas variáveis de ambiente.',
+      };
     }
     await this.prisma.client.user.updateMany({
       where: { email: superAdminEmail },

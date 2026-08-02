@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { MercadoPagoConfig, Payment as MercadoPagoPayment } from 'mercadopago';
 import { PrismaService } from '../core/prisma.service';
 import { PaymentMethod } from '@prisma/client';
@@ -17,9 +22,9 @@ export class PaymentsService {
     if (!sistemaToken) {
       this.logger.warn(
         '[PaymentsService] SISTEMA_PAYMENT_TOKEN não configurado. ' +
-        'As faturas mensais dos hotéis SERÃO GERADAS no banco de dados, ' +
-        'mas o débito automático via Mercado Pago NÃO será executado. ' +
-        'Configure esta variável no Railway para ativar a cobrança automática das assinaturas.',
+          'As faturas mensais dos hotéis SERÃO GERADAS no banco de dados, ' +
+          'mas o débito automático via Mercado Pago NÃO será executado. ' +
+          'Configure esta variável no Railway para ativar a cobrança automática das assinaturas.',
       );
     }
   }
@@ -36,7 +41,9 @@ export class PaymentsService {
 
   async createPixPayment(dto: CreatePaymentDto, userId?: string) {
     if (!dto.email) {
-      throw new BadRequestException('Email do pagador é obrigatório para gerar PIX.');
+      throw new BadRequestException(
+        'Email do pagador é obrigatório para gerar PIX.',
+      );
     }
 
     return this.prisma.client.$transaction(async (tx: any) => {
@@ -56,7 +63,9 @@ export class PaymentsService {
       let pointOfInteraction;
 
       if (!token || provider !== 'MERCADO_PAGO') {
-        throw new BadRequestException('O Hotel não possui um Gateway de Pagamento configurado (Mercado Pago). Vá em Integrações para configurar.');
+        throw new BadRequestException(
+          'O Hotel não possui um Gateway de Pagamento configurado (Mercado Pago). Vá em Integrações para configurar.',
+        );
       } else if (provider === 'MERCADO_PAGO') {
         const client = this.getMpClient(token);
         const payment = new MercadoPagoPayment(client);
@@ -114,7 +123,9 @@ export class PaymentsService {
     let isApproved = false;
 
     if (!token || provider !== 'MERCADO_PAGO') {
-      throw new BadRequestException('Gateway de pagamento não configurado para o hotel.');
+      throw new BadRequestException(
+        'Gateway de pagamento não configurado para o hotel.',
+      );
     } else if (provider === 'MERCADO_PAGO') {
       try {
         const client = this.getMpClient(token);
@@ -123,7 +134,9 @@ export class PaymentsService {
         isApproved = result.status === 'approved';
       } catch (error) {
         this.logger.error(`Error checking payment ${id}:`, error);
-        throw new BadRequestException('Falha ao consultar status no gateway do hotel');
+        throw new BadRequestException(
+          'Falha ao consultar status no gateway do hotel',
+        );
       }
     }
 

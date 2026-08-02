@@ -16,13 +16,17 @@ export class ExpensesService {
     });
   }
 
-  async create(data: {
-    descricao: string;
-    valor: number;
-    dataVencimento: string;
-    categoria: string;
-    fornecedor?: string;
-  }, hotelId: string, userId?: string) {
+  async create(
+    data: {
+      descricao: string;
+      valor: number;
+      dataVencimento: string;
+      categoria: string;
+      fornecedor?: string;
+    },
+    hotelId: string,
+    userId?: string,
+  ) {
     const created = await this.prisma.client.expense.create({
       data: {
         hotelId,
@@ -39,28 +43,40 @@ export class ExpensesService {
     return created;
   }
 
-  async update(id: string, data: Partial<{
-    descricao: string;
-    valor: number;
-    dataVencimento: string;
-    dataPagamento: string;
-    categoria: string;
-    fornecedor: string;
-    status: ExpenseStatus;
-  }>, userId?: string) {
+  async update(
+    id: string,
+    data: Partial<{
+      descricao: string;
+      valor: number;
+      dataVencimento: string;
+      dataPagamento: string;
+      categoria: string;
+      fornecedor: string;
+      status: ExpenseStatus;
+    }>,
+    userId?: string,
+  ) {
     const prev = await this.prisma.client.expense.findUnique({ where: { id } });
     if (!prev) throw new NotFoundException('Despesa não encontrada');
 
     const updateData: any = { ...data };
-    if (data.dataVencimento) updateData.dataVencimento = new Date(data.dataVencimento);
-    if (data.dataPagamento) updateData.dataPagamento = new Date(data.dataPagamento);
+    if (data.dataVencimento)
+      updateData.dataVencimento = new Date(data.dataVencimento);
+    if (data.dataPagamento)
+      updateData.dataPagamento = new Date(data.dataPagamento);
 
     const updated = await this.prisma.client.expense.update({
       where: { id },
       data: updateData,
     });
 
-    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'EXPENSE', prev, updated);
+    await this.audit.log(
+      userId,
+      AuditAction.MUDANCA_STATUS,
+      'EXPENSE',
+      prev,
+      updated,
+    );
     return updated;
   }
 
@@ -78,7 +94,13 @@ export class ExpensesService {
       data: updateData,
     });
 
-    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'EXPENSE', prev, updated);
+    await this.audit.log(
+      userId,
+      AuditAction.MUDANCA_STATUS,
+      'EXPENSE',
+      prev,
+      updated,
+    );
     return updated;
   }
 

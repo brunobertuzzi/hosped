@@ -87,28 +87,28 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </Link>
 
             <Link href="/super-admin/tenants" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/tenants' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Building className="w-4 h-4" /> Gestão de Tenants
+              <Building className="w-4 h-4" /> Hotéis
             </Link>
 
             <Link href="/super-admin/plans" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/plans' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Settings className="w-4 h-4" /> Planos e Preços
+              <Settings className="w-4 h-4" /> Planos
             </Link>
 
             <Link href="/super-admin/invoices" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/invoices' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <DollarSign className="w-4 h-4" /> Faturas e Cobranças
+              <DollarSign className="w-4 h-4" /> Faturas
             </Link>
 
             <Link href="/super-admin/settings" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/settings' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Settings className="w-4 h-4" /> Configurações Globais
+              <Settings className="w-4 h-4" /> Config. Globais
             </Link>
 
 
 
             <Link href="/super-admin/logs" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/logs' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Terminal className="w-4 h-4" /> Logs de Auditoria
+              <Terminal className="w-4 h-4" /> Auditoria
             </Link>
             <Link href="/super-admin/system-errors" className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] font-medium transition-all ${pathname === '/super-admin/system-errors' ? 'active-tab' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}>
-              <Server className="w-4 h-4" /> Erros de Sistema
+              <Server className="w-4 h-4" /> Erros
             </Link>
           </nav>
         </div>
@@ -124,7 +124,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </div>
           </div>
           <button onClick={handleLogout} className="w-full flex items-center gap-2 text-xs font-medium text-white/30 hover:text-red-400 px-3 py-2 rounded-lg transition-colors cursor-pointer text-left">
-            <LogOut className="w-4 h-4" /> Sair do Painel
+            <LogOut className="w-4 h-4" /> Sair
           </button>
         </div>
       </div>

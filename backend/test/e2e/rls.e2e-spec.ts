@@ -7,7 +7,7 @@ const hashedPassword = bcrypt.hashSync('password123', 10);
 
 async function cleanup() {
   const allHotels = await prisma.hotel.findMany();
-  const hotels = allHotels.filter(h => h.nome.startsWith('E2E RLS'));
+  const hotels = allHotels.filter((h) => h.nome.startsWith('E2E RLS'));
   for (const hotel of hotels) {
     const hotelId = hotel.id;
     await prisma.payment.deleteMany({ where: { hotelId } });

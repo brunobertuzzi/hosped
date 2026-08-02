@@ -7,7 +7,7 @@ export class WebhooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async processMercadoPago(hotelId: string, payload: any) {
-    let eventType = payload.type || payload.action || 'unknown';
+    const eventType = payload.type || payload.action || 'unknown';
     let status: WebhookStatus = WebhookStatus.RECEBIDO;
 
     // Processa notificação de pagamento PIX

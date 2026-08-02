@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../core/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '@prisma/client';
@@ -57,7 +61,9 @@ export class PromoCodesService {
     });
 
     if (existing) {
-      throw new BadRequestException('Já existe um cupom com este código neste hotel.');
+      throw new BadRequestException(
+        'Já existe um cupom com este código neste hotel.',
+      );
     }
 
     const created = await this.prisma.client.promoCode.create({
@@ -73,7 +79,13 @@ export class PromoCodesService {
       },
     });
 
-    await this.audit.log(userId, AuditAction.CRIAR, 'PROMO_CODE', null, created);
+    await this.audit.log(
+      userId,
+      AuditAction.CRIAR,
+      'PROMO_CODE',
+      null,
+      created,
+    );
     return created;
   }
 
@@ -96,7 +108,9 @@ export class PromoCodesService {
         },
       });
       if (existing) {
-        throw new BadRequestException('Já existe um cupom com este código neste hotel.');
+        throw new BadRequestException(
+          'Já existe um cupom com este código neste hotel.',
+        );
       }
     }
 
@@ -113,7 +127,13 @@ export class PromoCodesService {
       },
     });
 
-    await this.audit.log(userId, AuditAction.MUDANCA_STATUS, 'PROMO_CODE', promo, updated);
+    await this.audit.log(
+      userId,
+      AuditAction.MUDANCA_STATUS,
+      'PROMO_CODE',
+      promo,
+      updated,
+    );
     return updated;
   }
 
@@ -130,7 +150,13 @@ export class PromoCodesService {
       where: { id },
     });
 
-    await this.audit.log(userId, AuditAction.DELETAR, 'PROMO_CODE', promo, deleted);
+    await this.audit.log(
+      userId,
+      AuditAction.DELETAR,
+      'PROMO_CODE',
+      promo,
+      deleted,
+    );
     return deleted;
   }
 }

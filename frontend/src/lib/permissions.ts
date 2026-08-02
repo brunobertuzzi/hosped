@@ -41,7 +41,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.reservas',
-    label: 'Controle de Reservas',
+    label: 'Reservas',
     description: 'Criação e gestão completa de reservas.',
     icon: 'CalendarDays',
     category: 'business',
@@ -49,7 +49,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.hospedes',
-    label: 'Cadastro de Hóspedes',
+    label: 'Hóspedes',
     description: 'Gestão do perfil e histórico de hóspedes.',
     icon: 'Users',
     category: 'business',
@@ -57,7 +57,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.quartos',
-    label: 'Quartos & Categorias',
+    label: 'Quartos',
     description: 'Configuração de UHs, categorias e tarifas.',
     icon: 'Building2',
     category: 'business',
@@ -89,7 +89,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.estoque',
-    label: 'Estoque & Consumos',
+    label: 'Estoque',
     description: 'Controle de inventário e consumos de hóspedes.',
     icon: 'Package',
     category: 'business',
@@ -97,7 +97,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.gantt',
-    label: 'Mapa de Ocupação (Gantt)',
+    label: 'Mapa de Ocupação',
     description: 'Visualização interativa de ocupação em linha do tempo.',
     icon: 'Calendar',
     category: 'business',
@@ -105,7 +105,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.auditoria',
-    label: 'Histórico de Ações',
+    label: 'Auditoria',
     description: 'Log completo de todas as ações realizadas no sistema.',
     icon: 'ShieldCheck',
     category: 'business',
@@ -113,7 +113,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.integracoes',
-    label: 'Integrações & Webhooks',
+    label: 'Integrações',
     description: 'Configuração de webhooks e API.',
     icon: 'CloudLightning',
     category: 'business',
@@ -121,7 +121,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.marketing',
-    label: 'Marketing & Cupons',
+    label: 'Cupons',
     description: 'Criação de promoções e cupons de desconto.',
     icon: 'Tag',
     category: 'business',
@@ -131,7 +131,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   // ── SETUP & GESTÃO ───────────────────────────────────────
   {
     key: 'page.equipe',
-    label: 'Equipe (RH)',
+    label: 'Equipe',
     description: 'Cadastro de funcionários e permissões.',
     icon: 'Users',
     category: 'setup',
@@ -157,7 +157,7 @@ export const PAGE_PERMISSIONS: PagePermission[] = [
   },
   {
     key: 'page.site-reservas',
-    label: 'Ver Site de Reservas',
+    label: 'Site Público',
     description: 'Acessar o site público de reservas do hotel.',
     icon: 'Globe',
     category: 'settings',

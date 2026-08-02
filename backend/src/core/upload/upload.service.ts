@@ -1,4 +1,8 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,14 +34,21 @@ export class UploadService {
         if (!fs.existsSync(this.uploadDir)) {
           fs.mkdirSync(this.uploadDir, { recursive: true });
         }
-        this.logger.warn('Chaves AWS não encontradas. Utilizando fallback de storage local.');
+        this.logger.warn(
+          'Chaves AWS não encontradas. Utilizando fallback de storage local.',
+        );
       }
     } catch (error) {
-      this.logger.warn('Não foi possível iniciar o S3 ou criar diretório local.');
+      this.logger.warn(
+        'Não foi possível iniciar o S3 ou criar diretório local.',
+      );
     }
   }
 
-  async uploadFile(file: Express.Multer.File, hotelId?: string): Promise<string> {
+  async uploadFile(
+    file: Express.Multer.File,
+    hotelId?: string,
+  ): Promise<string> {
     const ext = path.extname(file.originalname);
     const filename = `${uuidv4()}${ext}`;
     const fileSizeMB = file.size / (1024 * 1024);
@@ -87,7 +98,10 @@ export class UploadService {
         data: { storageUsedMB: { increment: fileSizeMB } },
       });
     } catch (err) {
-      this.logger.error(`Erro ao atualizar storageUsedMB do hotel ${hotelId}:`, err);
+      this.logger.error(
+        `Erro ao atualizar storageUsedMB do hotel ${hotelId}:`,
+        err,
+      );
     }
   }
 }

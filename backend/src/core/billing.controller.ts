@@ -31,7 +31,8 @@ export class BillingController {
 
   private getHotelId(req: any): string {
     const hotelId = req.user?.hotelId;
-    if (!hotelId) throw new UnauthorizedException('Usuário sem hotel associado.');
+    if (!hotelId)
+      throw new UnauthorizedException('Usuário sem hotel associado.');
     return hotelId;
   }
 
@@ -40,7 +41,8 @@ export class BillingController {
   @Get('invoices')
   @UseGuards(AuthGuard)
   async getInvoices(@Request() req: any, @Query('hotelId') hotelId?: string) {
-    const hid = req.user?.role === 'PLATFORM_OWNER' ? hotelId : this.getHotelId(req);
+    const hid =
+      req.user?.role === 'PLATFORM_OWNER' ? hotelId : this.getHotelId(req);
     const where: any = {};
     if (hid) where.hotelId = hid;
     return this.prisma.client.systemInvoice.findMany({
@@ -52,7 +54,10 @@ export class BillingController {
 
   @Post('invoices/generate/:hotelId')
   @UseGuards(AuthGuard)
-  async generateInvoice(@Param('hotelId') hotelId: string, @Request() req: any) {
+  async generateInvoice(
+    @Param('hotelId') hotelId: string,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.generateInvoice(hotelId);
   }
@@ -74,7 +79,11 @@ export class BillingController {
 
   @Post('invoices/:id/confirm')
   @UseGuards(AuthGuard)
-  async confirmInvoice(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+  async confirmInvoice(
+    @Param('id') id: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.confirmPayment(id, body.gatewayId, body.method);
   }
@@ -98,7 +107,11 @@ export class BillingController {
 
   @Post('change-plan/:hotelId')
   @UseGuards(AuthGuard)
-  async changePlanAdmin(@Param('hotelId') hotelId: string, @Body() body: any, @Request() req: any) {
+  async changePlanAdmin(
+    @Param('hotelId') hotelId: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.changePlan(hotelId, body.plan, req.user?.sub);
   }
@@ -135,14 +148,22 @@ export class BillingController {
   // Admin: add-ons para qualquer hotel
   @Post('addons/admin/:hotelId/activate')
   @UseGuards(AuthGuard)
-  async adminActivateAddon(@Param('hotelId') hotelId: string, @Body() body: any, @Request() req: any) {
+  async adminActivateAddon(
+    @Param('hotelId') hotelId: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.activateAddon(hotelId, body.addonId, req.user?.sub);
   }
 
   @Post('addons/admin/:hotelId/deactivate')
   @UseGuards(AuthGuard)
-  async adminDeactivateAddon(@Param('hotelId') hotelId: string, @Body() body: any, @Request() req: any) {
+  async adminDeactivateAddon(
+    @Param('hotelId') hotelId: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.deactivateAddon(hotelId, body.addonId, req.user?.sub);
   }
@@ -165,7 +186,11 @@ export class BillingController {
 
   @Put('addons/manage/:id')
   @UseGuards(AuthGuard)
-  async updateAddon(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+  async updateAddon(
+    @Param('id') id: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
     this.checkSuperAdmin(req);
     const data: any = {};
     if (body.name !== undefined) data.name = body.name;
@@ -186,7 +211,10 @@ export class BillingController {
   // ========== CUPONS ==========
 
   @Get('coupons/validate/:code')
-  async validateCoupon(@Param('code') code: string, @Query('plan') plan?: string) {
+  async validateCoupon(
+    @Param('code') code: string,
+    @Query('plan') plan?: string,
+  ) {
     return this.billing.validateCoupon(code, plan);
   }
 
@@ -203,14 +231,21 @@ export class BillingController {
 
   @Get('logs')
   @UseGuards(AuthGuard)
-  async getBillingLogs(@Request() req: any, @Query('hotelId') hotelId?: string) {
+  async getBillingLogs(
+    @Request() req: any,
+    @Query('hotelId') hotelId?: string,
+  ) {
     this.checkSuperAdmin(req);
     return this.billing.getBillingLogs(hotelId);
   }
 
   @Get('admin/invoices')
   @UseGuards(AuthGuard)
-  async getAllInvoices(@Request() req: any, @Query('status') status?: string, @Query('hotelId') hotelId?: string) {
+  async getAllInvoices(
+    @Request() req: any,
+    @Query('status') status?: string,
+    @Query('hotelId') hotelId?: string,
+  ) {
     this.checkSuperAdmin(req);
     const where: any = {};
     if (status) where.status = status;
@@ -221,5 +256,4 @@ export class BillingController {
       include: { hotel: { select: { nome: true, plan: true } } },
     });
   }
-
-  }
+}
