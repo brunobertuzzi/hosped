@@ -3,17 +3,17 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#030308",
 };
 
 export const metadata: Metadata = {
-  title: "Hosped | Gestão Hoteleira Multi-Filiais",
-  description: "Next-Gen Property Management System",
+  title: "HOSPED | O Sistema Operacional Definitivo para Hotéis e Pousadas",
+  description: "Gestão hoteleira simples e lucrativa. Abandone as planilhas: recepção rápida, site de reservas próprio sem comissões, check-in via WhatsApp e relatórios automáticos.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "Hosped",
+    statusBarStyle: "black-translucent",
+    title: "HOSPED",
   },
 };
 
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark h-full">
-      <body className="h-full bg-background text-foreground antialiased">
+      <body className="h-full bg-background text-foreground antialiased selection:bg-indigo-500/40">
         {children}
         <Toaster theme="dark" richColors position="top-right" />
       </body>

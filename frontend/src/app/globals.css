@@ -4,7 +4,7 @@
 
 :root {
   font-family: 'Outfit', sans-serif;
-  --background: #000000;
+  --background: #030308;
   --foreground: #ffffff;
   --brand-primary: #6366f1; /* Fallback to prevent FOUC */
   --brand-primary-glow: rgba(99, 102, 241, 0.4);
@@ -16,7 +16,7 @@ body {
   font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+  background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
 }
 
 /* Base text rendering improvements */
@@ -25,45 +25,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* =========================================
-   Ultra-Premium Glassmorphism & Noir System
+   Guillaume Gouessan Inspired Glassmorphism & Noir System
    ========================================= */
 
 .glass-panel {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-  border-radius: 20px;
+  background: rgba(10, 10, 18, 0.7);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  border-radius: 24px;
 }
 
 .glass-card {
-  background: rgba(18, 18, 18, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
+  background: rgba(15, 15, 26, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  background: rgba(24, 24, 24, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  transform: translateY(-2px);
-}
-
-/* Seamless floating inputs and minimal borders */
-.input-premium {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.3s ease;
-}
-.input-premium:focus {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 1px var(--brand-primary);
-  outline: none;
+  background: rgba(22, 22, 38, 0.7);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+  transform: translateY(-4deg);
 }
 
 /* Dynamic Brand Utilities */
@@ -71,10 +58,10 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 40px -10px var(--brand-primary-glow); 
 }
 .glow-brand-intense {
-  box-shadow: 0 0 30px 0px var(--brand-primary-glow);
+  box-shadow: 0 0 35px 0px var(--brand-primary-glow);
 }
 .text-brand-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, var(--brand-primary) 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%, #6366f1 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -86,51 +73,45 @@ h1, h2, h3, h4, h5, h6 {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #030308;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(99, 102, 241, 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(168, 85, 247, 0.6);
 }
 
-/* Gantt Chart Customizations */
-.gantt-grid {
-  grid-template-columns: 200px repeat(14, minmax(80px, 1fr));
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 25s linear infinite;
 }
 
-/* Global Select & Dropdown Standardization */
-select {
-  /* Prevent white background flash on Windows/Chrome */
-  color-scheme: dark;
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 1rem center !important;
-  background-size: 16px !important;
-  padding-right: 2.5rem !important;
-  cursor: pointer;
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
-select option {
-  background-color: #0f0f13 !important; /* Deep noir background for dropdowns */
-  color: #ffffff;
-  padding: 12px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px;
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
 }
 
-select:focus > option:checked {
-  background: var(--brand-primary) !important;
-  color: white !important;
+.animate-float-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
 }
