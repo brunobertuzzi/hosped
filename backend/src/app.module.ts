@@ -15,7 +15,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { GuestsModule } from './guests/guests.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { BookingEngineModule } from './booking-engine/booking-engine.module';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { CustomThrottlerGuard } from './core/custom-throttler.guard';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/audit.interceptor';
 import { ApiUsageInterceptor } from './core/api-usage.interceptor';
@@ -46,8 +47,19 @@ import { envValidationSchema } from './config/env.validation';
 
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,
-        limit: 100, // Limite global de 100 req/minuto
+        name: 'short',
+        ttl: 10000, // 10 segundos
+        limit: 30, // Máximo de 30 requisições em rajada (10s)
+      },
+      {
+        name: 'medium',
+        ttl: 60000, // 1 minuto
+        limit: 120, // Limite padrão de 120 requisições/minuto
+      },
+      {
+        name: 'long',
+        ttl: 3600000, // 1 hora
+        limit: 2000, // Proteção contra scraping massivo (2000/hora)
       },
     ]),
     CoreModule,
@@ -72,7 +84,7 @@ import { envValidationSchema } from './config/env.validation';
     CommunicationOrchestratorService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: CustomThrottlerGuard,
     },
     {
       provide: APP_INTERCEPTOR,

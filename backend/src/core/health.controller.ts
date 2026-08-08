@@ -9,11 +9,13 @@ import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from './prisma.service';
 import { Redis } from 'ioredis';
 import * as os from 'os';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('core/health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
+  @SkipThrottle()
   @Get('public')
   async getPublicHealth() {
     let postgresStatus = 'OFFLINE';

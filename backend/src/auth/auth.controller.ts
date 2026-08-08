@@ -113,11 +113,13 @@ export class AuthController {
     return this.authService.updateTeamMember(id, data, req.user?.hotelId);
   }
 
+  @Throttle({ short: { limit: 3, ttl: 10000 }, medium: { limit: 5, ttl: 60000 } })
   @Post('forgot-password')
   async forgotPassword(@Body() data: { email: string }) {
     return this.authService.forgotPassword(data.email);
   }
 
+  @Throttle({ short: { limit: 3, ttl: 10000 }, medium: { limit: 5, ttl: 60000 } })
   @Post('reset-password')
   async resetPassword(
     @Body() data: { email: string; token: string; password: string },

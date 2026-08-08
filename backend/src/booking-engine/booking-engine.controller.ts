@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { BookingEngineService } from './booking-engine.service';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('booking-engine')
 export class BookingEngineController {
@@ -25,6 +26,7 @@ export class BookingEngineController {
     );
   }
 
+  @Throttle({ short: { limit: 5, ttl: 10000 }, medium: { limit: 15, ttl: 60000 } })
   @Post(':hotelId/:branchId/reserve')
   reserve(
     @Param('hotelId') hotelId: string,
