@@ -173,8 +173,8 @@ export class TenantsController {
     const hotel = await this.prisma.client.hotel.update({
       where: { id: hotelId },
       data: {
-        nome: body.nome,
-        cores: body.cores,
+        nome: body.nome !== undefined ? body.nome : undefined,
+        cores: body.cores !== undefined ? body.cores : undefined,
         slogan: body.slogan !== undefined ? body.slogan : undefined,
         descricaoPublica:
           body.descricaoPublica !== undefined
@@ -183,6 +183,15 @@ export class TenantsController {
         diferenciais:
           body.diferenciais !== undefined ? body.diferenciais : undefined,
         slug: body.slug !== undefined ? body.slug : undefined,
+        banner: body.banner !== undefined ? body.banner : undefined,
+        logo: body.logo !== undefined ? body.logo : undefined,
+        layout: body.layout !== undefined ? body.layout : undefined,
+        localInfos:
+          body.localInfos !== undefined ? body.localInfos : undefined,
+        politicaCancelamento:
+          body.politicaCancelamento !== undefined
+            ? body.politicaCancelamento
+            : undefined,
       },
     });
     return hotel;
