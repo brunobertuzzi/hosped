@@ -70,6 +70,13 @@ export class BillingController {
     return { success: true, invoicesCreated: count };
   }
 
+  @Get('invoices/preview-batch')
+  @UseGuards(AuthGuard)
+  async previewBatchInvoices(@Request() req: any) {
+    this.checkSuperAdmin(req);
+    return this.billing.previewBatchInvoices();
+  }
+
   @Post('invoices/:id/pay')
   @UseGuards(AuthGuard)
   async payInvoice(@Param('id') id: string, @Request() req: any) {

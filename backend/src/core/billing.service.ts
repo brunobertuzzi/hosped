@@ -176,6 +176,73 @@ export class BillingService {
   }
 
   /**
+   * Retorna prévia detalhada da geração de faturas do mês
+   */
+  async previewBatchInvoices(): Promise<any> {
+    const now = new Date();
+    const hotels = await this.prisma.client.hotel.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      include: {
+        hotelAddons: { where: { isActive: true }, include: { addon: true } },
+      },
+    });
+
+    const previewList = [];
+    let totalEstimated = 0;
+
+    for (const hotel of hotels) {
+      const mrrBase = Number(hotel.mrr || 0);
+      let addonsTotal = 0;
+      const addonsList = [];
+      if (hotel.hotelAddons?.length) {
+        for (const ha of hotel.hotelAddons) {
+          addonsTotal += Number(ha.price);
+          addonsList.push({ name: ha.addon.name, price: Number(ha.price) });
+        }
+      }
+      const totalAmount = mrrBase + addonsTotal;
+
+      const existingPending = await this.prisma.client.systemInvoice.findFirst({
+        where: {
+          hotelId: hotel.id,
+          status: 'PENDENTE',
+          periodStart: {
+            gte: new Date(now.getFullYear(), now.getMonth(), 1),
+          },
+        },
+      });
+
+      const isDue = !hotel.nextBillingDate || new Date(hotel.nextBillingDate) <= now;
+
+      if (!existingPending) {
+        totalEstimated += totalAmount;
+      }
+
+      previewList.push({
+        hotelId: hotel.id,
+        hotelName: hotel.nome,
+        plan: hotel.plan,
+        mrrBase,
+        addonsTotal,
+        addonsList,
+        totalAmount,
+        isDue,
+        alreadyHasPending: !!existingPending,
+        nextBillingDate: hotel.nextBillingDate,
+      });
+    }
+
+    return {
+      eligibleHotelsCount: previewList.filter((p) => !p.alreadyHasPending).length,
+      totalHotelsCount: hotels.length,
+      totalEstimatedAmount: totalEstimated,
+      hotels: previewList,
+    };
+  }
+
+  /**
    * Processa o pagamento de uma fatura via gateway central
    */
   async processInvoicePayment(invoiceId: string): Promise<any> {
