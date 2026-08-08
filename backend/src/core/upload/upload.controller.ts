@@ -9,6 +9,8 @@ import {
   BadRequestException,
   Res,
   Request,
+  ParseFilePipeBuilder,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
@@ -25,7 +27,19 @@ export class UploadController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png|webp|svg\+xml|pdf)$/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 5 * 1024 * 1024, // 5MB
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file: Express.Multer.File,
     @Request() req: any,
   ) {
     if (!file) {

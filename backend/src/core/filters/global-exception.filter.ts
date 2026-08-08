@@ -54,11 +54,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       if (reqAny.user.sub) userId = reqAny.user.sub;
     }
 
-    // Apenas logar erros sérios (500)
-    if (status >= 500) {
-      this.logger.error(
-        `[${request.method}] ${request.url} - ${errorMessage}`,
-        stackTrace,
+    // Logar erros sérios (500) E alertas de segurança (401 Não Autorizado, 403 Proibido, 429 Limite Excedido)
+    if (status >= 500 || status === 401 || status === 403 || status === 429) {
+      this.logger.warn(
+        `[AUDIT ALERTA ${status}] [${request.method}] ${request.url} - ${errorMessage}`,
       );
       try {
         await this.prisma.client.systemErrorLog.create({
@@ -68,13 +67,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             route: request.url,
             method: request.method,
             statusCode: status,
-            errorMessage,
-            stackTrace,
+            errorMessage: status >= 500 ? errorMessage : `[ALERTA DE SEGURANÇA]: ${errorMessage}`,
+            stackTrace:
+              stackTrace ||
+              `Tentativa não autorizada ou bloqueio por limite de acessos (IP: ${request.ip || request.headers['x-forwarded-for'] || '127.0.0.1'})`,
           },
         });
       } catch (logError) {
         this.logger.error(
-          'Falha ao salvar log de erro no banco de dados',
+          'Falha ao salvar log de segurança no banco de dados',
           logError,
         );
       }
