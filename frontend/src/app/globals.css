@@ -98,6 +98,12 @@ h1, h2, h3, h4, h5, h6 {
   animation-play-state: paused;
 }
 
+/* Gantt Grid Timeline System */
+.gantt-grid {
+  display: grid;
+  grid-template-columns: 220px repeat(14, minmax(0, 1fr));
+}
+
 @keyframes floatSlow {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(1.5deg); }
