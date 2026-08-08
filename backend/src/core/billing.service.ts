@@ -54,7 +54,19 @@ export class BillingService {
     }
 
     // Calcular valor total: MRR base + add-ons
-    const mrrBase = new Prisma.Decimal(hotel.mrr || 0);
+    let baseMrrVal = Number(hotel.mrr || 0);
+    if (baseMrrVal === 0 && hotel.plan) {
+      if (hotel.plan === 'ENTERPRISE') baseMrrVal = 599.0;
+      else if (hotel.plan === 'STARTER') baseMrrVal = 149.0;
+      else baseMrrVal = 299.0;
+
+      await this.prisma.client.hotel.update({
+        where: { id: hotelId },
+        data: { mrr: baseMrrVal },
+      });
+    }
+
+    const mrrBase = new Prisma.Decimal(baseMrrVal);
     let addonsTotal = new Prisma.Decimal(0);
     if (hotel.hotelAddons?.length) {
       for (const ha of hotel.hotelAddons) {
@@ -193,7 +205,12 @@ export class BillingService {
     let totalEstimated = 0;
 
     for (const hotel of hotels) {
-      const mrrBase = Number(hotel.mrr || 0);
+      let mrrBase = Number(hotel.mrr || 0);
+      if (mrrBase === 0 && hotel.plan) {
+        if (hotel.plan === 'ENTERPRISE') mrrBase = 599.0;
+        else if (hotel.plan === 'STARTER') mrrBase = 149.0;
+        else mrrBase = 299.0;
+      }
       let addonsTotal = 0;
       const addonsList = [];
       if (hotel.hotelAddons?.length) {

@@ -21,10 +21,33 @@ export class InvoicesController {
     if (req.user.role !== 'PLATFORM_OWNER') {
       throw new UnauthorizedException('Acesso negado.');
     }
-    return this.prisma.client.systemInvoice.findMany({
+    const invoices = await this.prisma.client.systemInvoice.findMany({
       orderBy: { createdAt: 'desc' },
       include: { hotel: true },
     });
+
+    const result = [];
+    for (const inv of invoices) {
+      let amount = Number(inv.amount);
+      if (amount === 0) {
+        const plan = inv.hotel?.plan || 'PRO';
+        if (plan === 'ENTERPRISE') amount = 599.0;
+        else if (plan === 'STARTER') amount = 149.0;
+        else amount = 299.0;
+
+        try {
+          await this.prisma.client.systemInvoice.update({
+            where: { id: inv.id },
+            data: { amount },
+          });
+        } catch (e) {
+          // ignore
+        }
+      }
+      result.push({ ...inv, amount });
+    }
+
+    return result;
   }
 
   @Post(':id/simulate-payment')
